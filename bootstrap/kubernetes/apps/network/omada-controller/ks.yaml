@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/network/omada-controller/app
+  path: ./bootstrap/kubernetes/apps
   prune: true
   sourceRef:
     kind: GitRepository
