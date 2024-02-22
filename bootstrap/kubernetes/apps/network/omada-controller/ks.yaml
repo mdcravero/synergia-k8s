@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./bootstrap/kubernetes/apps
+  path: ./bootstrap/kubernetes/apps/network
   prune: true
   sourceRef:
     kind: GitRepository
