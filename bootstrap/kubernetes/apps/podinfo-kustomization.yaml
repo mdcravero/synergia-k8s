@@ -24,12 +24,16 @@ spec:
         spec:
           type: LoadBalancer
           selector:
-            app: nginx
+            app: podinfo
           ports:
-          - protocol: TCP
-            port: 80
-            targetPort: 9898
-
+            - name: http
+              port: 9898
+              protocol: TCP
+              targetPort: http
+            - port: 9999
+              targetPort: grpc
+              protocol: TCP
+              name: grpc
       target:
         name: podinfo
-        kind: HorizontalPodAutoscaler
+        kind: Service
