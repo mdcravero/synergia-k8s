@@ -20,5 +20,13 @@ spec:
     replicaCount: 2
     ui:
       color: red
-    services:
+    service:
+      enabled: true
+      annotations: {}
       type: LoadBalancer
+      metricsPort: 9797
+      httpPort: 9898
+      externalPort: 9898
+      grpcPort: 9999
+      grpcService: podinfo
+      nodePort: 31198
