@@ -15,3 +15,8 @@ spec:
       version: 6.5.4
   interval: 1m0s
   releaseName: podinfo
+  values:
+    logLevel: debug
+    replicaCount: 2
+    ui:
+      color: red
