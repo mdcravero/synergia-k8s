@@ -7,7 +7,7 @@ metadata:
 spec:
   chart:
     spec:
-      chart: podinfo
+      chart: homarr
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
@@ -35,34 +35,34 @@ spec:
       annotations: {}
       enabled: false
       hosts:
-      - host: chart-example.local
-        paths:
-        - path: /
-          pathType: ImplementationSpecific
+        - host: chart-example.local
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
       ingressClassName: ""
       tls: []
     nameOverride: ""
     nodeSelector:
       type: worker
     persistence:
-    - accessMode: ReadWriteOnce
-      enabled: true
-      mountPath: /app/data/configs
-      name: homarr-config
-      size: 50Mi
-      storageClassName: nfs-client
-    - accessMode: ReadWriteOnce
-      enabled: true
-      mountPath: /app/database
-      name: homarr-database
-      size: 50Mi
-      storageClassName: nfs-client
-    - accessMode: ReadWriteOnce
-      enabled: true
-      mountPath: /app/public/icons
-      name: homarr-icons
-      size: 50Mi
-      storageClassName: nfs-client
+      - accessMode: ReadWriteOnce
+        enabled: true
+        mountPath: /app/data/configs
+        name: homarr-config
+        size: 50Mi
+        storageClassName: nfs-client
+      - accessMode: ReadWriteOnce
+        enabled: true
+        mountPath: /app/database
+        name: homarr-database
+        size: 50Mi
+        storageClassName: nfs-client
+      - accessMode: ReadWriteOnce
+        enabled: true
+        mountPath: /app/public/icons
+        name: homarr-icons
+        size: 50Mi
+        storageClassName: nfs-client
     podAnnotations: {}
     podLabels: {}
     podSecurityContext: {}
