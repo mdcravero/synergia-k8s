@@ -20,3 +20,5 @@ spec:
     replicaCount: 2
     ui:
       color: red
+    services:
+      type: LoadBalancer
