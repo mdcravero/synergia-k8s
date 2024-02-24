@@ -17,9 +17,10 @@ spec:
   releaseName: podinfo
   values:
     logLevel: debug
-    replicaCount: 2
+    replicaCount: 1
     ui:
       color: red
+
     service:
       enabled: true
       annotations: {}
