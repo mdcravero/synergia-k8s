@@ -31,10 +31,6 @@ spec:
         mountPath: /opt/tplink/EAPController/data
         size: 1Gi
         storageClass: nfs-client
-        annotations:
-          nfs.io/createUID: "508"
-          nfs.io/createGID: "508"
-          nfs.io/createMode: "508"
 
     service:
       main:
