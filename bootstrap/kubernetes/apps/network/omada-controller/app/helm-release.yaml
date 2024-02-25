@@ -12,6 +12,6 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: omada-controller
-      version: "latest"
+      version: 4.4.2
   interval: 1m0s
   releaseName: omada-controller
