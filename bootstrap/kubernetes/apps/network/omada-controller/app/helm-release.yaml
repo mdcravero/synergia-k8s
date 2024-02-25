@@ -30,7 +30,7 @@ spec:
         enabled: true
         mountPath: /opt/tplink/EAPController/data
         size: 1Gi
-        storageClass: nfs-client
+        storageClass: nfs-omada
 
     service:
       main:
