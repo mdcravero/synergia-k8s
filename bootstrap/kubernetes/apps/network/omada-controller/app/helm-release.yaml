@@ -3,7 +3,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: omada-controller
-  namespace: services
+  namespace: network
 spec:
   chart:
     spec:
@@ -16,94 +16,58 @@ spec:
   interval: 1m0s
   releaseName: omada-controller
   values:
-    common:
-      containers:
-        image:
-          # -- image repository
-          repository: mbentley/omada-controller
-          # -- image tag
-          tag: "5.13"
-          # -- image pull policy
-          pullPolicy: IfNotPresent
-
-        # -- environment variables. See [image docs](https://github.com/mbentley/docker-omada-controller) for more details.
-        # @default -- See below
-        env:
-          # -- Set the container timezone
-          TZ: America/Argentina/Cordoba
-      service:
-        main:
-          type: LoadBalancer
-          ports:
-            http:
-              port: 8043
-            omada-tcp1:
-              enabled: true
-              port: 29811
-              targetPort: 29811
-            omada-tcp2:
-              enabled: true
-              port: 29812
-              targetPort: 29812
-            omada-tcp3:
-              enabled: true
-              port: 29813
-              targetPort: 29813
-            omada-tcp4:
-              enabled: true
-              port: 29814
-              targetPort: 29814
-            omada-tcp5:
-              enabled: true
-              port: 29815
-              targetPort: 29815
-            omada-tcp6:
-              enabled: true
-              port: 29816
-              targetPort: 29816
-            omada-udp1:
-              enabled: true
-              protocol: UDP
-              port: 29810
-              targetPort: 29810
-            omada-udp2:
-              enabled: true
-              protocol: UDP
-              port: 27001
-              targetPort: 27001
-
-      ingress:
-        # -- Enable and configure ingress settings for the chart under this key.
-        # @default -- See values.yaml
-        main:
-          enabled: false
-
-      # -- Configure persistence settings for the chart under this key.
-      # @default -- See values.yaml
-      persistence:
-        data:
-          enabled: true
-          storageClass: nfs-client
-          size: 1Gi
-          accessMode: ReadWriteOnce
-          mountPath: /opt/tplink/EAPController/data
-          # annotations:
-          #   nfs.io/createUID: "508"
-          #   nfs.io/createGID: "508"
-          #   nfs.io/createMode: "508"
-
-          #retain: true
-
-          #  backup:
-          #    enabled: true
-          #    storageClass: nfs-client
-          #    size: 500M
-          #    accessMode: ReadWriteOnce
-          #    mountPath: /opt/tplink/EAPController/data/autobackup
-
-          # logs:
-          #   enabled: true
-          #   storageClass: nfs-client
-          #   size: 1Gi
-          #   accessMode: ReadWriteOnce
-          #   mountPath: /opt/tplink/EAPController/logs
+    image:
+      TZ: America/Argentina/Cordoba
+      pullPolicy: IfNotPresent
+      repository: mbentley/omada-controller
+      tag: "5.13"
+    ingress:
+      main:
+        enabled: false
+    persistence:
+      data:
+        accessMode: ReadWriteOnce
+        enabled: true
+        mountPath: /opt/tplink/EAPController/data
+        size: 1Gi
+        storageClass: nfs-client
+    service:
+      main:
+        ports:
+          http:
+            port: 8043
+          omada-tcp1:
+            enabled: true
+            port: 29811
+            targetPort: 29811
+          omada-tcp2:
+            enabled: true
+            port: 29812
+            targetPort: 29812
+          omada-tcp3:
+            enabled: true
+            port: 29813
+            targetPort: 29813
+          omada-tcp4:
+            enabled: true
+            port: 29814
+            targetPort: 29814
+          omada-tcp5:
+            enabled: true
+            port: 29815
+            targetPort: 29815
+          omada-tcp6:
+            enabled: true
+            port: 29816
+            targetPort: 29816
+          omada-udp1:
+            enabled: true
+            port: 29810
+            protocol: UDP
+            targetPort: 29810
+          omada-udp2:
+            enabled: true
+            port: 27001
+            protocol: UDP
+            targetPort: 27001
+        type: LoadBalancer
