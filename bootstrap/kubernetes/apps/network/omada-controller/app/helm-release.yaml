@@ -30,16 +30,6 @@ spec:
       env:
         # -- Set the container timezone
         TZ: America/Argentina/Cordoba
-      initContainers:
-        - name: volume-permissions
-          image: busybox:1.31.1
-          command:
-            ["sh", "-c", "chwon 508:508 -R /opt/tplink/EAPController/data/*"]
-          volumeMounts:
-            - name: data
-              mountPath: /opt/tplink/EAPController/data
-      # -- Configures service settings for the chart.
-      # @default -- See values.yaml
       service:
         main:
           type: LoadBalancer
@@ -116,5 +106,3 @@ spec:
           #   size: 1Gi
           #   accessMode: ReadWriteOnce
           #   mountPath: /opt/tplink/EAPController/logs
-
-      nodeSelector: { type: worker }
