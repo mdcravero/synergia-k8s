@@ -17,19 +17,20 @@ spec:
   releaseName: omada-controller
   values:
     common:
-      image:
-        # -- image repository
-        repository: mbentley/omada-controller
-        # -- image tag
-        tag: "5.13"
-        # -- image pull policy
-        pullPolicy: IfNotPresent
+      containers:
+        image:
+          # -- image repository
+          repository: mbentley/omada-controller
+          # -- image tag
+          tag: "5.13"
+          # -- image pull policy
+          pullPolicy: IfNotPresent
 
-      # -- environment variables. See [image docs](https://github.com/mbentley/docker-omada-controller) for more details.
-      # @default -- See below
-      env:
-        # -- Set the container timezone
-        TZ: America/Argentina/Cordoba
+        # -- environment variables. See [image docs](https://github.com/mbentley/docker-omada-controller) for more details.
+        # @default -- See below
+        env:
+          # -- Set the container timezone
+          TZ: America/Argentina/Cordoba
       service:
         main:
           type: LoadBalancer
