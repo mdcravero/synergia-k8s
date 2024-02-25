@@ -19,9 +19,10 @@ spec:
     env:
       TZ: Argentina/Cordoba/Arroyito
     persistence:
-      config:
-        accessMode: ReadWriteOnce
-        enabled: enable
-        mountPath: /app/config
-        size: 200M
-        storageClass: nfs-client
+      enabled: true
+      volumes:
+        - name: "data"
+          storageClassName: "nfs-client" # leave empty if you want to use default
+          size: "5Gi" # We recommend to allocate a minimum of 1GB if you do not use attachments
+          pvcClaim: "" # leave empty unless if you want to use an existing PVC
+          containerMount: "/app/config
