@@ -16,25 +16,30 @@ spec:
   interval: 1m0s
   releaseName: omada-controller
 values:
-  image:
-    pullPolicy: IfNotPresent
-    repository: mbentley/omada-controller
-    tag: "5.13"
-  ingress:
+  controllers:
     main:
-      enabled: false
-  persistence:
-    data:
-      enabled: false
+      containers:
+        main:
+          image:
+            repository: mbentley/omada-controller
+            tag: 5.13@sha256:6b878ecca6e2806ef0495961d33db1b9adb1ba7582d2bdd4d759ff0ff7288470
+          env:
+            TZ: America/Argentina/Cordoba
+            MANAGE_HTTP_PORT: "8088"
+            MANAGE_HTTPS_PORT: "8043"
+            PORTAL_HTTP_PORT: "8888"
+            PORTAL_HTTPS_PORT: "8843"
+            SHOW_SERVER_LOGS: "true"
+            SHOW_MONGODB_LOGS: "true"
   service:
     main:
+      enabled: true
       ports:
         http:
+          enabled: true
           port: 8043
+          targetPort: 8043
+          protocol: TCP
+    controller:
+      enabled: true
       type: LoadBalancer
-  data:
-    enabled: true
-    storageClass: nfs-client
-    size: 1Gi
-    accessMode: ReadWriteOnce
-    mountPath: /opt/tplink/EAPController/data
