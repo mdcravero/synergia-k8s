@@ -12,20 +12,6 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jellyseerr
-      version: 9.1.2
+      version: 1.0.0
   interval: 1m0s
   releaseName: jellyseerr
-  values:
-    service:
-      main:
-        ports:
-          main:
-            port: 10241
-      type: LoadBalancer
-    persistence:
-      config:
-        accessMode: ReadWriteOnce
-        enabled: true
-        mountPath: /app/config
-        size: 200M
-        storageClass: nfs-client
