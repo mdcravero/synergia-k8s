@@ -1,0 +1,17 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: omada-controller
+  namespace: services
+spec:
+  chart:
+    spec:
+      chart: omada-controller
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: omada-controller
+      version: 14.1.3
+  interval: 1m0s
+  releaseName: omada-controller
