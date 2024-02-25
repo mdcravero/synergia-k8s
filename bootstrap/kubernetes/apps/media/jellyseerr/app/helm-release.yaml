@@ -25,6 +25,6 @@ spec:
       config:
         accessMode: ReadWriteOnce
         enabled: true
-        mountPath: "/app/config"
+        mountPath: /app/config
         size: 200M
         storageClass: nfs-client
