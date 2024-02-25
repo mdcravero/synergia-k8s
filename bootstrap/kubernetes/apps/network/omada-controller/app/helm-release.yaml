@@ -16,104 +16,105 @@ spec:
   interval: 1m0s
   releaseName: omada-controller
   values:
-    image:
-      # -- image repository
-      repository: mbentley/omada-controller
-      # -- image tag
-      tag: "5.13"
-      # -- image pull policy
-      pullPolicy: IfNotPresent
+    common:
+      image:
+        # -- image repository
+        repository: mbentley/omada-controller
+        # -- image tag
+        tag: "5.13"
+        # -- image pull policy
+        pullPolicy: IfNotPresent
 
-    # -- environment variables. See [image docs](https://github.com/mbentley/docker-omada-controller) for more details.
-    # @default -- See below
-    env:
-      # -- Set the container timezone
-      TZ: America/Argentina/Cordoba
-    initContainers:
-      - name: volume-permissions
-        image: busybox:1.31.1
-        command:
-          ["sh", "-c", "chwon 508:508 -R /opt/tplink/EAPController/data/*"]
-        volumeMounts:
-          - name: data
-            mountPath: /opt/tplink/EAPController/data
-    # -- Configures service settings for the chart.
-    # @default -- See values.yaml
-    service:
-      main:
-        type: LoadBalancer
-        ports:
-          http:
-            port: 8043
-          omada-tcp1:
-            enabled: true
-            port: 29811
-            targetPort: 29811
-          omada-tcp2:
-            enabled: true
-            port: 29812
-            targetPort: 29812
-          omada-tcp3:
-            enabled: true
-            port: 29813
-            targetPort: 29813
-          omada-tcp4:
-            enabled: true
-            port: 29814
-            targetPort: 29814
-          omada-tcp5:
-            enabled: true
-            port: 29815
-            targetPort: 29815
-          omada-tcp6:
-            enabled: true
-            port: 29816
-            targetPort: 29816
-          omada-udp1:
-            enabled: true
-            protocol: UDP
-            port: 29810
-            targetPort: 29810
-          omada-udp2:
-            enabled: true
-            protocol: UDP
-            port: 27001
-            targetPort: 27001
-
-    ingress:
-      # -- Enable and configure ingress settings for the chart under this key.
+      # -- environment variables. See [image docs](https://github.com/mbentley/docker-omada-controller) for more details.
+      # @default -- See below
+      env:
+        # -- Set the container timezone
+        TZ: America/Argentina/Cordoba
+      initContainers:
+        - name: volume-permissions
+          image: busybox:1.31.1
+          command:
+            ["sh", "-c", "chwon 508:508 -R /opt/tplink/EAPController/data/*"]
+          volumeMounts:
+            - name: data
+              mountPath: /opt/tplink/EAPController/data
+      # -- Configures service settings for the chart.
       # @default -- See values.yaml
-      main:
-        enabled: false
+      service:
+        main:
+          type: LoadBalancer
+          ports:
+            http:
+              port: 8043
+            omada-tcp1:
+              enabled: true
+              port: 29811
+              targetPort: 29811
+            omada-tcp2:
+              enabled: true
+              port: 29812
+              targetPort: 29812
+            omada-tcp3:
+              enabled: true
+              port: 29813
+              targetPort: 29813
+            omada-tcp4:
+              enabled: true
+              port: 29814
+              targetPort: 29814
+            omada-tcp5:
+              enabled: true
+              port: 29815
+              targetPort: 29815
+            omada-tcp6:
+              enabled: true
+              port: 29816
+              targetPort: 29816
+            omada-udp1:
+              enabled: true
+              protocol: UDP
+              port: 29810
+              targetPort: 29810
+            omada-udp2:
+              enabled: true
+              protocol: UDP
+              port: 27001
+              targetPort: 27001
 
-    # -- Configure persistence settings for the chart under this key.
-    # @default -- See values.yaml
-    persistence:
-      data:
-        enabled: true
-        storageClass: nfs-client
-        size: 1Gi
-        accessMode: ReadWriteOnce
-        mountPath: /opt/tplink/EAPController/data
-        # annotations:
-        #   nfs.io/createUID: "508"
-        #   nfs.io/createGID: "508"
-        #   nfs.io/createMode: "508"
+      ingress:
+        # -- Enable and configure ingress settings for the chart under this key.
+        # @default -- See values.yaml
+        main:
+          enabled: false
 
-        #retain: true
+      # -- Configure persistence settings for the chart under this key.
+      # @default -- See values.yaml
+      persistence:
+        data:
+          enabled: true
+          storageClass: nfs-client
+          size: 1Gi
+          accessMode: ReadWriteOnce
+          mountPath: /opt/tplink/EAPController/data
+          # annotations:
+          #   nfs.io/createUID: "508"
+          #   nfs.io/createGID: "508"
+          #   nfs.io/createMode: "508"
 
-        #  backup:
-        #    enabled: true
-        #    storageClass: nfs-client
-        #    size: 500M
-        #    accessMode: ReadWriteOnce
-        #    mountPath: /opt/tplink/EAPController/data/autobackup
+          #retain: true
 
-        # logs:
-        #   enabled: true
-        #   storageClass: nfs-client
-        #   size: 1Gi
-        #   accessMode: ReadWriteOnce
-        #   mountPath: /opt/tplink/EAPController/logs
+          #  backup:
+          #    enabled: true
+          #    storageClass: nfs-client
+          #    size: 500M
+          #    accessMode: ReadWriteOnce
+          #    mountPath: /opt/tplink/EAPController/data/autobackup
 
-    nodeSelector: { type: worker }
+          # logs:
+          #   enabled: true
+          #   storageClass: nfs-client
+          #   size: 1Gi
+          #   accessMode: ReadWriteOnce
+          #   mountPath: /opt/tplink/EAPController/logs
+
+      nodeSelector: { type: worker }
