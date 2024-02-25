@@ -2,27 +2,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: jellyseer
+  name: jellyseerr
   namespace: media
 spec:
   chart:
     spec:
-      chart: jellyseer
+      chart: jellyseerr
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: jellyseer
-      version: 1.0.0
+        name: jellyseerr
+      version: 9.1.2
   interval: 1m0s
-  releaseName: jellyseer
-  values:
-    env:
-      TZ: Argentina/Cordoba/Arroyito
-    persistence:
-      enabled: true
-      volumes:
-        - name: "data"
-          storageClassName: "nfs-client" # leave empty if you want to use default
-          size: "5Gi" # We recommend to allocate a minimum of 1GB if you do not use attachments
-          pvcClaim: "" # leave empty unless if you want to use an existing PVC
-          containerMount: "/app/config
+  releaseName: jellyseerr
