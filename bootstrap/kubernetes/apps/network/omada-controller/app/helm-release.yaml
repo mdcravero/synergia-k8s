@@ -15,25 +15,26 @@ spec:
       version: 4.4.2
   interval: 1m0s
   releaseName: omada-controller
-  values:
-    common:
-      image:
-        pullPolicy: IfNotPresent
-        repository: mbentley/omada-controller
-        tag: 5.13
-      ingress:
-        main:
-          enabled: false
-      persistence:
-        data:
-          enabled: false
-          storageClass: nfs-client
-          size: 1Gi
-          accessMode: ReadWriteOnce
-          mountPath: /opt/tplink/EAPController/data
-      service:
-        main:
-          ports:
-            http:
-              port: 8043
-          type: LoadBalancer
+values:
+  image:
+    pullPolicy: IfNotPresent
+    repository: mbentley/omada-controller
+    tag: "4.3"
+  ingress:
+    main:
+      enabled: false
+  persistence:
+    data:
+      enabled: false
+  service:
+    main:
+      ports:
+        http:
+          port: 8043
+      type: LoadBalancer
+  data:
+    enabled: true
+    storageClass: nfs-client
+    size: 1Gi
+    accessMode: ReadWriteOnce
+    mountPath: /opt/tplink/EAPController/data
