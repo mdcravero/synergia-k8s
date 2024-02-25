@@ -2,16 +2,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: jellyseerr
+  name: jellyseer
   namespace: media
 spec:
   chart:
     spec:
-      chart: jellyseerr
+      chart: jellyseer
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: jellyseer
       version: 1.0.0
   interval: 1m0s
-  releaseName: jellyseerr
+  releaseName: jellyseer
