@@ -11,7 +11,7 @@ spec:
   path: ./bootstrap/kubernetes/apps/network/omada-controller/app
   prune: true
   sourceRef:
-    kind: HelmRepository
+    kind: GitRepository
     name: omada-controller
   wait: false
   interval: 30m
