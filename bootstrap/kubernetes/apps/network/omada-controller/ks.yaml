@@ -10,6 +10,9 @@ spec:
       app.kubernetes.io/name: *app
   path: ./bootstrap/kubernetes/apps/network/omada-controller/app
   prune: true
+  sourceRef:
+    kind: HelmRepository
+    name: omada-controller
   wait: false
   interval: 30m
   retryInterval: 1m
