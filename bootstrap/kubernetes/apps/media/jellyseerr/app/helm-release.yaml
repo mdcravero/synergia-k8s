@@ -18,7 +18,7 @@ spec:
   values:
     image:
       repository: fallenbagel/jellyseerr
-      tag: 1.7.0@sha256:6dcdb5ba50913a14b2bd7df6388607ce175121f3416679c2746501256ac9f075
+      tag: 1.7.0
       pullPolicy: IfNotPresent
     service:
       main:
