@@ -1,0 +1,66 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: nfs-omada
+  namespace: nfs-storage
+spec:
+  chart:
+    spec:
+      chart: nfs-subdir-external-provisioner
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: nfs-subdir-external-provisioner
+      version: 4.0.18
+  interval: 1m0s
+  releaseName: nfs-omada
+  values:
+    affinity: {}
+    image:
+      pullPolicy: IfNotPresent
+      repository: registry.k8s.io/sig-storage/nfs-subdir-external-provisioner
+      tag: v4.0.2
+    imagePullSecrets: []
+    labels: {}
+    leaderElection:
+      enabled: true
+    nfs:
+      mountOptions:
+        - hard
+        - nfsvers=4.1
+      path: /omada
+      reclaimPolicy: Retain
+      server: 192.168.1.10
+      volumeName: nfs-subdir-external-provisioner-root
+    nodeSelector: {}
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      maxUnavailable: 1
+    podSecurityContext: {}
+    podSecurityPolicy:
+      enabled: false
+    rbac:
+      create: true
+    replicaCount: 1
+    resources: {}
+    securityContext: {}
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: null
+    storageClass:
+      accessModes: ReadWriteOnce
+      allowVolumeExpansion: true
+      annotations: {}
+      archiveOnDelete: true
+      create: true
+      defaultClass: false
+      name: nfs-omada
+      onDelete: null
+      pathPattern: null
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+    strategyType: Recreate
+    tolerations: []
