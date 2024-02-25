@@ -15,3 +15,13 @@ spec:
       version: 1.0.0
   interval: 1m0s
   releaseName: jellyseer
+  values:
+    env:
+      TZ: Argentina/Cordoba/Arroyito
+    persistence:
+      config:
+        accessMode: ReadWriteOnce
+        enabled: enable
+        mountPath: /app/config
+        size: 200M
+        storageClass: nfs-client
