@@ -19,7 +19,7 @@ values:
   image:
     pullPolicy: IfNotPresent
     repository: mbentley/omada-controller
-    tag: "4.3"
+    tag: "5.13"
   ingress:
     main:
       enabled: false
