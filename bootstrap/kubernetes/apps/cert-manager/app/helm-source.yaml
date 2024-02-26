@@ -7,3 +7,8 @@ metadata:
 spec:
   interval: 1m0s
   url: https://charts.jetstack.io
+#
+# Before installing the chart, you must first install the cert-manager CustomResourceDefinition resources.
+# This is performed in a separate step to allow you to easily uninstall
+# and reinstall cert-manager without deleting your installed custom resources.
+# kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.3/cert-manager.crds.yaml
