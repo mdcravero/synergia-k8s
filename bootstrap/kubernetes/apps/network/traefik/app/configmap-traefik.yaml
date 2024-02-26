@@ -4,49 +4,49 @@ kind: ConfigMap
 metadata:
   name: traefik-values
   namespace: traefik
-data:
-  additionalArguments:
-  additionalVolumeMounts:
-  affinity:
+data: |
+  additionalArguments: []
+  additionalVolumeMounts: []
+  affinity: {}
   autoscaling:
     enabled: false
-  certResolvers:
-  commonLabels:
+  certResolvers: {}
+  commonLabels: {}
   deployment:
-    additionalContainers:
-    additionalVolumes:
-    annotations:
-    dnsConfig:
+    additionalContainers: []
+    additionalVolumes: []
+    annotations: {}
+    dnsConfig: {}
     enabled: true
-    imagePullSecrets:
-    initContainers:
+    imagePullSecrets: []
+    initContainers: []
     kind: Deployment
-    labels:
-    lifecycle:
+    labels: {}
+    lifecycle: {}
     minReadySeconds: 0
-    podAnnotations:
-    podLabels:
+    podAnnotations: {}
+    podLabels: {}
     replicas: 1
     shareProcessNamespace: false
     terminationGracePeriodSeconds: 60
   env:
-    - name: POD_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.name
-    - name: POD_NAMESPACE
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.namespace
-  envFrom:
+  - name: POD_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.name
+  - name: POD_NAMESPACE
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.namespace
+  envFrom: []
   experimental:
     kubernetesGateway:
       enabled: false
-    plugins:
-  extraObjects:
+    plugins: {}
+  extraObjects: []
   globalArguments:
-    - --global.checknewversion=false
-    - --global.sendanonymoususage=false
+  - --global.checknewversion
+  - --global.sendanonymoususage
   hostNetwork: false
   image:
     pullPolicy: IfNotPresent
@@ -58,23 +58,23 @@ data:
     isDefaultClass: true
   ingressRoute:
     dashboard:
-      annotations:
+      annotations: {}
       enabled: true
       entryPoints:
-        - traefik
-      labels:
+      - traefik
+      labels: {}
       matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
-      middlewares:
-      tls:
+      middlewares: []
+      tls: {}
     healthcheck:
-      annotations:
+      annotations: {}
       enabled: false
       entryPoints:
-        - traefik
-      labels:
+      - traefik
+      labels: {}
       matchRule: PathPrefix(`/ping`)
-      middlewares:
-      tls:
+      middlewares: []
+      tls: {}
   livenessProbe:
     failureThreshold: 3
     initialDelaySeconds: 2
@@ -87,20 +87,20 @@ data:
       fields:
         general:
           defaultmode: keep
-          names:
+          names: {}
         headers:
           defaultmode: drop
-          names:
-      filters:
+          names: {}
+      filters: {}
     general:
       level: ERROR
   metrics:
     prometheus:
       entryPoint: metrics
-  nodeSelector:
+  nodeSelector: {}
   persistence:
     accessMode: ReadWriteOnce
-    annotations:
+    annotations: {}
     enabled: false
     name: data
     path: /data
@@ -135,12 +135,12 @@ data:
       exposedPort: 443
       http3:
         enabled: false
-      middlewares:
+      middlewares: []
       port: 8443
       protocol: TCP
       tls:
         certResolver: ""
-        domains:
+        domains: []
         enabled: true
         options: ""
   priorityClassName: ""
@@ -150,19 +150,18 @@ data:
       enabled: false
       watch: true
     kubernetesCRD:
-      ingressClass: traefik-external
       allowCrossNamespace: false
       allowEmptyServices: false
       allowExternalNameServices: false
       enabled: true
-      namespaces:
+      namespaces: []
     kubernetesIngress:
       allowEmptyServices: false
-      allowExternalNameServices: true
+      allowExternalNameServices: false
       enabled: true
-      namespaces:
+      namespaces: []
       publishedService:
-        enabled: true
+        enabled: false
   rbac:
     enabled: true
     namespaced: false
@@ -172,37 +171,36 @@ data:
     periodSeconds: 10
     successThreshold: 1
     timeoutSeconds: 2
-  resources:
+  resources: {}
   securityContext:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-        - ALL
+      - ALL
     readOnlyRootFilesystem: true
   service:
-    annotations:
-    annotationsTCP:
-    annotationsUDP:
+    annotations: {}
+    annotationsTCP: {}
+    annotationsUDP: {}
     enabled: true
-    externalIPs:
-    labels:
-    loadBalancerSourceRanges:
+    externalIPs: []
+    labels: {}
+    loadBalancerSourceRanges: []
     single: true
-    spec:
-      extenalTrafficPolicy: local
+    spec: {}
     type: LoadBalancer
   serviceAccount:
     name: ""
-  serviceAccountAnnotations:
+  serviceAccountAnnotations: {}
   startupProbe: null
-  tlsOptions:
-  tlsStore:
-  tolerations:
-  topologySpreadConstraints:
-  tracing:
+  tlsOptions: {}
+  tlsStore: {}
+  tolerations: []
+  topologySpreadConstraints: []
+  tracing: {}
   updateStrategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
     type: RollingUpdate
-  volumes:
+  volumes: []
