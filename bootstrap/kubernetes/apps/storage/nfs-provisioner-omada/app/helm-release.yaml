@@ -38,17 +38,17 @@ spec:
     podDisruptionBudget:
       enabled: false
       maxUnavailable: 1
-    podSecurityContext: {}
+    podSecurityContext:
+      runAsUser: 508
+      runAsGroup: 508
+      fsGroup: 508
     podSecurityPolicy:
       enabled: false
     rbac:
       create: true
     replicaCount: 1
     resources: {}
-    securityContext:
-      runAsUser: 508
-      runAsGroup: 508
-      fsGroup: 508
+    securityContext: {}
     serviceAccount:
       annotations: {}
       create: true
