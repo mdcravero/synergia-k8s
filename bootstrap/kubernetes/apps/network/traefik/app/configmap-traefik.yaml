@@ -863,12 +863,12 @@ data:
       # -- Enable persistence using Persistent Volume Claims
       # ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
       # It can be used to store TLS certificates, see `storage` in certResolvers
-      enabled: false
+      enabled: true
       name: data
       #  existingClaim: ""
       accessMode: ReadWriteOnce
       size: 128Mi
-      # storageClass: ""
+      storageClass: "nfs-client"
       # volumeName: ""
       path: /data
       annotations: {}
