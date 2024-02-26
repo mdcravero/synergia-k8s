@@ -45,7 +45,10 @@ spec:
       create: true
     replicaCount: 1
     resources: {}
-    securityContext: {}
+    securityContext:
+      runAsUser: 508
+      runAsGroup: 508
+      fsGroup: 508
     serviceAccount:
       annotations: {}
       create: true
