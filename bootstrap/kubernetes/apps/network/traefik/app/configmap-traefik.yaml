@@ -45,8 +45,8 @@ data:
     plugins: {}
   extraObjects: []
   globalArguments:
-    - --global.checknewversion
-    - --global.sendanonymoususage
+    - --global.checknewversion=false
+    - --global.sendanonymoususage=false
   hostNetwork: false
   image:
     pullPolicy: IfNotPresent
@@ -150,6 +150,7 @@ data:
       enabled: false
       watch: true
     kubernetesCRD:
+      ingressClass: traefik-external
       allowCrossNamespace: false
       allowEmptyServices: false
       allowExternalNameServices: false
@@ -157,11 +158,11 @@ data:
       namespaces: []
     kubernetesIngress:
       allowEmptyServices: false
-      allowExternalNameServices: false
+      allowExternalNameServices: true
       enabled: true
       namespaces: []
       publishedService:
-        enabled: false
+        enabled: true
   rbac:
     enabled: true
     namespaced: false
@@ -187,7 +188,8 @@ data:
     labels: {}
     loadBalancerSourceRanges: []
     single: true
-    spec: {}
+    spec:
+      extenalTrafficPolicy: local
     type: LoadBalancer
   serviceAccount:
     name: ""
