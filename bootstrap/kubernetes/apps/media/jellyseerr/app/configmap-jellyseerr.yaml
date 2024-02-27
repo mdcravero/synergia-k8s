@@ -44,7 +44,6 @@ data:
     service:
       type: LoadBalancer
       port: 5055
-      targetPort: 5055
 
     ingress:
       enabled: false
