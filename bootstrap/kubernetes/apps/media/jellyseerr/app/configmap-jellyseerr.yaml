@@ -19,7 +19,7 @@ data:
       repository: fallenbagel/jellyseerr
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: 1.7.0
 
     env:
       TZ: "America/Argentina/Cordoba"
