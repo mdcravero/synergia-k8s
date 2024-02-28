@@ -76,7 +76,7 @@ data:
         name: downloads
 
     persistence:
-      config:
+      movies:
         enabled: true
         ## If defined, storageClassName: <storageClass>
         ## If set to "-", storageClassName: "", which disables dynamic provisioning
