@@ -84,13 +84,14 @@ data:
         ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
         ##   GKE, AWS & OpenStack)
         ##
-        storageClass: ""
+        storageClass: "nfs-client"
         annotations: {}
-        existingClaim: ""
+        existingClaim: "jellyfin-media"
         accessModes:
           - ReadWriteOnce
-        size: 100Mi
-        volumeName: ""
+        size: 50G
+        volumeName: "pvc-6347e698-c88d-4005-a250-fe285cf2ade6"
+        mountPath: /movies
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
