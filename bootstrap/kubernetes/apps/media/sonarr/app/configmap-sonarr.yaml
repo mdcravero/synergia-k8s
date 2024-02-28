@@ -26,6 +26,10 @@ data:
       PGID: 1001
       TZ: "America/Argentina/Cordoba"
 
+    volumeMounts:
+      - mountPath: /tvseries
+        name: tvseries
+
     imagePullSecrets: []
     nameOverride: ""
     fullnameOverride: ""
