@@ -65,32 +65,32 @@ data:
 
     extraVolumes:
       - name: movies
-        mountPath: /movies
-        existingClaim: jellyfin-media
+        emptyDir: {}
+      - name: downloads
+        emptyDir: {}
 
     extraVolumeMounts:
       - mountPath: /movies
         name: movies
-      # - mountPath: /downloads
-      #   name: downloads
+      - mountPath: /downloads
+        name: downloads
 
     persistence:
-      movies:
-        enabled: true
+      config:
+        enabled: false
         ## If defined, storageClassName: <storageClass>
         ## If set to "-", storageClassName: "", which disables dynamic provisioning
         ## If undefined (the default) or set to null, no storageClassName spec is
         ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
         ##   GKE, AWS & OpenStack)
         ##
-        storageClass: "nfs-client"
+        storageClass: ""
         annotations: {}
-        existingClaim: "jellyfin-media"
+        existingClaim: ""
         accessModes:
           - ReadWriteOnce
-        size: 50G
-        volumeName: "pvc-6347e698-c88d-4005-a250-fe285cf2ade6"
-        mountPath: /movies
+        size: 100Mi
+        volumeName: ""
 
     resources: {}
       # We usually recommend not to specify default resources and to leave this as a conscious
