@@ -16,17 +16,17 @@ data:
           main:
             port: 10109
         type: LoadBalancer
-      torrent:
-        enabled: true
-        ports:
-          torrent:
-            enabled: true
-            port: 51414
-            protocol: tcp
-          torrentudp:
-            enabled: true
-            port: "{{ .Values.service.torrent.ports.torrent.port }}"
-            protocol: udp
+    torrent:
+      enabled: true
+      ports:
+        torrent:
+          enabled: true
+          port: 51414
+          protocol: tcp
+        torrentudp:
+          enabled: true
+          port: "{{ .Values.service.torrent.ports.torrent.port }}"
+          protocol: udp
       workload:
         main:
           podSpec:
@@ -121,15 +121,15 @@ data:
           mountPath: "/config"
           storageClass: "nfs-client"
           size: 100Mi
-        downloads:
-          enabled: true
-          storageClass: "nfs-client"
-          existingClaim: "jellyfin-media"
-          accessModes:
-            - ReadWriteOnce
-          size: 50G
-          volumeName: "pvc-6347e698-c88d-4005-a250-fe285cf2ade6"
-          mountPath: /downloads
+        # downloads:
+        #   enabled: true
+        #   storageClass: "nfs-client"
+        #   existingClaim: "jellyfin-media"
+        #   accessModes:
+        #     - ReadWriteOnce
+        #   size: 50G
+        #   volumeName: "pvc-6347e698-c88d-4005-a250-fe285cf2ade6"
+        #   mountPath: /downloads
       portal:
         open:
           enabled: true
