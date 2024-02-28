@@ -25,7 +25,7 @@ data:
             protocol: tcp
           torrentudp:
             enabled: true
-            port: "{{ .Values.service.torrent.ports.torrent.port }}"
+            port: 51414
             protocol: udp
     workload:
       main:
@@ -77,7 +77,7 @@ data:
                 # TRANSMISSION__PEER_ID_TTL_HOURS: 6
                 # TRANSMISSION__PEER_LIMIT_GLOBAL: 200
                 # TRANSMISSION__PEER_LIMIT_PER_TORRENT: 50
-                TRANSMISSION__PEER_PORT: "{{ .Values.service.torrent.ports.torrent.port }}"
+                TRANSMISSION__PEER_PORT: 51414
                 # TRANSMISSION__PEER_PORT_RANDOM_HIGH: 65535
                 # TRANSMISSION__PEER_PORT_RANDOM_LOW: 49152
                 # TRANSMISSION__PEER_PORT_RANDOM_ON_START: false
@@ -95,7 +95,7 @@ data:
                 # TRANSMISSION__RPC_ENABLED: true
                 # TRANSMISSION__RPC_HOST_WHITELIST: ""
                 # TRANSMISSION__RPC_HOST_WHITELIST_ENABLED: false
-                TRANSMISSION__RPC_PORT: "{{ .Values.service.main.ports.main.port }}"
+                TRANSMISSION__RPC_PORT: 10109
                 # TRANSMISSION__RPC_URL: "/transmission/"
                 # TRANSMISSION__RPC_WHITELIST: ""
                 # TRANSMISSION__RPC_WHITELIST_ENABLED: false
