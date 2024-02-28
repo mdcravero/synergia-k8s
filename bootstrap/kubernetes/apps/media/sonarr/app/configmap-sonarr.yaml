@@ -6,7 +6,7 @@ metadata:
   namespace: media
 data:
   values.yaml: |-
-    # Default values for radarr.
+    # Default values for sonarr.
     # This is a YAML-formatted file.
     # Declare variables to be passed into your templates.
 
@@ -16,7 +16,7 @@ data:
       type: Recreate
 
     image:
-      repository: lscr.io/linuxserver/radarr
+      repository: lscr.io/linuxserver/sonarr
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
       tag: ""
@@ -24,7 +24,7 @@ data:
     env:
       PUID: 1001
       PGID: 1001
-      TZ: "UTC"
+      TZ: "America/Argentina/Cordoba"
 
     imagePullSecrets: []
     nameOverride: ""
@@ -44,8 +44,8 @@ data:
       # runAsUser: 1000
 
     service:
-      type: LoadBalancer
-      port: 7878
+      type: loadBalancer
+      port: 8989
 
     ingress:
       enabled: false
@@ -54,7 +54,7 @@ data:
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:
-        - host: radarr.local
+        - host: sonarr.local
           paths:
             - path: /
               pathType: ImplementationSpecific
@@ -64,14 +64,14 @@ data:
       #      - chart-example.local
 
     extraVolumes:
-      - name: movies
+      - name: tvseries
         emptyDir: {}
       - name: downloads
         emptyDir: {}
 
     extraVolumeMounts:
-      - mountPath: /movies
-        name: movies
+      - mountPath: /tv
+        name: tvseries
       - mountPath: /downloads
         name: downloads
 
