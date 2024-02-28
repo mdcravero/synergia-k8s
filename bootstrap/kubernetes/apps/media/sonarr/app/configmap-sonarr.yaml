@@ -27,7 +27,7 @@ data:
       TZ: "America/Argentina/Cordoba"
 
     volumeMounts:
-      - mountPath: /tvseries
+      - mountPath: /tv
         name: tvseries
 
     imagePullSecrets: []

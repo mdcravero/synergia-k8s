@@ -26,6 +26,11 @@ data:
       PGID: 1001
       TZ: "America/Argentina/Cordoba"
 
+     volumes:
+      - name: movies
+      persistentVolumeClaim:
+        claimName: movies
+
     imagePullSecrets: []
     nameOverride: ""
     fullnameOverride: ""
