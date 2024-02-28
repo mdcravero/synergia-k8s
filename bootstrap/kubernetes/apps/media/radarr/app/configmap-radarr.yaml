@@ -44,7 +44,7 @@ data:
       # runAsUser: 1000
 
     service:
-      type: loadBalancer
+      type: LoadBalancer
       port: 7878
 
     ingress:
