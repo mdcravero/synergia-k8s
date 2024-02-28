@@ -6,4 +6,4 @@ metadata:
   namespace: tools
 spec:
   interval: 1m0s
-  url: https://k8s-at-home.com/charts/
+  url: https://charts.truecharts.org

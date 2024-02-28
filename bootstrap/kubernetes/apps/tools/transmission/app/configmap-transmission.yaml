@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: transmission-values
-  namespace: media
+  namespace: tools
 data:
   values.yaml: |-
     image:
