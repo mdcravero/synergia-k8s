@@ -71,8 +71,8 @@ data:
     extraVolumeMounts:
       - mountPath: /movies
         name: movies
-      - mountPath: /downloads
-        name: downloads
+      # - mountPath: /downloads
+      #   name: downloads
 
     persistence:
       movies:
