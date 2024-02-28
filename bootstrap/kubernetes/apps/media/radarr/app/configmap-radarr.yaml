@@ -64,7 +64,7 @@ data:
       #      - chart-example.local
 
     extraVolumes:
-      - name: pvc-6347e698-c88d-4005-a250-fe285cf2ade6
+      - name: movies
         mountPath: /movies
         existingClaim: jellyfin-media
 
