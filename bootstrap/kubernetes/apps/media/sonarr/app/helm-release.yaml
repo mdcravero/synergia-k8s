@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: sonarr
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: sonarr
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: sonarr
+      version: 1.0.1
+  interval: 1m0s
+  releaseName: sonarr
+  valuesFrom:
+    - kind: ConfigMap
+      name: sonarr-values
+      valuesKey: values.yaml
