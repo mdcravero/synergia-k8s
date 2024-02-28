@@ -19,17 +19,12 @@ data:
       repository: lscr.io/linuxserver/radarr
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: ""
+      tag: "latest"
 
     env:
       PUID: 1001
       PGID: 1001
       TZ: "America/Argentina/Cordoba"
-
-     volumes:
-      - name: movies
-      persistentVolumeClaim:
-        claimName: movies
 
     imagePullSecrets: []
     nameOverride: ""
@@ -69,10 +64,9 @@ data:
       #      - chart-example.local
 
     extraVolumes:
-      - name: movies
-        emptyDir: {}
-      - name: downloads
-        emptyDir: {}
+      - name: pvc-6347e698-c88d-4005-a250-fe285cf2ade6
+        mountPath: /movies
+        existingClaim: jellyfin-media
 
     extraVolumeMounts:
       - mountPath: /movies
