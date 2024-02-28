@@ -7,9 +7,9 @@ metadata:
 data:
   values.yaml: |-
     image:
-      repository: ghcr.io/onedr0p/transmission
+      repository: lscr.io/linuxserver/transmission
       pullPolicy: IfNotPresent
-      tag: 4.0.5
+      tag: : "latest"
     service:
       main:
         ports:
