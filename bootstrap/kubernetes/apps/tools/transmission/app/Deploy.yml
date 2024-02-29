@@ -27,6 +27,6 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: transmission-config
-       - name: media
+        - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
