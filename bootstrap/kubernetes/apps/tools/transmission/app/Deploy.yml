@@ -19,8 +19,8 @@ spec:
           ports:
             - containerPort: 9091
           environment:
-            - PUID: 1000
-            - PGID: 1000
+            - PUID: 1001
+            - PGID: 1001
             - TZ: America/Argentina/Cordoba
 
           volumeMounts:
