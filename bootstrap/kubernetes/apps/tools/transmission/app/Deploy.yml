@@ -18,6 +18,11 @@ spec:
           image: "lscr.io/linuxserver/transmission:latest"
           ports:
             - containerPort: 9091
+          environment:
+            - PUID: 1000
+            - PGID: 1000
+            - TZ: America/Argentina/Cordoba
+
           volumeMounts:
             - name: config
               mountPath: /config
