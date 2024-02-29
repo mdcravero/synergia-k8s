@@ -2,20 +2,20 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: transmission
+  name: flood
   namespace: tools
 spec:
   chart:
     spec:
-      chart: transmission
+      chart: flood
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: transmission
-      version: 20.1.2
+        name: flood
+      version: 7.0.0
   interval: 1m0s
-  releaseName: transmission
+  releaseName: flood
   valuesFrom:
     - kind: ConfigMap
-      name: transmission-values
+      name: flood-values
       valuesKey: values.yaml

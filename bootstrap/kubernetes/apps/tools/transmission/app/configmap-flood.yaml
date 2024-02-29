@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flood-values
+  namespace: tools
+data:
+  values.yaml: |-
+    image:
+      # -- image repository
+      repository: jesec/flood
+      # -- image tag
+      tag: "latest"
+      # -- image pull policy
+      pullPolicy: IfNotPresent
+
+    # -- environment variables. See more environment variables in the [flood documentation] (https://github.com/jesec/flood/blob/v4.6.0/config.ts)
+    # Note: The environmental variables are not case sensitive (e.g. FLOOD_OPTION_port=FLOOD_OPTION_PORT).
+    # @default -- See below
+    env:
+      # -- Where to store Flood's runtime files (eg. database)
+      FLOOD_OPTION_RUNDIR: /data
+
+    # -- Configures service settings for the chart.
+    # @default -- See values.yaml
+    service:
+      main:
+        ports:
+          http:
+            port: 3000
+          type: LoadBalancer
+
+    ingress:
+      # -- Enable and configure ingress settings for the chart under this key.
+      # @default -- See values.yaml
+      main:
+        enabled: false
+
+    # -- Configure persistence settings for the chart under this key.
+    # @default -- See values.yaml
+    persistence:
+      data:
+        enabled: false
