@@ -15,7 +15,7 @@ spec:
       version: 7.0.0
   interval: 1m0s
   releaseName: flood
-  valuesFrom:
-    - kind: ConfigMap
-      name: flood-values
-      valuesKey: values.yaml
+  # valuesFrom:
+  #   - kind: ConfigMap
+  #     name: flood-values
+  #     valuesKey: values.yaml
