@@ -22,11 +22,11 @@ data:
           torrent:
             enabled: true
             port: 51414
-            protocol: tcp
+            protocol: TCP
           torrentudp:
             enabled: true
             port: " "
-            protocol: udp
+            protocol: UDP
     workload:
       main:
         podSpec:
