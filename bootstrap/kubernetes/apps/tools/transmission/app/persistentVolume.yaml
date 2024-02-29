@@ -10,3 +10,18 @@ spec:
   resources:
     requests:
       storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media
+  namespace: tools
+spec:
+  existingClaim: "jellyfin-media"
+  volumeName: "pvc-6347e698-c88d-4005-a250-fe285cf2ade6"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
