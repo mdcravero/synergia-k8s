@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: flood
       version: 7.0.0
-  interval: 1m0s
+  interval: 2m0s
   releaseName: flood
   # valuesFrom:
   #   - kind: ConfigMap
