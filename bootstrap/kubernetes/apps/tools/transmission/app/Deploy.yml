@@ -29,9 +29,6 @@ spec:
             - name: media
               mountPath: /media
       volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: transmission-config
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
