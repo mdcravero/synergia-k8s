@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: jackett-values
+  name: prowlarr-values
   namespace: media
 data:
   values.yaml: |-
