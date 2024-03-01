@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: jackett
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: jackett
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: jackett
+      version: 0.1.3
+  interval: 1m0s
+  releaseName: jackett
+  valuesFrom:
+    - kind: ConfigMap
+      name: jackett-values
+      valuesKey: values.yaml
