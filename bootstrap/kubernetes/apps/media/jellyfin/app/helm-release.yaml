@@ -39,6 +39,7 @@ spec:
         accessMode: ReadWriteOnce
         enabled: enable
         mountPath: /media
+        persistentVolumeReclaimPolicy: Retain
         size: 50Gi
         storageClass: nfs-client
     podSecurityContext: {}
