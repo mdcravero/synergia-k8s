@@ -20,11 +20,11 @@ spec:
             - containerPort: 9091
           env:
             - name: PUID
-              value: 1001
+              value: "1001"
             - name: PGID
-              value: 1001
+              value: "1001"
             - name: TZ
-              value: America/Argentina/Cordoba
+              value: "America/Argentina/Cordoba"
 
           volumeMounts:
             - name: config
