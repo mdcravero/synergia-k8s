@@ -17,7 +17,7 @@ data:
 
     image:
       repository: linuxserver/jackett
-      tag: "{{ .Chart.AppVersion }}"
+      tag: "latest"
       pullPolicy: Always
 
     nameOverride: ""
