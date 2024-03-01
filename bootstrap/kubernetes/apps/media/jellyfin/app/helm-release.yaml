@@ -48,4 +48,5 @@ spec:
           http:
             port: 8096
         type: LoadBalancer
+        loadBalancerIP: 192.168.1.61
 #
