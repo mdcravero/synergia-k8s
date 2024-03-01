@@ -37,4 +37,4 @@ spec:
             claimName: transmission-config
         - name: media
           persistentVolumeClaim:
-            claimName: media-pvc
+            claimName: jellyfin-media
