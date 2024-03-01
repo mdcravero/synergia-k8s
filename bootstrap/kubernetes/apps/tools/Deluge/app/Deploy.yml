@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deluge
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deluge
+  template:
+    metadata:
+      labels:
+        app: deluge
+    spec:
+      containers:
+        - name: deluge
+          image: "lscr.io/linuxserver/deluge:latest"
+          ports:
+            - containerPort: 8112
+          env:
+            - name: PUID
+              value: "1001"
+            - name: PGID
+              value: "1001"
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: deluge-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: jellyfin-media
