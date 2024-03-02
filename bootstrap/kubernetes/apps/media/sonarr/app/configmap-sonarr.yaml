@@ -72,9 +72,6 @@ data:
       - name: downloads
         persistentVolumeClaim:
             claimName: trans-shows-down
-        hostPath: 
-            path: /complete
-        
 
     extraVolumeMounts:
       - mountPath: /media
