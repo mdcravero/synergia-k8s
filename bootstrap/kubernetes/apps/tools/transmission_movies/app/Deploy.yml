@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: deluge
+  name: trans-movies
   namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: deluge
+      app: trans-movies
   template:
     metadata:
       labels:
-        app: deluge
+        app: trans-movies
     spec:
       containers:
-        - name: deluge
-          image: "lscr.io/linuxserver/deluge:latest"
+        - name: trans-movies
+          image: "lscr.io/linuxserver/transmission:latest"
           ports:
-            - containerPort: 8112
+            - containerPort: 9091
           env:
             - name: PUID
               value: "1001"
@@ -34,7 +34,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: deluge-config
+            claimName: trans-movies-config
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media

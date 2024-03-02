@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: transmission
+  name: trans-shows
   namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: transmission
+      app: trans-shows
   template:
     metadata:
       labels:
-        app: transmission
+        app: trans-shows
     spec:
       containers:
-        - name: transmission
+        - name: trans-shows
           image: "lscr.io/linuxserver/transmission:latest"
           ports:
             - containerPort: 9091
@@ -34,7 +34,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: transmission-config
+            claimName: trans-shows-config
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
