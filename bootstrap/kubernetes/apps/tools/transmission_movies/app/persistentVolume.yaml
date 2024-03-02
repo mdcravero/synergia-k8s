@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: trans-config-movies
+  name: trans-movies-config
   namespace: media
 spec:
   storageClassName: "nfs-client"
