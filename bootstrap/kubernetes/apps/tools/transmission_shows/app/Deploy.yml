@@ -25,7 +25,7 @@ spec:
               value: "1001"
             - name: TZ
               value: "America/Argentina/Cordoba"
-
+          #Sonarr depens on to downloads folder to move shows
           volumeMounts:
             - name: config
               mountPath: /config

@@ -64,12 +64,16 @@ data:
       #    hosts:
       #      - chart-example.local
 
+    #### Sonar depends on this two volumenes!!!! ###
     extraVolumes:
       - name: media
         persistentVolumeClaim:
             claimName: jellyfin-media
       - name: downloads
-        emptyDir: {}
+        persistentVolumeClaim:
+            claimName: trans-shows-down
+        mountPath: /complete
+        
 
     extraVolumeMounts:
       - mountPath: /media
