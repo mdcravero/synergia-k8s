@@ -29,12 +29,12 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
-            - name: media
-              mountPath: /media
+            - name: download
+              mountPath: /download
       volumes:
         - name: config
           persistentVolumeClaim:
             claimName: trans-shows-config
-        - name: media
+        - name: download
           persistentVolumeClaim:
-            claimName: jellyfin-media
+            claimName: trans-shows-down
