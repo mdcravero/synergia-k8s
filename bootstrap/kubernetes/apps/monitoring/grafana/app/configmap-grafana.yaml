@@ -424,7 +424,7 @@ data:
 
     # Administrator credentials when not using an existing secret (see below)
     adminUser: admin
-    adminPassword: EotP$HoQqHutBH8
+    adminPassword: dEq9Wyu^c2rB3rTY4J6G
 
     # Use an existing secret for the admin user.
     admin:
