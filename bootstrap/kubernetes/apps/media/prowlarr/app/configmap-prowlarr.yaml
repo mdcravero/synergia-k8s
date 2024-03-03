@@ -25,7 +25,9 @@ data:
     # @default -- See below
     env:
       # -- Set the container timezone
-      TZ: UTC
+      PUID: 1001
+      PGID: 1001
+      TZ: "America/Argentina/Cordoba"
 
     # -- Configures service settings for the chart.
     # @default -- See values.yaml
