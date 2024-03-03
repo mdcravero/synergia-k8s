@@ -46,6 +46,7 @@ data:
     service:
       type: LoadBalancer
       port: 7878
+      loadBalancerIP: 192.168.1.65
 
     ingress:
       enabled: false
@@ -64,27 +65,29 @@ data:
       #      - chart-example.local
 
     extraVolumes:
-      - name: movies
-        emptyDir: {}
+      - name: media
+        persistentVolumeClaim:
+            claimName: jellyfin-media
       - name: downloads
-        emptyDir: {}
+        persistentVolumeClaim:
+            claimName: trans-movies-down
 
     extraVolumeMounts:
-      - mountPath: /movies
-        name: movies
+      - mountPath: /media
+        name: media
       - mountPath: /downloads
         name: downloads
 
     persistence:
       config:
-        enabled: false
+        enabled: true
         ## If defined, storageClassName: <storageClass>
         ## If set to "-", storageClassName: "", which disables dynamic provisioning
         ## If undefined (the default) or set to null, no storageClassName spec is
         ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
         ##   GKE, AWS & OpenStack)
         ##
-        storageClass: ""
+        storageClass: "nfs-client"
         annotations: {}
         existingClaim: ""
         accessModes:
