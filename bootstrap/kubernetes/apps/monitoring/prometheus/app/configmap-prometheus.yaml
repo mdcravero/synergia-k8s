@@ -221,7 +221,7 @@ data:
           value: "1001"
         - name: PGID
           value: "1001"
-        - name TZ
+        - name: TZ
           value: "America/Argentina/Cordoba"
 
       # List of flags to override default parameters, e.g:
