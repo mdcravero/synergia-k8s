@@ -1221,7 +1221,7 @@ data:
       ##
       enabled: true
 
-      persistence:
+      persistentVolume:
         size: 2Gi
         storageClass: "nfs-client"
         accessModes:
