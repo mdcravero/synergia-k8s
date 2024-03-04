@@ -216,13 +216,7 @@ data:
       ##     secretKeyRef:
       ##       name: mysecret
       ##       key: username
-      env: 
-        - name: PUID
-          value: "1001"
-        - name: PGID
-          value: "1001"
-        - name: TZ
-          value: "America/Argentina/Cordoba"
+      env: []
 
       # List of flags to override default parameters, e.g:
       # - --enable-feature=agent
@@ -656,10 +650,15 @@ data:
       ## Security context to be added to server pods
       ##
       securityContext:
-        runAsUser: 65534
+        runAsUser: 1001
         runAsNonRoot: true
-        runAsGroup: 65534
-        fsGroup: 65534
+        runAsGroup: 1001
+        fsGroup: 1001
+      # securityContext:
+      #   runAsUser: 65534
+      #   runAsNonRoot: true
+      #   runAsGroup: 65534
+      #   fsGroup: 65534
 
       ## Security context to be added to server container
       ##
@@ -1233,11 +1232,16 @@ data:
         accessModes:
           - ReadWriteOnce
 
+      # podSecurityContext:
+      #   runAsUser: 65534
+      #   runAsNonRoot: true
+      #   runAsGroup: 65534
+      #   fsGroup: 65534
       podSecurityContext:
-        runAsUser: 65534
+        runAsUser: 1001
         runAsNonRoot: true
-        runAsGroup: 65534
-        fsGroup: 65534
+        runAsGroup: 1001
+        fsGroup: 1001
 
     ## kube-state-metrics sub-chart configurable values
     ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-state-metrics
