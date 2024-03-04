@@ -22,9 +22,12 @@ data:
       tag: "latest"
 
     env:
-      PUID: 1001
-      PGID: 1001
-      TZ: "America/Argentina/Cordoba"
+      - name: PUID
+        values: 1001
+      - name: PGID
+        value: 1001
+      - name TZ
+        value: "America/Argentina/Cordoba"
 
     imagePullSecrets: []
     nameOverride: ""
