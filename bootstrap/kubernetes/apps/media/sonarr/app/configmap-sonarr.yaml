@@ -23,9 +23,9 @@ data:
 
     env:
       - name: PUID
-        values: 1001
+        values: "1001"
       - name: PGID
-        value: 1001
+        value: "1001"
       - name TZ
         value: "America/Argentina/Cordoba"
 
