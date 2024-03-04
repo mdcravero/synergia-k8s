@@ -216,7 +216,10 @@ data:
       ##     secretKeyRef:
       ##       name: mysecret
       ##       key: username
-      env: []
+      env: 
+        PUID: 1001
+        PGID: 1001
+        TZ: "America/Argentina/Cordoba"
 
       # List of flags to override default parameters, e.g:
       # - --enable-feature=agent
