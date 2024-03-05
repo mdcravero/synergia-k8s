@@ -673,7 +673,7 @@ data:
         ##
         externalIPs: []
 
-        loadBalancerIP: 192.168.1.57
+        loadBalancerIP: 192.168.1.58
         loadBalancerSourceRanges: []
         servicePort: 80
         sessionAffinity: None
