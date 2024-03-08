@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: whoami
+  namespace: tools
+spec:
+  chart:
+    spec:
+      chart: whoami
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: whoami
+      version: 2.6.2
+  interval: 1m0s
+  releaseName: whoami
+  valuesFrom:
+    - kind: ConfigMap
+      name: whoami-values
+      valuesKey: values.yaml
