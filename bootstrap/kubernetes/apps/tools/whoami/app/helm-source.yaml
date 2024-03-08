@@ -2,8 +2,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: homarr
+  name: whoami
   namespace: tools
 spec:
   interval: 1m0s
-  url: https://oben01.github.io/charts/
+  url: https://charts.riftbit.com
