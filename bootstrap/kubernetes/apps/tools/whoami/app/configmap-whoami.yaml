@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: whoami-values
-  namespace: whoami
+  namespace: tools
 data:
   values.yaml: |-
     # Default values for whoami.
