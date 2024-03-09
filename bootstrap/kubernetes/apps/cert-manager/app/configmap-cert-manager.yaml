@@ -243,7 +243,9 @@ data:
     # For example:
     #  extraArgs:
     #    - --controllers=*,-certificaterequests-approver
-    extraArgs: []
+    extraArgs:
+      - --dns01-recursive-nameservers=1.1.1.1:53,9.9.9.9:53
+      - --dns01-recursive-nameservers-only
 
     # Additional environment variables to pass to cert-manager controller binary.
     extraEnv: []
@@ -321,7 +323,7 @@ data:
     # podDnsConfig:
     #   nameservers:
     #     - "1.1.1.1"
-    #     - "8.8.8.8"
+    #     - "9.9.9.9"
 
     # The nodeSelector on Pods tells Kubernetes to schedule Pods on the nodes with
     # matching labels.
