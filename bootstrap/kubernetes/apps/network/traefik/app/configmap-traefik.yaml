@@ -867,10 +867,10 @@ data:
       # It can be used to store TLS certificates, see `storage` in certResolvers
       enabled: true
       name: data
-      #  existingClaim: ""
+      existingClaim: "pvc-568dc9e1-a466-4bfa-8d5a-cadb638e1382"
       accessMode: ReadWriteOnce
       size: 128Mi
-      storageClass: "nfs-client"
+      # storageClass: "nfs-client"
       # volumeName: ""
       path: /data
       annotations: {}
