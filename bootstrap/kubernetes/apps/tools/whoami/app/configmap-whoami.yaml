@@ -151,9 +151,9 @@ data:
             paths: 
             - backend:
                 service:
-                  name: project-backend
+                  name: whoami
                   port:
-                    number: 8080
+                    number: 80
               path: /
         
       tls:
