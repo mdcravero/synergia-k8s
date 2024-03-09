@@ -149,12 +149,13 @@ data:
         - host: whoami.synergia-it.ar
           http:
             paths: 
-            - backend:
+            - path: /
+              backend:
                 service:
                   name: whoami
                   port:
                     number: 80
-              path: /
+              
         
       tls:
        - secretName: whoami
