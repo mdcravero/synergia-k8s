@@ -137,7 +137,7 @@ data:
       enabled: true
 
       # IngressClass that will be be used to implement the Ingress
-      ingressClassName: traefik
+      ingressClassName: traefik-external
 
       # Ingress path type
       pathType: ImplementationSpecific
@@ -151,7 +151,7 @@ data:
             - /
 
       tls:
-       - secretName: whoami
+       - secretName: whoami-syneria-it-ar-tls
 
 
     resources: {}
