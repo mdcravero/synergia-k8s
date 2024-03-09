@@ -151,7 +151,7 @@ data:
             - /
 
       tls:
-       - secretName: whoami-syneria-it-ar
+       - secretName: "whoami-syneria-it-ar"
          hosts:
             - whoami.local
 
