@@ -152,6 +152,8 @@ data:
 
       tls:
        - secretName: whoami-syneria-it-ar-tls
+         hosts:
+            - whoami.local
 
 
     resources: {}
