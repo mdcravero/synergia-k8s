@@ -150,7 +150,7 @@ data:
         accessModes:
           - ReadWriteOnce
         # -- Data: Size for the claim
-        size: 59Gi
+        size: 50Gi
         # -- Data: Alternative data volume definition (e.g. nfs, hostPath). Used when `persistence.data.isPvc` is `false`
         customVolume: {}
         # hostPath:

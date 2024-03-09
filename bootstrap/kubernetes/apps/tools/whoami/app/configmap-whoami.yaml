@@ -147,14 +147,15 @@ data:
         # kubernetes.io/tls-acme: "true"
       hosts:
         - host: whoami.synergia-it.ar
-          paths: 
-           - backend:
-              service:
-                name: whoami
-                # port: 80
-             path: /
-             pathType: ImplementationSpecific
-
+          http:
+            paths: 
+            - backend:
+                service:
+                  name: project-backend
+                  port:
+                    number: 8080
+              path: /
+        
       tls:
        - secretName: whoami
 
