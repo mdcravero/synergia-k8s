@@ -151,9 +151,9 @@ data:
             - /
 
       tls:
-       - secretName: "whoami-syneria-it-ar"
+       - secretName: "whoami-syneria-it-ar-tls"
          hosts:
-            - whoami.local
+            - whoami.synergia-it.ar
 
 
     resources: {}
