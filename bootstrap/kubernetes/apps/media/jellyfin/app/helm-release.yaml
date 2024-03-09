@@ -12,42 +12,46 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: jellyfin
-      version: 9.5.3
+      version: 2.0.0
   interval: 1m0s
   releaseName: jellyfin
-  values:
-    env:
-      TZ: Argentina/Cordoba/Arroyito
-    image:
-      pullPolicy: IfNotPresent
-      repository: jellyfin/jellyfin
-      tag: latest
-    ingress:
-      main:
-        enabled: false
-    persistence:
-      cache:
-        enabled: false
-        mountPath: /cache
-      config:
-        accessMode: ReadWriteOnce
-        enabled: enable
-        mountPath: /config
-        size: 200M
-        storageClass: nfs-client
-      media:
-        accessMode: ReadWriteOnce
-        enabled: enable
-        mountPath: /media
-        persistentVolumeReclaimPolicy: Retain
-        size: 50Gi
-        storageClass: nfs-client
-    podSecurityContext: {}
-    service:
-      main:
-        ports:
-          http:
-            port: 8096
-        type: LoadBalancer
-        loadBalancerIP: 192.168.1.61
-#
+  valuesFrom:
+    - kind: ConfigMap
+      name: jellyfin-values
+      valuesKey: values.yaml
+#   values:
+#     env:
+#       TZ: Argentina/Cordoba/Arroyito
+#     image:
+#       pullPolicy: IfNotPresent
+#       repository: jellyfin/jellyfin
+#       tag: latest
+#     ingress:
+#       main:
+#         enabled: false
+#     persistence:
+#       cache:
+#         enabled: false
+#         mountPath: /cache
+#       config:
+#         accessMode: ReadWriteOnce
+#         enabled: enable
+#         mountPath: /config
+#         size: 200M
+#         storageClass: nfs-client
+#       media:
+#         accessMode: ReadWriteOnce
+#         enabled: enable
+#         mountPath: /media
+#         persistentVolumeReclaimPolicy: Retain
+#         size: 50Gi
+#         storageClass: nfs-client
+#     podSecurityContext: {}
+#     service:
+#       main:
+#         ports:
+#           http:
+#             port: 8096
+#         type: LoadBalancer
+#         loadBalancerIP: 192.168.1.61
+# #

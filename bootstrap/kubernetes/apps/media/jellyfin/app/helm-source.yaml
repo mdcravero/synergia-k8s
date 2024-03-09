@@ -6,9 +6,9 @@ metadata:
   namespace: media
 spec:
   interval: 1m0s
-  url: https://k8s-at-home.com/charts/
+  url: https://utkuozdemir.org/helm-charts
 
   ### Apply path PV ###
-  ### kubectl patch pv pvc-25e31db7-a9ab-46e9-9d13-47092a75f757 -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+  ### kubectl patch pv pvc-032ef641-addd-4b6e-9707-092885872c76 -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
   ### If need delete PVC can use
   ### kubectl patch pvc jellyfin-media -p '{"metadata":{"finalizers":null}}'
