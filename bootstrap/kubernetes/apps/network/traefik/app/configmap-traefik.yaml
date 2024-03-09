@@ -584,7 +584,7 @@ data:
     ## Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
     additionalArguments: 
     - "--serversTransport.insecureSkipVerify=true"
-    - "--log.vevel=INFO"
+    - "--log.level=INFO"
     #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
     #  - "--log.level=DEBUG"
 
