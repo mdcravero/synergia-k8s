@@ -147,9 +147,10 @@ data:
         # kubernetes.io/tls-acme: "true"
       hosts:
         - host: whoami.synergia-it.ar
-           paths:
-           - /
-              
+          http:
+            paths: 
+              - /
+
       tls:
        - secretName: whoami
 
