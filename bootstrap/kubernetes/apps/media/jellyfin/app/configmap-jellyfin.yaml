@@ -81,7 +81,7 @@ data:
       type: LoadBalancer
       # -- Port for the service to use
       port: 8096
-      loadBalancerIP: 192.168.1.61
+      
 
     ingress:
       # -- Expose the app using an ingress

@@ -148,8 +148,7 @@ data:
       hosts:
         - host: whoami.synergia-it.ar
           paths: 
-           - path: /
-             serviceName: whoami
+           - path: /()(.*)
 
       tls:
        - secretName: whoami
