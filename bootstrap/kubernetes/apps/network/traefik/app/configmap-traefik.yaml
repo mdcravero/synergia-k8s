@@ -157,7 +157,7 @@ data:
     ingressRoute:
       dashboard:
         # -- Create an IngressRoute for the dashboard
-        enabled: true
+        enabled: false
         # -- Additional ingressRoute annotations (e.g. for kubernetes.io/ingress.class)
         annotations: {}
         # -- Additional ingressRoute labels (e.g. for filtering IngressRoute by custom labels)
@@ -667,8 +667,8 @@ data:
         # Port Redirections
         # Added in 2.2, you can make permanent redirects via entrypoints.
         # https://docs.traefik.io/routing/entrypoints/#redirection
-        # redirectTo:
-        #   port: websecure
+        redirectTo:
+          port: websecure
         #   (Optional)
         #   priority: 10
         #
