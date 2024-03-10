@@ -149,7 +149,9 @@ data:
         - host: whoami.synergia-it.ar
           paths:
             - /
-
+          backend:
+            serviceName: whoami
+            servicePort: http
       tls:
        - secretName: "whoami-syneria-it-ar-tls"
          hosts:
