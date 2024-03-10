@@ -137,7 +137,7 @@ data:
       enabled: true
 
       # IngressClass that will be be used to implement the Ingress
-      ingressClassName: traefik-external
+      ingressClassName: traefik
 
       # Ingress path type
       pathType: ImplementationSpecific
