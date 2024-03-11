@@ -129,12 +129,12 @@ data:
         accessModes:
           - ReadWriteOnce
         # -- Config: Size for the claim
-        size: 100Mi
+        size: 200Mi
         # -- Config: Alternative data volume definition (e.g. nfs, hostPath). Used when `persistence.config.isPvc` is `false`
         customVolume: {}
           # hostPath:
           #   path: /path/on/host
-      data:
+      media:
         # -- Data: Enable persistence
         enabled: true
         # -- Data: Persistence type is pvc. When `false`, data volume definition is read from `persistence.data.customVolume`
@@ -172,7 +172,11 @@ data:
     extraVolumes: []
 
     # -- Arbitrary extra volume mounts for the pod
-    extraVolumeMounts: {}
+    extraVolumeMounts:
+      - mountPath: /media
+        name: media
+      - mountPath: /config
+        name: config
 
     # -- Pod liveness probe
     livenessProbe: {}
