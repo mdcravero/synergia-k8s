@@ -157,10 +157,10 @@ data:
         #   path: /path/on/host
 
     # -- Non-sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
-    env: 
-      PUID: 1001
-      PGID: 1001
-      TZ: Argentina/Cordoba/Arroyito
+    env: {}
+      # PUID: 1001
+      # PGID: 1001
+      # TZ: Argentina/Cordoba/Arroyito
 
     # -- Sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
     secretEnv: {}
