@@ -117,7 +117,7 @@ data:
         # -- Config: Enable persistence
         enabled: false
         # -- Config: Persistence type is pvc. When `false`, data volume definition is read from `persistence.config.customVolume`
-        isPvc: true
+        isPvc: false
         # -- Config: Name of the existing claim to be used for config
         existingClaim: ""
         # -- Config: Storage class for the volume
@@ -138,7 +138,7 @@ data:
         # -- Data: Enable persistence
         enabled: false
         # -- Data: Persistence type is pvc. When `false`, data volume definition is read from `persistence.data.customVolume`
-        isPvc: true
+        isPvc: false
         # -- Data: Name of the existing claim to be used
         existingClaim: ""
         # -- Data: Storage class for the data volume
@@ -158,6 +158,8 @@ data:
 
     # -- Non-sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
     env: 
+      PUID: 1001
+      PGID: 1001
       TZ: Argentina/Cordoba/Arroyito
 
     # -- Sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
@@ -174,9 +176,9 @@ data:
       - name: data
         persistentVolumeClaim:
             claimName: jellyfin-media
-      - name: downloads
+      - name: config
         persistentVolumeClaim:
-            claimName: trans-movies-down 
+            claimName: jellyfin-config
 
     # -- Arbitrary extra volume mounts for the pod
     extraVolumeMounts:
