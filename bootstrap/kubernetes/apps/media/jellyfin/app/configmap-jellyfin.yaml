@@ -134,7 +134,7 @@ data:
         customVolume: {}
           # hostPath:
           #   path: /path/on/host
-      media:
+      data:
         # -- Data: Enable persistence
         enabled: true
         # -- Data: Persistence type is pvc. When `false`, data volume definition is read from `persistence.data.customVolume`
@@ -173,8 +173,8 @@ data:
 
     # -- Arbitrary extra volume mounts for the pod
     extraVolumeMounts:
-      - mountPath: /media
-        name: media
+      - mountPath: /data
+        name: data
       - mountPath: /config
         name: config
 
