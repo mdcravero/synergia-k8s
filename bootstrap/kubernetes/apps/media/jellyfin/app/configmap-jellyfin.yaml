@@ -43,7 +43,7 @@ data:
       # -- Image pull policy
       pullPolicy: IfNotPresent
       # -- Image tag (if not specified, defaults to the chart's appVersion)
-      tag: "latest"
+      tag: "tatest"
 
     # -- Image pull secrets
     imagePullSecrets: []
@@ -78,10 +78,9 @@ data:
 
     service:
       # -- Type of the service
-      type: LoadBalancer
+      type: LoadBalacner
       # -- Port for the service to use
       port: 8096
-      loadBalancerIP: 192.168.1.61
 
     ingress:
       # -- Expose the app using an ingress
@@ -112,55 +111,8 @@ data:
     # -- Affinity for the pod assignment
     affinity: {}
 
-    persistence:
-      config:
-        # -- Config: Enable persistence
-        enabled: false
-        # -- Config: Persistence type is pvc. When `false`, data volume definition is read from `persistence.config.customVolume`
-        isPvc: false
-        # -- Config: Name of the existing claim to be used for config
-        existingClaim: ""
-        # -- Config: Storage class for the volume
-        storageClass: ""
-        # -- Config: Annotations for the claim
-        annotations: {}
-          # helm.sh/resource-policy: keep
-        # -- Config: Access modes for the claim
-        accessModes:
-          - ReadWriteOnce
-        # -- Config: Size for the claim
-        size: 200Mi
-        # -- Config: Alternative data volume definition (e.g. nfs, hostPath). Used when `persistence.config.isPvc` is `false`
-        customVolume: {}
-          # hostPath:
-          #   path: /path/on/host
-      data:
-        # -- Data: Enable persistence
-        enabled: false
-        # -- Data: Persistence type is pvc. When `false`, data volume definition is read from `persistence.data.customVolume`
-        isPvc: false
-        # -- Data: Name of the existing claim to be used
-        existingClaim: ""
-        # -- Data: Storage class for the data volume
-        storageClass: ""
-        # -- Data: Annotations for the claim
-        annotations: {}
-        # helm.sh/resource-policy: keep
-        # -- Data: Access modes for the claim
-        accessModes:
-          - ReadWriteOnce
-        # -- Data: Size for the claim
-        size: 50Gi
-        # -- Data: Alternative data volume definition (e.g. nfs, hostPath). Used when `persistence.data.isPvc` is `false`
-        customVolume: {}
-        # hostPath:
-        #   path: /path/on/host
-
     # -- Non-sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
     env: {}
-      # PUID: 1001
-      # PGID: 1001
-      # TZ: Argentina/Cordoba/Arroyito
 
     # -- Sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
     secretEnv: {}
@@ -176,12 +128,12 @@ data:
       - name: data
         persistentVolumeClaim:
             claimName: jellyfin-media
-      - name: config
+      - name: downloads
         persistentVolumeClaim:
             claimName: jellyfin-config
-
+            
     # -- Arbitrary extra volume mounts for the pod
-    extraVolumeMounts:
+    extraVolumeMounts: 
       - mountPath: /data
         name: data
       - mountPath: /config
@@ -194,21 +146,3 @@ data:
     readinessProbe:
       httpGet:
         port: http
-
-    # -- Init containers
-    initContainers: []
-      # - name: init
-      #   image: busybox:stable-musl
-      #   command:
-      #     - sh
-      #     - -c
-      #     - echo "initializing..."
-
-    # -- Sidecar containers
-    sidecarContainers: []
-      # - name: sidecar
-      #   image: busybox:stable-musl
-      #   command:
-      #     - tail
-      #     - -f
-      #     - /dev/null
