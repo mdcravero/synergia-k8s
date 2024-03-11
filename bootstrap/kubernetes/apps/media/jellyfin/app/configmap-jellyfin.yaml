@@ -18,20 +18,17 @@ data:
       main:
         enabled: false
 
-    extraVolumes: 
-      - name: media
-        persistentVolumeClaim:
-            claimName: jellyfin-media
-      - name: downloads
-        persistentVolumeClaim:
-            claimName: jellyfin-config
-            
-    extraVolumeMounts: 
-      - mountPath: /media
-        name: media
-      - mountPath: /config
-        name: config
+    persistence:
+      config:
+        enabled: true
+        existingClaim: jellyfin-config
+        mountPath: /config
 
+      media:
+        enabled: true
+        existingClaim: jellyfin-media
+        mountPath: /media
+        
     podSecurityContext: {}
 
     service:
