@@ -115,11 +115,11 @@ data:
     persistence:
       config:
         # -- Config: Enable persistence
-        enabled: true
+        enabled: false
         # -- Config: Persistence type is pvc. When `false`, data volume definition is read from `persistence.config.customVolume`
         isPvc: true
         # -- Config: Name of the existing claim to be used for config
-        existingClaim: "jellyfin-config"
+        existingClaim: ""
         # -- Config: Storage class for the volume
         storageClass: ""
         # -- Config: Annotations for the claim
@@ -136,11 +136,11 @@ data:
           #   path: /path/on/host
       data:
         # -- Data: Enable persistence
-        enabled: true
+        enabled: false
         # -- Data: Persistence type is pvc. When `false`, data volume definition is read from `persistence.data.customVolume`
         isPvc: true
         # -- Data: Name of the existing claim to be used
-        existingClaim: "jellyfin-media"
+        existingClaim: ""
         # -- Data: Storage class for the data volume
         storageClass: ""
         # -- Data: Annotations for the claim
@@ -170,7 +170,13 @@ data:
     dnsPolicy: ClusterFirst
 
     # -- Arbitrary extra volume definitions for the pod
-    extraVolumes: []
+    extraVolumes: 
+      - name: data
+        persistentVolumeClaim:
+            claimName: jellyfin-media
+      - name: downloads
+        persistentVolumeClaim:
+            claimName: trans-movies-down 
 
     # -- Arbitrary extra volume mounts for the pod
     extraVolumeMounts:
