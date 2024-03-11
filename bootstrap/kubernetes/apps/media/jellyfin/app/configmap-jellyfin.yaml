@@ -8,28 +8,32 @@ data:
   values.yaml: |-
     env:
       TZ: Argentina/Cordoba/Arroyito
+
     image:
       pullPolicy: IfNotPresent
       repository: jellyfin/jellyfin
       tag: latest
+
     ingress:
       main:
         enabled: false
+
     extraVolumes: 
-      - name: data
+      - name: media
         persistentVolumeClaim:
             claimName: jellyfin-media
       - name: downloads
         persistentVolumeClaim:
             claimName: jellyfin-config
             
-    # -- Arbitrary extra volume mounts for the pod
     extraVolumeMounts: 
-      - mountPath: /data
-        name: data
+      - mountPath: /media
+        name: media
       - mountPath: /config
         name: config
+
     podSecurityContext: {}
+
     service:
       main:
         ports:
