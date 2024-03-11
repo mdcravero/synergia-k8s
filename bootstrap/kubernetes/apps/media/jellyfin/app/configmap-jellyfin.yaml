@@ -6,124 +6,15 @@ metadata:
   namespace: media
 data:
   values.yaml: |-
-    # -- Number of replicas to run. Chart is not designed to scale horizontally, use at your own risk
-    replicaCount: 1
-
-    # -- Use host network
-    hostNetwork: false
-
-    port: 8096
-    hostPort:
-      # -- Use host port for the application
-      enabled: false
-      # -- Host port to bind to
-      port: 8096
-
-    # -- Additional port definitions for the pod
-    additionalPorts: []
-      # - name: tcp-8920
-      #   containerPort: 8920
-      #   protocol: TCP
-      #   hostPort: 8920
-      # - name: udp-1900
-      #   containerPort: 1900
-      #   protocol: UDP
-      #   hostPort: 1900
-      # - name: udp-7359
-      #   containerPort: 7359
-      #   protocol: UDP
-      #   hostPort: 7359
-
-    # -- Additional port definitions for the service
-    additionalServicePorts: []
-
+    env:
+      TZ: Argentina/Cordoba/Arroyito
     image:
-      # -- Image repository
-      repository: docker.io/linuxserver/jellyfin
-      # -- Image pull policy
       pullPolicy: IfNotPresent
-      # -- Image tag (if not specified, defaults to the chart's appVersion)
-      tag: "tatest"
-
-    # -- Image pull secrets
-    imagePullSecrets: []
-    # -- String to partially override fullname template with a string (will prepend the release name)
-    nameOverride: ""
-    # -- String to fully override fullname template with a string
-    fullnameOverride: ""
-
-    serviceAccount:
-      # -- Specifies whether a service account should be created
-      create: true
-      # -- Annotations to add to the service account
-      annotations: {}
-      # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
-      name: ""
-
-    # -- Annotations for the pods
-    podAnnotations: {}
-
-    # -- Security context for the pods
-    podSecurityContext: {}
-
-    # -- Security context for the container. NET_ADMIN capability is required for the VPN to work properly.
-    securityContext:
-      capabilities:
-        add:
-          - runAsUser: 1001
-
-    # -- Deployment strategy
-    strategy:
-      type: Recreate
-
-    service:
-      # -- Type of the service
-      type: LoadBalacner
-      # -- Port for the service to use
-      port: 8096
-
+      repository: jellyfin/jellyfin
+      tag: latest
     ingress:
-      # -- Expose the app using an ingress
-      enabled: false
-      # -- Ingress class name
-      className: ""
-      # -- Annotations for the ingress
-      annotations: {}
-      # -- Ingress hosts configuration
-      # @default -- see [values.yaml](values.yaml)
-      hosts:
-        - host: chart-example.local
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
-      # -- The TLS configuration for the Ingress
-      tls: []
-
-    # -- The resource requests and limits of the container
-    resources: {}
-
-    # -- The node selector for the deployment
-    nodeSelector: {}
-
-    # -- Tolerations for the pod assignment
-    tolerations: []
-
-    # -- Affinity for the pod assignment
-    affinity: {}
-
-    # -- Non-sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
-    env: {}
-
-    # -- Sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
-    secretEnv: {}
-
-    # -- DNS configuration for the pod
-    dnsConfig: {}
-
-    # -- DNS policy for the pod
-    dnsPolicy: ClusterFirst
-
-    # -- Arbitrary extra volume definitions for the pod
+      main:
+        enabled: false
     extraVolumes: 
       - name: data
         persistentVolumeClaim:
@@ -138,11 +29,13 @@ data:
         name: data
       - mountPath: /config
         name: config
+    podSecurityContext: {}
+    service:
+      main:
+        ports:
+          http:
+            port: 8096
+        type: LoadBalancer
+        loadBalancerIP: 192.168.1.61
 
-    # -- Pod liveness probe
-    livenessProbe: {}
-
-    # -- Pod readiness probe
-    readinessProbe:
-      httpGet:
-        port: http
+#
