@@ -43,7 +43,7 @@ data:
       # -- Image pull policy
       pullPolicy: IfNotPresent
       # -- Image tag (if not specified, defaults to the chart's appVersion)
-      tag: ""
+      tag: "latest"
 
     # -- Image pull secrets
     imagePullSecrets: []
@@ -157,7 +157,8 @@ data:
         #   path: /path/on/host
 
     # -- Non-sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
-    env: {}
+    env: 
+      TZ: Argentina/Cordoba/Arroyito
 
     # -- Sensitive environment variables to be set in the pods. See the [application docs](https://docs.linuxserver.io/images/docker-jellyfin)
     secretEnv: {}
