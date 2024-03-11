@@ -70,7 +70,7 @@ data:
     securityContext:
       capabilities:
         add:
-          #- NET_ADMIN
+          - runAsUser: 1001
 
     # -- Deployment strategy
     strategy:
