@@ -952,7 +952,8 @@ data:
     #        topologyKey: kubernetes.io/hostname
 
     # -- nodeSelector is the simplest recommended form of node selection constraint.
-    nodeSelector: {}
+    nodeSelector:
+      type: worker
     # -- Tolerations allow the scheduler to schedule pods with matching taints.
     tolerations: []
     # -- You can use topology spread constraints to control
