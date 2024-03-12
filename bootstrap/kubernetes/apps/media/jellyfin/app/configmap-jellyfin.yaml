@@ -31,6 +31,9 @@ data:
         
     podSecurityContext: {}
 
+    nodeSelector:
+      type: worker
+
     service:
       main:
         ports:
