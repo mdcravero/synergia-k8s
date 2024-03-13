@@ -587,7 +587,7 @@ data:
     - "--log.level=DEBUG"
     - "--api.insecure=false"
     - "--api.dashboard=true"
-    #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
+    - "--providers.kubernetesingress.ingressclass=traefik-internal"
     #  - "--log.level=DEBUG"
 
     # -- Environment variables to be passed to Traefik's binary
