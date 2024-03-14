@@ -13,9 +13,7 @@ data:
     # If left blank, the chart will default to the individually set 'image.registry' values
     global:
       image:
-        repository: aquasec/trivy-operator
-        tag: 0.19.0-rc
-        pullPolicy: IfNotPresent
+        repository: ""
 
     # -- managedBy is similar to .Release.Service but allows to overwrite the value
     managedBy: Helm
