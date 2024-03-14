@@ -486,7 +486,7 @@ data:
 
       # -- The Flag to enable insecure connection for downloading trivy-db via proxy (air-gaped env)
       #
-      dbRepositoryInsecure: "false"
+      dbRepositoryInsecure: "true"
 
       # -- The Flag to enable the usage of builtin rego policies by default
       #
