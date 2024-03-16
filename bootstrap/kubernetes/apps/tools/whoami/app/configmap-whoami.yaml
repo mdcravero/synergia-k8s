@@ -118,7 +118,7 @@ data:
       # clusterIP: 10.43.0.100
 
       # Static load balancer IP address when service type is LoadBalancer
-      # loadBalancerIP: 10.0.0.100
+      loadBalancerIP: 192.168.1.70
 
       # Source IP address ranges when service type is LoadBalancer
       # loadBalancerSourceRanges:
