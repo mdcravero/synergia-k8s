@@ -588,6 +588,10 @@ data:
     additionalArguments:
     #  - "--providers.kubernetesingress.ingressclass=traefik-internal"
     - "--log.level=DEBUG"
+    - "--certificatesresolvers.le-staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+    - "--certificatesresolvers.le.acme.tlschallenge=true"
+    - "--certificatesresolvers.le.acme.email=synergia.soporte@gmail.com"
+    - "--certificatesresolvers.le.acme.storage=/data/acme.json"
 
     # -- Environment variables to be passed to Traefik's binary
     env:
@@ -879,26 +883,26 @@ data:
       # subPath: ""
 
     # -- Certificates resolvers configuration
-    certResolvers:
-      letsencrypt:
-        # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
-        email: synergia.soporte@gmail.com
-        dnsChallenge:
-          # also add the provider's required configuration under env
-          # or expand then from secrets/configmaps with envfrom
-          # cf. https://doc.traefik.io/traefik/https/acme/#providers
-          provider: cloudflare
-          # add futher options for the dns challenge as needed
-          # cf. https://doc.traefik.io/traefik/https/acme/#dnschallenge
-          delayBeforeCheck: 30
-          resolvers:
-            - 1.1.1.1
-            - 8.8.8.8
-        tlsChallenge: true
-        httpChallenge:
-          entryPoint: "web"
-        # It has to match the path with a persistent volume
-        storage: /data/acme.json
+    certResolvers: {}
+      # letsencrypt:
+      #   # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
+      #   email: synergia.soporte@gmail.com
+      #   dnsChallenge:
+      #     # also add the provider's required configuration under env
+      #     # or expand then from secrets/configmaps with envfrom
+      #     # cf. https://doc.traefik.io/traefik/https/acme/#providers
+      #     provider: cloudflare
+      #     # add futher options for the dns challenge as needed
+      #     # cf. https://doc.traefik.io/traefik/https/acme/#dnschallenge
+      #     delayBeforeCheck: 30
+      #     resolvers:
+      #       - 1.1.1.1
+      #       - 8.8.8.8
+      #   tlsChallenge: true
+      #   httpChallenge:
+      #     entryPoint: "web"
+      #   # It has to match the path with a persistent volume
+      #   storage: /data/acme.json
 
     # -- If hostNetwork is true, runs traefik in the host network namespace
     # To prevent unschedulabel pods due to port collisions, if hostNetwork=true
