@@ -140,9 +140,11 @@ data:
       ingressClassName: traefik
 
       # Ingress path type
-      pathType: ImplementationSpecific
+      # pathType: ImplementationSpecific
+      pathType: Prefix
 
-      annotations: {}
+      annotations: 
+        traefik.ingress.kubernetes.io/router.entrypoints: web
         # kubernetes.io/ingress.class: nginx
         # kubernetes.io/tls-acme: "true"
       hosts:
@@ -152,10 +154,10 @@ data:
           backend:
             serviceName: whoami
             servicePort: http
-      tls:
-       - secretName: "whoami-syneria-it-ar-tls"
-         hosts:
-            - whoami.synergia-it.ar
+      # tls:
+      #  - secretName: "whoami-syneria-it-ar-tls"
+      #    hosts:
+      #       - whoami.synergia-it.ar
 
 
     resources: {}
