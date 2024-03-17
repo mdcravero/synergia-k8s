@@ -314,10 +314,10 @@ data:
         # format: json
         # By default, the level is set to ERROR.
         # -- Alternative logging levels are DEBUG, PANIC, FATAL, ERROR, WARN, and INFO.
-        level: ERROR
+        level: DEGUG
       access:
         # -- To enable access logs
-        enabled: false
+        enabled: true
         ## By default, logs are written using the Common Log Format (CLF) on stdout.
         ## To write logs in JSON, use json in the format option.
         ## If the given format is unsupported, the default (CLF) is used instead.
@@ -866,9 +866,9 @@ data:
       # -- Enable persistence using Persistent Volume Claims
       # ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
       # It can be used to store TLS certificates, see `storage` in certResolvers
-      enabled: false
+      enabled: true
       name: data
-      #  existingClaim: ""
+      #  existingClaim: "traefik"
       accessMode: ReadWriteOnce
       size: 128Mi
       # storageClass: ""
@@ -879,26 +879,26 @@ data:
       # subPath: ""
 
     # -- Certificates resolvers configuration
-    certResolvers: {}
-    #   letsencrypt:
-    #     # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
-    #     email: email@example.com
-    #     dnsChallenge:
-    #       # also add the provider's required configuration under env
-    #       # or expand then from secrets/configmaps with envfrom
-    #       # cf. https://doc.traefik.io/traefik/https/acme/#providers
-    #       provider: digitalocean
-    #       # add futher options for the dns challenge as needed
-    #       # cf. https://doc.traefik.io/traefik/https/acme/#dnschallenge
-    #       delayBeforeCheck: 30
-    #       resolvers:
-    #         - 1.1.1.1
-    #         - 8.8.8.8
-    #     tlsChallenge: true
-    #     httpChallenge:
-    #       entryPoint: "web"
-    #     # It has to match the path with a persistent volume
-    #     storage: /data/acme.json
+    certResolvers:
+      letsencrypt:
+        # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
+        email: synergia.soporte@gmail.com
+        dnsChallenge:
+          # also add the provider's required configuration under env
+          # or expand then from secrets/configmaps with envfrom
+          # cf. https://doc.traefik.io/traefik/https/acme/#providers
+          provider: cloudflare
+          # add futher options for the dns challenge as needed
+          # cf. https://doc.traefik.io/traefik/https/acme/#dnschallenge
+          delayBeforeCheck: 30
+          resolvers:
+            - 1.1.1.1
+            - 8.8.8.8
+        tlsChallenge: true
+        httpChallenge:
+          entryPoint: "web"
+        # It has to match the path with a persistent volume
+        storage: /data/acme.json
 
     # -- If hostNetwork is true, runs traefik in the host network namespace
     # To prevent unschedulabel pods due to port collisions, if hostNetwork=true
