@@ -375,7 +375,7 @@ data:
 
     service:
       enabled: true
-      type: loadBalancer
+      type: LoadBalancer
       loadBalancerIP: 192.168.1.56
       
     ## Extra configurations:
