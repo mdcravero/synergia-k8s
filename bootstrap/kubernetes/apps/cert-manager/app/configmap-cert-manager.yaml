@@ -75,7 +75,7 @@ data:
 
     # Install the cert-manager CRDs, it is recommended to not use Helm to manage
     # the CRDs
-    installCRDs: false
+    installCRDs: true
 
     # +docs:section=Controller
 
@@ -336,7 +336,9 @@ data:
       kubernetes.io/os: linux
 
     # +docs:ignore
-    ingressShim: {}
+    ingressShim:
+      defaultIssuerKind: "ClusterIssuer"
+      defaultIssuerName: "letsencrypt-prod"
 
       # Optional default issuer to use for ingress resources
       # +docs:property=ingressShim.defaultIssuerName
