@@ -134,7 +134,7 @@ data:
       # nodePort: 30000
 
     ingress:
-      enabled: false
+      enabled: true
 
       # IngressClass that will be be used to implement the Ingress
       ingressClassName: traefik
