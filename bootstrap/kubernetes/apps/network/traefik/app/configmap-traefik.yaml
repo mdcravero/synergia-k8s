@@ -646,7 +646,7 @@ data:
         # -- Defines whether the port is exposed on the internal service;
         # note that ports exposed on the default service are exposed on the internal
         # service by default as well.
-        exposeInternal: false
+        exposeInternal: true
       web:
         ## -- Enable this entrypoint as a default entrypoint. When a service doesn't explicitly set an entrypoint it will only use this entrypoint.
         # asDefault: true
