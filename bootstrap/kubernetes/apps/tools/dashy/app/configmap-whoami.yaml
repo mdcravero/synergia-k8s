@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: Dashy-values
+  name: dashy-values
   namespace: tools
 data:
   values.yaml: |-
@@ -123,7 +123,7 @@ data:
         conf: |-
           # Page meta info, like heading, footer text and nav links
           pageInfo:
-            title: Dashy
+            title: dashy
             description: Welcome to your new dashboard!
             navLinks:
               - title: GitHub
@@ -140,8 +140,8 @@ data:
             - name: Getting Started
               icon: fas fa-rocket
               items:
-                - title: Dashy Live
-                  description: Development a project management links for Dashy
+                - title: dashy Live
+                  description: Development a project management links for dashy
                   icon: https://i.ibb.co/qWWpD0v/astro-dab-128.png
                   url: https://live.dashy.to/
                   target: newtab
@@ -151,11 +151,11 @@ data:
                   icon: favicon
                 - title: Docs
                   description: Configuring & Usage Documentation
-                  provider: Dashy.to
+                  provider: dashy.to
                   icon: far fa-book
                   url: https://dashy.to/docs
                 - title: Showcase
-                  description: See how others are using Dashy
+                  description: See how others are using dashy
                   url: https://github.com/Lissy93/dashy/blob/master/docs/showcase.md
                   icon: far fa-grin-hearts
                 - title: Config Guide
@@ -163,6 +163,6 @@ data:
                   url: https://github.com/Lissy93/dashy/blob/master/docs/configuring.md
                   icon: fas fa-wrench
                 - title: Support
-                  description: Get help with Dashy, raise a bug, or get in contact
+                  description: Get help with dashy, raise a bug, or get in contact
                   url: https://github.com/Lissy93/dashy/blob/master/.github/SUPPORT.md
                   icon: far fa-hands-helping
