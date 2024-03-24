@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: Dashy
+  namespace: tools
+spec:
+  chart:
+    spec:
+      chart: Dashy
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: Dashy
+      version: 0.1.8
+  interval: 1m0s
+  releaseName: Dashy
+  valuesFrom:
+    - kind: ConfigMap
+      name: Dashy-values
+      valuesKey: values.yaml
