@@ -32,7 +32,7 @@ data:
     podSecurityContext: {}
 
     nodeSelector:
-      type: worker
+      type: worker-amd
 
     service:
       main:
