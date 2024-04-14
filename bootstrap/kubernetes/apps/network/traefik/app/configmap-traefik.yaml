@@ -13,25 +13,25 @@ data:
          enabled: true
          format: json
 
-     additionalArguments:
-       - "--certificatesresolvers.le-staging.acme.tlschallenge=true"
-       - "--certificatesresolvers.le-staging.acme.email=synergia.soporte@gmail.com"
-       - "--certificatesresolvers.le-staging.acme.storage=/data/acme.json"
-       - "--certificatesresolvers.le-staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-       - "--certificatesresolvers.le.acme.tlschallenge=true"
-       - "--certificatesresolvers.le.acme.email=synergia.soporte@gmail.com"
-       - "--certificatesresolvers.le.acme.storage=/data/acme.json"
+    additionalArguments:
+      - "--certificatesresolvers.le-staging.acme.tlschallenge=true"
+      - "--certificatesresolvers.le-staging.acme.email=synergia.soporte@gmail.com"
+      - "--certificatesresolvers.le-staging.acme.storage=/data/acme.json"
+      - "--certificatesresolvers.le-staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=synergia.soporte@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/data/acme.json"
 
-     persistence:
-       enabled: true
-       storageClass: "nfs-client"
-       accessModes:
-         - ReadWriteOnce
-       size: 128Mi
+    persistence:
+      enabled: true
+      storageClass: "nfs-client"
+      accessModes:
+        - ReadWriteOnce
+      size: 128Mi
 
-     service:
-       enabled: true
-       single: true
-       type: LoadBalancer
-       spec:
-         loadBalancerIP: "192.168.1.50"
+    service:
+      enabled: true
+      single: true
+      type: LoadBalancer
+      spec:
+        loadBalancerIP: "192.168.1.50"
