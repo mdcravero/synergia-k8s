@@ -44,9 +44,7 @@ data:
     service:
       type: LoadBalancer
       port: 5055
-      annotations:
-        metallb.universe.tf/loadBalancerIPs: |-
-          "192.168.1.64"
+      loadBalancerIP: 192.168.1.61
 
     ingress:
       enabled: false

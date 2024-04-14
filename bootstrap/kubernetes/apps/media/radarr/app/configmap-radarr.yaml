@@ -46,7 +46,7 @@ data:
     service:
       type: LoadBalancer
       port: 7878
-      loadBalancerIP: 192.168.1.65
+      loadBalancerIP: 192.168.1.63
 
     ingress:
       enabled: false
