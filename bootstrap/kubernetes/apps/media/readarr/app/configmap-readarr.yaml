@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: radarr-values
+  namespace: media
+data:
+  values.yaml: |-
+    env:
+      PUID: 1000
+      PGID: 1000
+      TZ: "America/Argentina/Cordoba"
+
+    imagePullSecrets: []
+    nameOverride: ""
+    fullnameOverride: ""
+
+    podAnnotations: {}
+
+    podSecurityContext: {}
+      # fsGroup: 2000
+
+    securityContext: {}
+      # capabilities:
+      #   drop:
+      #   - ALL
+      # readOnlyRootFilesystem: true
+      # runAsNonRoot: true
+      # runAsUser: 1000
+
+    service:
+      type: LoadBalancer
+
+    persistence:
+      config:
+        enabled: true
+        storageClass: "nfs-client"
+        annotations: {}
+        existingClaim: ""
+        accessModes:
+          - ReadWriteOnce
+        size: 1Gi
+        volumeName: ""
