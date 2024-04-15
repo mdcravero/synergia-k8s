@@ -42,4 +42,3 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 1Gi
-        volumeName: ""
