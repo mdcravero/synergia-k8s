@@ -29,7 +29,9 @@ data:
       # runAsUser: 1000
 
     service:
-      type: LoadBalancer
+      main:
+        enabled: true
+        type: LoadBalancer
 
     persistence:
       config:
