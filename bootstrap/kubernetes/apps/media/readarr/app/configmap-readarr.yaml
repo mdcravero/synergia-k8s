@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: radarr-values
+  name: readarr-values
   namespace: media
 data:
   values.yaml: |-
