@@ -34,15 +34,19 @@ spec:
     ingress:
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: le
       enabled: true
       hosts:
         - host: homarr.synergia-it.ar
           paths:
             - path: /
-              pathType: Prefix
-      ingressClassName: traefik
+              pathType: ImplementationSpecific
+      className: "traefik"
       tls:
-        certResolver: le
+        - hosts:
+            - "homarr.synergia-it.ar"
+          secretName: ls
     nameOverride: ""
     persistence:
       - accessMode: ReadWriteOnce
