@@ -41,7 +41,7 @@ spec:
         - host: homarr.synergia-it.ar
           paths:
             - path: /
-              pathType: Prefix
+              pathType: ImplementationSpecific
       ingressClassName: traefik
       tls: []
     nameOverride: ""
