@@ -33,6 +33,7 @@ spec:
     imagePullSecrets: []
     ingress:
       annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: web
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: le
@@ -41,7 +42,7 @@ spec:
         - host: homarr.synergia-it.ar
           paths:
             - path: /
-              pathType: ImplementationSpecific
+              pathType: Prefix
       ingressClassName: traefik
       tls: []
     nameOverride: ""
