@@ -39,8 +39,13 @@ data:
     # @default -- See values.yaml
     persistence:
       config:
-        enabled: false
+        enabled: true
+        storageClass: "nfs-client"
+        accessModes:
+          - ReadWriteOnce
+        size: 100Mi
 
       media:
-        enabled: false
+        enabled: true
+        existingClaim: jellyfin-media
         mountPath: /media
