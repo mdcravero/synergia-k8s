@@ -18,7 +18,7 @@ data:
     # @default -- See below
     env:
       # -- Set the container timezone
-      TZ: "UTC-3"
+      TZ: "America/Argentina/Cordoba"
 
     # -- Configures service settings for the chart.
     # @default -- See values.yaml
