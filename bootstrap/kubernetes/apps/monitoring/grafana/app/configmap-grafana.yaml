@@ -471,8 +471,8 @@ data:
     ## make sure to replace arn:aws:iam::123456789000:role/iam-role-name-here with your role arn
 
     env: 
-      PUID: 1001
-      PGID: 1001
+      PUID: 1000
+      PGID: 1000
       TZ: "America/Argentina/Cordoba"
 
     ## "valueFrom" environment variable references that will be added to deployment pods. Name is templated.
