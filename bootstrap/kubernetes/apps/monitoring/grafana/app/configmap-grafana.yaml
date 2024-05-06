@@ -391,7 +391,7 @@ data:
       ## If false, data ownership will not be reset at startup
       ## This allows the grafana-server to be run with an arbitrary user
       ##
-      enabled: true
+      enabled: false
 
       ## initChownData container image
       ##
