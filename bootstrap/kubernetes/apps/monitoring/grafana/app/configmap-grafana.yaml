@@ -1211,7 +1211,7 @@ data:
         limitEgress: false
         # Allow additional services to access image-renderer (eg. Prometheus operator when ServiceMonitor is enabled)
         extraIngressSelectors: []
-      resources: {}
+      resources:
     #   limits:
     #     cpu: 100m
     #     memory: 100Mi
