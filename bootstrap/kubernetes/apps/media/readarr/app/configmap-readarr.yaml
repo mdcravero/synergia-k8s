@@ -42,7 +42,7 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 1Gi
-      download:
+      downloads:
         enabled: true
         existingClaim: "trans-books-down"
 
