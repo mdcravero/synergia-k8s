@@ -42,12 +42,15 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 1Gi
+      download:
+        enabled: true
+        existingClaim: "trans-books-down"
 
-    extraVolumes:
-      - name: downloads
-        persistentVolumeClaim:
-            claimName: trans-books-down
+    # extraVolumes:
+    #   - name: downloads
+    #     persistentVolumeClaim:
+    #         claimName: trans-books-down
 
-    extraVolumeMounts:
-      - mountPath: /downloads
-        name: downloads
+    # extraVolumeMounts:
+    #   - mountPath: /downloads
+    #     name: downloads
