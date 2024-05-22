@@ -6,11 +6,6 @@ metadata:
   namespace: monitoring
 data:
   values.yaml: |-
-    test_pod:
-    enabled: true
-    image: bats/bats:1.8.2
-    pullPolicy: IfNotPresent
-
     loki:
       enabled: true
       isDefault: true
@@ -117,5 +112,3 @@ data:
       http_proxy: ""
       https_proxy: ""
       no_proxy: ""
-
-
