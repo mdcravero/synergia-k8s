@@ -10,7 +10,7 @@ data:
       # -- image repository
       repository: lscr.io/linuxserver/readarr
       # -- image tag
-      tag: develop
+      tag: nightly
       
       # -- image pull policy
       pullPolicy: IfNotPresent
