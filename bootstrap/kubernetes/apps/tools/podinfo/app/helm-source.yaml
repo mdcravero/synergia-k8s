@@ -6,4 +6,4 @@ metadata:
   namespace: tools
 spec:
   interval: 1m0s
-  url: https://ghcr.io/stefanprodan
+  url: https://stefanprodan.github.io
