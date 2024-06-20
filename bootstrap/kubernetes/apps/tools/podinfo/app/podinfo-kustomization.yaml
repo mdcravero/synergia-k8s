@@ -35,9 +35,10 @@ spec:
         spec:
           type: LoadBalancer
           ports:
-            - protocol: TCP
-              port: 80
-              targetPort: 9898
+            - name: http
+              protocol: TCP
+              port: 9898
+              targetPort: http
       target:
         name: podinfo
         kind: Service
