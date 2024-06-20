@@ -1,9 +1,0 @@
----
-apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: HelmRepository
-metadata:
-  name: dashy
-  namespace: tools
-spec:
-  interval: 1m0s
-  url: https://vyrtualsynthese.github.io/selfhosted-helmcharts/
