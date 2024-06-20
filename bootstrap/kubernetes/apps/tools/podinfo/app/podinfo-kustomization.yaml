@@ -15,14 +15,14 @@ spec:
   targetNamespace: tools
   timeout: 3m0s
   wait: true
-  patches:
-    - patch: |-
-        apiVersion: autoscaling/v2
-        kind: HorizontalPodAutoscaler
-        metadata:
-          name: podinfo
-        spec:
-          minReplicas: 1
-      target:
+patches:
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
         name: podinfo
-        kind: HorizontalPodAutoscaler
+      spec:
+        minReplicas: 1
+    target:
+      name: podinfo
+      kind: HorizontalPodAutoscaler
