@@ -37,8 +37,8 @@ spec:
           ports:
             - name: http
               protocol: TCP
-              port: http
-              targetPort: 80
+              port: 9898
+              targetPort: http
       target:
         name: podinfo
         kind: Service
