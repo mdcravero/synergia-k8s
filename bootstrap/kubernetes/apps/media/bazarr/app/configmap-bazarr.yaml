@@ -8,9 +8,9 @@ data:
   values.yaml: |-
     image:
       # -- image repository
-      repository: ghcr.io/k8s-at-home/bazarr
+      repository: linuxserver/bazarr
       # @default -- chart.appVersion
-      tag:
+      tag: 1.4.3
       # -- image pull policy
       pullPolicy: IfNotPresent
 
