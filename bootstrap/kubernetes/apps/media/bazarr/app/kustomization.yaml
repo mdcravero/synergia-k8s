@@ -5,4 +5,4 @@ metadata:
 resources:
   - deployment.yaml
   - service.yaml
-  - pvc-bazarr.yml
+  - pvc-bazarr.yaml
