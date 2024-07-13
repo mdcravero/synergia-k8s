@@ -271,12 +271,10 @@ data:
 
     # Persistence values for the Home Assistant instance
     persistence:
-      name: homeassistant
       enabled: true
-      accessMode: 
-        - ReadWriteOnce
-      size: 3Gi
-      storageClass: nfs-client
+      accessMode: ReadWriteOnce
+      size: 5Gi
+      storageClass: "nfs-client"
 
     # if you need any additional volumes, you can define them here
     additionalVolumes: []
