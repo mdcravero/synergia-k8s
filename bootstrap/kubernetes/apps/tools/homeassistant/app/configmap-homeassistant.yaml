@@ -51,9 +51,9 @@ data:
       # fsGroupChangePolicy: "OnRootMismatch"
 
     # Environment variables
-    env: []
-    # - name: TZ
-    #   value: Europe/Prague
+    env:
+      - name: TZ
+        value: America/Argentina/Cordoba
     # - name: SOME_VAR_FROM_CONFIG_MAP
     #   valueFrom:
     #     configMapRef:
@@ -272,13 +272,13 @@ data:
     # Persistence values for the Home Assistant instance
     persistence:
       # Enable or disable persistence
-      enabled: false
+      enabled: true
       # Access mode for the persistent volume claim
       accessMode: ReadWriteOnce
       # Size of the persistent volume claim
-      size: 5Gi
+      size: 3Gi
       # Storage class for the persistent volume claim
-      storageClass: ""
+      storageClass: "nfs-client"
       # Name of the existing volume claim for the stateful set, this option can be used to use existing volumes
       existingVolume: ""
       ## Persistent Volume selectors
