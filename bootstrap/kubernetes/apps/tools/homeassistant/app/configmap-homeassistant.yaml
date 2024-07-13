@@ -271,6 +271,7 @@ data:
 
     # Persistence values for the Home Assistant instance
     persistence:
+      name: homeassistant
       # Enable or disable persistence
       enabled: true
       # Access mode for the persistent volume claim
