@@ -28,6 +28,8 @@ spec:
           env:
             - name: TZ
               value: "America/Argentina/Córdoba"
+            - name: PYTHONWARNINGS
+              value: ignore:Unverified HTTPS request
           volumeMounts:
             - mountPath: /config
               name: config
