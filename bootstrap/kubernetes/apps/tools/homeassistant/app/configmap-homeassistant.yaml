@@ -274,7 +274,7 @@ data:
       enabled: true
       accessMode: ReadWriteOnce
       size: 5Gi
-      storageClass: "nfs-client"
+      storageClass: 'nfs-client'
 
     # if you need any additional volumes, you can define them here
     additionalVolumes: []
