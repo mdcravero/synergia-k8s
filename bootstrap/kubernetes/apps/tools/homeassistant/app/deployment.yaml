@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: homeassistant
+  name: homeassistant
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homeassistant
+  template:
+    metadata:
+      labels:
+        app: homeassistant
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: homeassistant-pvc
+      containers:
+        - name: homeassistant
+          image: homeassistant/home-assistant:stable
+          env:
+            - name: TZ
+              value: "America/Argentina/Córdoba"
+          volumeMounts:
+            - mountPath: /config
+              name: config
+          ports:
+            - containerPort: 8123
+              name: http
+              protocol: TCP
