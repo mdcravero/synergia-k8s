@@ -23,7 +23,7 @@ spec:
           persistentVolumeClaim:
             claimName: home-assistant-pvc
       containers:
-        - name: homeassistant
+        - name: home-assistant-app
           image: homeassistant/home-assistant:stable
           env:
             - name: TZ
