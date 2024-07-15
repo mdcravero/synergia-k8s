@@ -8,6 +8,8 @@ metadata:
   namespace: tools
 spec:
   type: LoadBalancer
+  selector:
+    app: home-assistant
   ports:
     - port: 8123
       targetPort: 8123
