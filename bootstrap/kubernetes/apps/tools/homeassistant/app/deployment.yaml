@@ -3,25 +3,25 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: homeassistant
-  name: homeassistant
+    app: home-assistant
+  name: home-assistant
   namespace: tools
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: homeassistant
+      app: home-assistant
   template:
     metadata:
       labels:
-        app: homeassistant
+        app: home-assistant
     spec:
       securityContext:
         fsGroup: 1000
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: homeassistant-pvc
+            claimName: home-assistant-pvc
       containers:
         - name: homeassistant
           image: homeassistant/home-assistant:stable

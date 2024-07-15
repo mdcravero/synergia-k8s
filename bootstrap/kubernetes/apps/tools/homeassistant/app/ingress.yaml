@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: homeassistant-http
+  name: home-assistant-http
   namespace: tools
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
@@ -14,7 +14,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: homeassistant
+                name: home-assistant-svc
                 port:
                   number: 8123
 
@@ -22,7 +22,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: homeassistant-https
+  name: home-assistant-https
   namespace: tools
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -37,6 +37,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: homeassistant
+                name: home-assistant-svc
                 port:
                   number: 8123

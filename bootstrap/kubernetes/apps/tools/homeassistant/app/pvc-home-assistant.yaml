@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: homeassistant-pvc
+  name: home-assistant-pvc
   namespace: tools
 spec:
   storageClassName: "nfs-client"
