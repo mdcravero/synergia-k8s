@@ -5,6 +5,7 @@ metadata:
   labels:
     app: home-assistant
   name: home-assistant
+  namespace: tools
 spec:
   type: LoadBalancer
   ports:
