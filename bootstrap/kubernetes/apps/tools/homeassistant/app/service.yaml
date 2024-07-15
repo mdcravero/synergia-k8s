@@ -9,6 +9,6 @@ spec:
   type: LoadBalancer
   ports:
     - port: 8123
-      targetPort: http
+      targetPort: 8123
       protocol: TCP
       name: http
