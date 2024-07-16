@@ -69,12 +69,10 @@ spec:
               name: http
               protocol: TCP
           args:
-            [
-              "--auth",
-              "none",
-              "--user-data-dir",
-              "/config/.vscode",
-              "--extensions-dir",
-              "/config/.vscode",
-              "/config",
-            ]
+            - "--auth"
+            - "none"
+            - "--user-data-dir"
+            - "/config/.vscode"
+            - "--extensions-dir"
+            - "/config/.vscode"
+            - "/config"
