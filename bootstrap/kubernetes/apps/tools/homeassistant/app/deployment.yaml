@@ -64,6 +64,9 @@ spec:
             - containerPort: 8443
               name: http
               protocol: TCP
-          volumeMounts: 
-            - mountPath: /config
-              name: config
+          args: [
+              "--auth", "none",
+              "--user-data-dir", "/config/.vscode",
+              "--extensions-dir", "/config/.vscode",
+              "/config"
+            ]
