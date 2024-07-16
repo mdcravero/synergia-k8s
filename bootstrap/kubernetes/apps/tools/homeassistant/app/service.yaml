@@ -24,7 +24,7 @@ metadata:
     app: home-assistant
   namespace: tools
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - port: 12321
       targetPort: codeserver
