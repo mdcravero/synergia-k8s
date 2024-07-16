@@ -57,16 +57,19 @@ spec:
             initialDelaySeconds: 0
             failureThreshold: 30
             timeoutSeconds: 1
-            periodSeconds: 5
-        -name: code-server
+        - name: code-server
           image: linuxserver/code-server
           ports:
             - containerPort: 8443
               name: http
               protocol: TCP
-          args: [
-              "--auth", "none",
-              "--user-data-dir", "/config/.vscode",
-              "--extensions-dir", "/config/.vscode",
-              "/config"
+          args:
+            [
+              "--auth",
+              "none",
+              "--user-data-dir",
+              "/config/.vscode",
+              "--extensions-dir",
+              "/config/.vscode",
+              "/config",
             ]
