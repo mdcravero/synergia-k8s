@@ -79,4 +79,4 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /config
-              name: home-assistant-pvc
+              name: config
