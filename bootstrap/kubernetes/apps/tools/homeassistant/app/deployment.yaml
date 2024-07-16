@@ -57,22 +57,4 @@ spec:
             initialDelaySeconds: 0
             failureThreshold: 30
             timeoutSeconds: 1
-        - name: code-server
-          image: linuxserver/code-server
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-          ports:
-            - containerPort: 8443
-              name: http
-              protocol: TCP
-          args:
-            - "--auth"
-            - "none"
-            - "--user-data-dir"
-            - "/config/.vscode"
-            - "--extensions-dir"
-            - "/config/.vscode"
-            - "/config"
+            periodSeconds: 10
