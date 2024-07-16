@@ -59,16 +59,11 @@ spec:
             timeoutSeconds: 1
             periodSeconds: 5
         -name: code-server
-          image: linuxserver/code-server
-          tag: latest
-          args: [
-              "--auth", "none",
-              "--user-data-dir", "/config/.vscode",
-              "--extensions-dir", "/config/.vscode",
-              "--port", "12321",
-              "/config"
-            ]
+          image: lscr.io/linuxserver/code-server:latest
           ports:
-            - containerPort: 12321
+            - containerPort: 8443
               name: http
               protocol: TCP
+          volumeMounts: 
+            - mountPath: /config
+              name: config
