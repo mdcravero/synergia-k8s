@@ -58,3 +58,25 @@ spec:
             failureThreshold: 30
             timeoutSeconds: 1
             periodSeconds: 10
+
+        - name: codeserver
+          securityContext: {}
+          args:
+            - --auth
+            - none
+            - --user-data-dir
+            - "/config/.vscode"
+            - --extensions-dir
+            - "/config/.vscode"
+            - --port
+            - "12321"
+            - "/config"
+          image: "ghcr.io/coder/code-server:4.90.3"
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 12321
+              name: codeserver
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /config
+              name: home-assistant-pvc
