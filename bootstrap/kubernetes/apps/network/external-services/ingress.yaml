@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: omada-controller
+  name: omada-controller-http
   namespace: external-services
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
@@ -22,7 +22,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: omada-controller
+  name: omada-controller-https
   namespace: external-services
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
