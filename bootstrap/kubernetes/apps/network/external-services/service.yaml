@@ -4,7 +4,7 @@ metadata:
   name: omada-controller
   namespace: external-services
 spec:
-  type: omada-controller
+  type: ExternalName
   externalName: 192.168.1.12
   ports:
     - port: 8043
