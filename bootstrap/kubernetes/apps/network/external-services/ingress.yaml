@@ -1,20 +1,42 @@
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: omada-controller
   namespace: external-services
   annotations:
-    kubernetes.io/ingress.class: traefik-external
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: omada.synergia-it.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: omada-controller
+                port:
+                  number: 8043
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oma-controller
+  namespace: external-services
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
 spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`omada.synergia-it.ar`)
-      kind: Rule
-      services:
-        - name: omada-controller
-          namespace: external-services
-          port: 8043
-          scheme: https
+  rules:
+    - host: omada.synergia-it.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: omada.synergia-it.ar
+                port:
+                  number: 8043
