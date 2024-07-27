@@ -16,7 +16,7 @@ spec:
               service:
                 name: omada-controller
                 port:
-                  number: 8043
+                  number: 8088
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -39,4 +39,4 @@ spec:
               service:
                 name: omada-controller
                 port:
-                  number: 8043
+                  number: 8088
