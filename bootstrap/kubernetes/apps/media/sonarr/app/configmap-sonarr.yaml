@@ -19,7 +19,7 @@ data:
       repository: lscr.io/linuxserver/sonarr
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "version-5.8.3.8933"
+      tag: "version-4.0.8.1874"
 
     env:
       PUID: 1000
