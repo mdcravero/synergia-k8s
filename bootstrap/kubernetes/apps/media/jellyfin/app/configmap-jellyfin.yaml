@@ -15,17 +15,8 @@ data:
       tag: 10.9.9
 
     ingress:
-      enabled: false
-      className: traefik
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.tls: "true"
-        traefik.ingress.kubernetes.io/router.tls.certresolver: le
-      hosts:
-        - host: jellyfin.synergia-it.ar
-          paths:
-            - path: /
-              pathType: Prefix
+      main:
+        enabled: false
 
     persistence:
       config:
@@ -50,5 +41,3 @@ data:
             port: 8096
         type: LoadBalancer
         loadBalancerIP: 192.168.1.60
-
-#
