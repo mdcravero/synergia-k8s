@@ -15,7 +15,7 @@ data:
       tag: 10.9.9
 
     ingress:
-      enabled: true
+      enabled: false
       className: traefik
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
