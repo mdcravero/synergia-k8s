@@ -62,6 +62,12 @@ data:
                   port:
                     number: 7878
 
+      tls:
+        - secretName: le
+          hosts:
+            - radarr.synergia.net.ar
+
+
     extraVolumes:
       - name: media
         persistentVolumeClaim:
