@@ -7,7 +7,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web
 spec:
   rules:
-    - host: bazarr.synergia-it.ar
+    - host: bazarr.synergia.net.ar
       http:
         paths:
           - path: /
@@ -30,7 +30,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
 spec:
   rules:
-    - host: bazarr.synergia-it.ar
+    - host: bazarr.synergia.net.ar
       http:
         paths:
           - path: /
