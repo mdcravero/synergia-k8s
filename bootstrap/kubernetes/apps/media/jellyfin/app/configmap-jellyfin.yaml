@@ -16,7 +16,18 @@ data:
 
     ingress:
       main:
-        enabled: false
+        enabled: true
+        ingressClassName: traefik
+        hosts:
+          - host: jellyfin.synergia.net.ar
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: jellyfin
+                    port:
+                      number: 8096
 
     persistence:
       config:
