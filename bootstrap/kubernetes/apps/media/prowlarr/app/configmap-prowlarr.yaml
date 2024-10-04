@@ -17,7 +17,7 @@ data:
       # -- image repository
       repository: ghcr.io/onedr0p/prowlarr-develop
       # @default -- chart.appVersion
-      tag: 1.23.1.4708
+      tag: 1.24.3.4754
       # -- image pull policy
       pullPolicy: IfNotPresent
 
@@ -43,7 +43,18 @@ data:
       # -- Enable and configure ingress settings for the chart under this key.
       # @default -- See values.yaml
       main:
-        enabled: false
+        enabled: true
+        ingressClassName: traefik
+        hosts:
+          - host: prowlarr.synergia.net.ar
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: prowlarr
+                    port:
+                      number: 9696
 
     # -- Configures the probes for the main Pod.
     # @default -- See values.yaml
