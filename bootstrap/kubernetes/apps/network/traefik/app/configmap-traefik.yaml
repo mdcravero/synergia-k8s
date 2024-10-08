@@ -42,3 +42,17 @@ data:
       type: LoadBalancer
       spec:
         loadBalancerIP: "192.168.1.50"
+    
+    ingress:
+      enabled: true
+      hosts:
+        - traefik-dash.synergia.net.ar
+      path: /traefik
+      pathType: Prefix
+      backend:
+        service:
+          name: traefik
+          port:
+            number: 8080
+  
+
