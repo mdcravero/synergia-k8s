@@ -1275,10 +1275,10 @@ data:
       enabled: true
 
       rbac:
-        pspEnabled: false
+        pspEnabled: true
 
       containerSecurityContext:
-        allowPrivilegeEscalation: false
+        allowPrivilegeEscalation: true
 
     ## prometheus-pushgateway sub-chart configurable values
     ## Please see https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-pushgateway
