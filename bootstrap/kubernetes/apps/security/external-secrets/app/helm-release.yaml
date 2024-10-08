@@ -11,7 +11,7 @@ spec:
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: external-secrets-operator
+        name: external-secrets
       version: 0.10.4
   interval: 1m0s
   releaseName: external-secrets-operator
