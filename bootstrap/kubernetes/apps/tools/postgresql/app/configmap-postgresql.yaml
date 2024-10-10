@@ -31,6 +31,8 @@ data:
         postgresql: 5432
 
     persistence:
+      ## @param persistence.storageClass Storage class to use for the PersistentVolumeClaim
+      storageClass: nfs-client
       enabled: true
       accessModes:
         - ReadWriteOnce
