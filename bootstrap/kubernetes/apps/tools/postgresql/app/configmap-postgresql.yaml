@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-values
+  namespace: tools
+data:
+  values.yaml: |-
+    image:
+      registry: docker.io
+      repository: bitnami/postgresql
+      tag: 17.0.0-debian-12-r1
+      digest: ""
+
+    auth:
+      ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
+      ##
+      enablePostgresUser: true
+      ## @param auth.postgresPassword Password for the "postgres" admin user. Ignored if `auth.existingSecret` is provided
+      ##
+      postgresPassword: ""
+      ## @param auth.username Name for a custom user to create
+      ##
+      username: ""
+      ## @param auth.password Password for the custom user to create. Ignored if `auth.existingSecret` is provided
+      ##
+      password: ""
+      ## @param auth.database Name for a custom database to create
+      ##
+      database: ""
+      ## @param auth.replicationUsername Name of the replication user
+      ##
+      replicationUsername: repl_user
+      ## @param auth.replicationPassword Password for the replication user. Ignored if `auth.existingSecret` is provided
+      ##
+      replicationPassword: ""
+      ## @param auth.existingSecret Name of existing secret to use for PostgreSQL credentials. `auth.postgresPassword`, `auth.password`, and `auth.replicationPassword` will be ignored and picked up from this secret. The secret might also contains the key `ldap-password` if LDAP is enabled. `ldap.bind_password` will be ignored and picked from this secret in this case.
+      ##
+      existingSecret: "postgres-secret"
+      ## @param auth.secretKeys.adminPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      
+      ## @param auth.secretKeys.userPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ## @param auth.secretKeys.replicationPasswordKey Name of key in existing secret to use for PostgreSQL credentials. Only used when `auth.existingSecret` is set.
+      ##
+      secretKeys:
+        adminPasswordKey: password
+        userPasswordKey: username
+      ## @param auth.usePasswordFiles Mount credentials as a files instead of using an environment variable
+      ##
+      usePasswordFiles: false
+    ## @param architecture PostgreSQL architecture (`standalone` or `replication`)
+
+    service:
+      type: LoadBalancer
+      ports:
+        postgresql: 5432
+
+    persistence:
+      enabled: true
+      storageClass: "nfs-client"
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
