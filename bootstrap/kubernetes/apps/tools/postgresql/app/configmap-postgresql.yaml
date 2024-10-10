@@ -6,7 +6,7 @@ metadata:
   namespace: tools
 data:
   values.yaml: |-
-    storageClass: nfs-client
+    defaultStorageClass: nfs-client
 
     image:
       registry: docker.io
