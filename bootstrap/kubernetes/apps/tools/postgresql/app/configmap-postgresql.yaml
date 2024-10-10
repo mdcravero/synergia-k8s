@@ -49,8 +49,11 @@ data:
 
     service:
       type: LoadBalancer
+
       ports:
         postgresql: 5432
+      
+      loadBalancerIP: 192.168.1.75
 
     persistence:
       ## @param persistence.storageClass Storage class to use for the PersistentVolumeClaim
