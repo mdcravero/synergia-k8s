@@ -6,9 +6,8 @@ metadata:
   namespace: tools
 data:
   values.yaml: |-
+    storageClass: nfs-client
 
-    global:
-      storageClass: nfs-client
     image:
       registry: docker.io
       repository: bitnami/postgresql
@@ -33,8 +32,6 @@ data:
 
     persistence:
       enabled: true
-      volumeName: "data"
-      mountPath: /bitnami/postgresql
       accessModes:
         - ReadWriteOnce
       size: 8Gi
