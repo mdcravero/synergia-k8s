@@ -25,23 +25,18 @@ data:
         volumes:
           - name: postgres-creds
             secret:
-              secretName: authentik-postgres-credentials
+              secretName: secret-authentik-postgres
         volumeMounts:
           - name: postgres-creds
             mountPath: /postgres-creds
             readOnly: true
 
     postgresql:
-      enabled: true
       host: 192.168.1.70
-      auth:
-        user: file:///postgres-creds/username
-        password: file:///postgres-creds/password
-        database: authentik
+      user: file:///postgres-creds/username
+      password: file:///postgres-creds/password
+      database: authentik
 
     redis:
-      enabled: true
       host: 192.168.1.71
       architecture: standalone
-        auth:
-        enabled: true
