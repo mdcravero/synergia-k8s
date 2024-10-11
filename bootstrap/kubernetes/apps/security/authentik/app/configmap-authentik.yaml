@@ -15,8 +15,8 @@ data:
 
       postgresql:
         host: 192.168.1.70
-        user: /postgres-creds/username
-        password: /postgres-creds/password
+        user: "/postgres-creds/username"
+        password: "/postgres-creds/password"
         database: authentik
 
       redis:
