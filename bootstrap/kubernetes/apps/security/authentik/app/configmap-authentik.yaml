@@ -7,6 +7,15 @@ metadata:
 data:
   values.yaml: |-
     # Default values for authentik.
+
+    global:
+       env:
+        - name: AUTHENTIK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik-key
+              key: password
+
     authentik:
 
       error_reporting:
@@ -19,14 +28,6 @@ data:
       redis:
         host: 192.168.1.71
         architecture: standalone
-
-      env:
-        - name: AUTHENTIK_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-key
-              key: password
-
 
     server:
 
