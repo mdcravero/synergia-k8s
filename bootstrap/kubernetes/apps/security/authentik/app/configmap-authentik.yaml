@@ -38,7 +38,7 @@ data:
         hosts:
           - authentik.synergia.net.ar
         paths:
-          - path: /
+          - /
         pathType: Prefix
 
       env:
