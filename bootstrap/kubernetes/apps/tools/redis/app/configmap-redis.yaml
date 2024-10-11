@@ -1,0 +1,132 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-values
+  namespace: tools
+data:
+  values.yaml: |-
+
+    clusterDomain: synergia.local
+    extraDeploy: []
+    useHostnames: true
+    nameResolutionThreshold: 5
+    nameResolutionTimeout: 5
+
+
+    image:
+      registry: docker.io
+      repository: bitnami/redis
+      tag: 7.4.1-debian-12-r0
+      digest: ""
+      pullPolicy: IfNotPresent
+      debug: true
+
+    auth:
+      enabled: true
+      sentinel: true
+      existingSecret: "redis-secret"
+      existingSecretPasswordKey: "password"
+      usePasswordFileFromSecret: true
+
+
+    master:
+      count: 1
+      revisionHistoryLimit: 10
+      disableCommands:
+        - FLUSHDB
+        - FLUSHALL
+      
+      enableServiceLinks: true
+      containerPorts:
+        redis: 6379
+      
+      startupProbe:
+        enabled: false
+        initialDelaySeconds: 20
+        periodSeconds: 5
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 5
+      
+      livenessProbe:
+        enabled: true
+        initialDelaySeconds: 20
+        periodSeconds: 5
+        timeoutSeconds: 5
+        successThreshold: 1
+        failureThreshold: 5
+      
+      readinessProbe:
+        enabled: true
+        initialDelaySeconds: 20
+        periodSeconds: 5
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 5
+     
+      podSecurityContext:
+        enabled: true
+        fsGroupChangePolicy: Always
+        sysctls: []
+        supplementalGroups: []
+        fsGroup: 1001
+     
+      containerSecurityContext:
+        enabled: true
+        seLinuxOptions: {}
+        runAsUser: 1001
+        runAsGroup: 1001
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        seccompProfile:
+          type: RuntimeDefault
+        capabilities:
+          drop: ["ALL"]
+      
+      kind: StatefulSet
+
+      persistence:
+        enabled: true
+        path: /data
+        storageClass: "nfs-client"
+        accessModes:
+          - ReadWriteOnce
+        size: 8Gi
+
+      service:
+        type: LoadBalancer
+        portNames:
+          redis: "tcp-redis"
+        ports:
+          redis: 6379
+        loadBalancerIP: "192.168.1.71"
+        
+      serviceAccount:
+        create: true
+        
+      pdb:
+        create: true
+        minAvailable: ""
+        maxUnavailable: ""
+     
+      podSecurityContext:
+        enabled: true
+        fsGroupChangePolicy: Always
+        sysctls: []
+        supplementalGroups: []
+        fsGroup: 1000
+      
+      containerSecurityContext:
+        enabled: true
+        seLinuxOptions: {}
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        seccompProfile:
+          type: RuntimeDefault
+        capabilities:
+          drop: ["ALL"]

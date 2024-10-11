@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: redis
+  namespace: tools
+spec:
+  chart:
+    spec:
+      chart: redis
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: redis
+      version: 20.2.0
+  interval: 1m0s
+  releaseName: redis
+  valuesFrom:
+    - kind: ConfigMap
+      name: redis-values
+      valuesKey: values.yaml
