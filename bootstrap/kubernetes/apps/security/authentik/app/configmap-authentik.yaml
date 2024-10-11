@@ -23,6 +23,12 @@ data:
 
 
     server:
+
+      ## authentik server service configuration
+      service:
+        type: LoadBalancer
+        LoadBalancerIP: 192.168.1.72
+
       ingress:
         # Specify kubernetes ingress controller class name
         ingressClassName: traefik
