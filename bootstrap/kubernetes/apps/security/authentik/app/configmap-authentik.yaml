@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-values
+  namespace: authentik
+data:
+  values.yaml: |-
+    # Default values for authentik.
+    authentik:
+    secret_key: "PleaseGenerateASecureKey"
+    # This sends anonymous usage-data, stack traces on errors and
+    # performance data to sentry.io, and is fully opt-in
+    error_reporting:
+        enabled: true
+
+    server:
+      ingress:
+        # Specify kubernetes ingress controller class name
+        ingressClassName: traefik
+        enabled: true
+        hosts:
+            - authentik.synergia-it.net.ar
+
+    postgresql:
+      enabled: true
+      host: 192.168.1.70
+      auth:
+        username: authentik
+        database: authentik
+        existingSecret: "secret-authentik-postgres"
+        secretKeys:
+          adminPasswordKey: password
+
+    redis:
+      enabled: true
+      host: 192.168.1.71
+      architecture: standalone
+        auth:
+        enabled: true
