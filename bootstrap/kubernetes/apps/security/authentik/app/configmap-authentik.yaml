@@ -36,9 +36,9 @@ data:
         ingressClassName: traefik
         enabled: true
         hosts:
-          - host: authentik.synergia-it.net.ar
+          - host: authentik.synergia.net.ar
             paths:
-              - path: "/"
+              - path: /
                 pathType: Prefix
 
       env:
