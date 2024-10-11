@@ -39,3 +39,13 @@ data:
         - name: postgres-creds
           mountPath: /postgres-creds
           readOnly: true
+
+    worker:
+      volumes:
+        - name: postgres-creds
+          secret:
+            secretName: secret-authentik-postgres
+      volumeMounts:
+        - name: postgres-creds
+          mountPath: /postgres-creds
+          readOnly: true
