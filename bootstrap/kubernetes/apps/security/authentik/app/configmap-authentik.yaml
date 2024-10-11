@@ -31,11 +31,11 @@ data:
         hosts:
             - authentik.synergia-it.net.ar
         
-        volumes:
-          - name: postgres-creds
-            secret:
-              secretName: secret-authentik-postgres
-        volumeMounts:
-          - name: postgres-creds
-            mountPath: /postgres-creds
-            readOnly: true
+      volumes:
+        - name: postgres-creds
+          secret:
+            secretName: secret-authentik-postgres
+      volumeMounts:
+        - name: postgres-creds
+          mountPath: /postgres-creds
+          readOnly: true
