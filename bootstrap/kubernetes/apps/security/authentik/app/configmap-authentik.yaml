@@ -15,13 +15,20 @@ data:
 
       postgresql:
         host: 192.168.1.70
-        user: /postgres-creds/username
-        password: /postgres-creds/password
+        # user: /postgres-creds/username
+        # password: /postgres-creds/password
         database: authentik
 
       redis:
         host: 192.168.1.71
         architecture: standalone
+
+      env:
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik-postgres
+              key: password
 
     server:
       ingress:
@@ -31,12 +38,12 @@ data:
         hosts:
             - authentik.synergia-it.net.ar
 
-      env:
-        - name: AUTHENTIK_POSTGRESQL__PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-postgres
-              key: password
+      # env:
+      #   - name: AUTHENTIK_POSTGRESQL__PASSWORD
+      #     valueFrom:
+      #       secretKeyRef:
+      #         name: secret-authentik-postgres
+      #         key: password
         
       # volumes:
       #   - name: postgres-creds
@@ -56,10 +63,10 @@ data:
       #   - name: postgres-creds
       #     mountPath: /postgres-creds
       #     readOnly: true
-      
-      env:
-        - name: AUTHENTIK_POSTGRESQL__PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-postgres
-              key: password
+
+      # env:
+      #   - name: AUTHENTIK_POSTGRESQL__PASSWORD
+      #     valueFrom:
+      #       secretKeyRef:
+      #         name: secret-authentik-postgres
+      #         key: password
