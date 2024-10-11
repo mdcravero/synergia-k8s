@@ -14,10 +14,10 @@ data:
           enabled: true
 
       postgresql:
-      host: 192.168.1.70
-      user: file:///postgres-creds/username
-      password: file:///postgres-creds/password
-      database: authentik
+        host: 192.168.1.70
+        user: file:///postgres-creds/username
+        password: file:///postgres-creds/password
+        database: authentik
 
       redis:
         host: 192.168.1.71
