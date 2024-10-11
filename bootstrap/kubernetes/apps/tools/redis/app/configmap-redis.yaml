@@ -130,3 +130,6 @@ data:
           type: RuntimeDefault
         capabilities:
           drop: ["ALL"]
+
+    replica:
+      count: 0
