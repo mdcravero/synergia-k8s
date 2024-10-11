@@ -24,7 +24,9 @@ data:
 
     server:
 
-      ## authentik server service configuration
+      podLabels:
+        app.kubernetes.io/name: authentik
+
       service:
         type: LoadBalancer
         LoadBalancerIP: 192.168.1.72
@@ -34,10 +36,15 @@ data:
         ingressClassName: traefik
         enabled: true
         hosts:
-            - authentik.synergia-it.net.ar
-        backend:
-            service:
-                name: authentik
+          - host: authentik.synergia-it.net.ar
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: authentik
+                    port:
+                      number: 8000
 
       env:
         - name: AUTHENTIK_POSTGRESQL__PASSWORD
