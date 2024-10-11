@@ -132,4 +132,9 @@ data:
           drop: ["ALL"]
 
     replica:
-      count: 0
+      kind: StatefulSet
+      replicaCount: 0
+
+    sentinel:
+      kind: StatefulSet
+      replicaCount: 0
