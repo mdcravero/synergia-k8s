@@ -41,6 +41,8 @@ data:
             secretKeyRef:
               name: secret-authentik-redis
               key: password
+        - name: AUTHENTIK_REDIS__USER
+          value: default
         
 
     worker:
@@ -55,3 +57,5 @@ data:
             secretKeyRef:
               name: secret-authentik-redis
               key: password
+        - name: AUTHENTIK_REDIS__USER
+          value: default
