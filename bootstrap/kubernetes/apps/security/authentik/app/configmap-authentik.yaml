@@ -32,27 +32,34 @@ data:
             - authentik.synergia-it.net.ar
 
       env:
-        - name: AUTHENTIK_VAR_OTHER
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
           valueFrom:
             secretKeyRef:
               name: secret-authentik-postgres
-              key: username
+              key: password
         
-      volumes:
-        - name: postgres-creds
-          secret:
-            secretName: secret-authentik-postgres
-      volumeMounts:
-        - name: postgres-creds
-          mountPath: /postgres-creds
-          readOnly: true
+      # volumes:
+      #   - name: postgres-creds
+      #     secret:
+      #       secretName: secret-authentik-postgres
+      # volumeMounts:
+      #   - name: postgres-creds
+      #     mountPath: /postgres-creds
+      #     readOnly: true
 
     worker:
-      volumes:
-        - name: postgres-creds
-          secret:
-            secretName: secret-authentik-postgres
-      volumeMounts:
-        - name: postgres-creds
-          mountPath: /postgres-creds
-          readOnly: true
+      # volumes:
+      #   - name: postgres-creds
+      #     secret:
+      #       secretName: secret-authentik-postgres
+      # volumeMounts:
+      #   - name: postgres-creds
+      #     mountPath: /postgres-creds
+      #     readOnly: true
+      
+      env:
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik-postgres
+              key: password
