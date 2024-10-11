@@ -35,6 +35,9 @@ data:
         enabled: true
         hosts:
             - authentik.synergia-it.net.ar
+        backend:
+            service:
+                name: authentik
 
       env:
         - name: AUTHENTIK_POSTGRESQL__PASSWORD
