@@ -36,10 +36,10 @@ data:
         ingressClassName: traefik
         enabled: true
         hosts:
-          - host: authentik.synergia.net.ar
-            paths:
-              - path: /
-                pathType: Prefix
+          - authentik.synergia.net.ar
+        paths:
+          - path: /
+        pathType: Prefix
 
       env:
         - name: AUTHENTIK_POSTGRESQL__PASSWORD
