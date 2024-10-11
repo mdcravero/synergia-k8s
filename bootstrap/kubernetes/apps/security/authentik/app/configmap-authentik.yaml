@@ -42,7 +42,7 @@ data:
               name: secret-authentik-redis
               key: password
         - name: AUTHENTIK_REDIS__USERNAME
-            valueFrom:
+          valueFrom:
             secretKeyRef:
               name: secret-authentik-redis
               key: username
@@ -61,7 +61,7 @@ data:
               name: secret-authentik-redis
               key: password
         - name: AUTHENTIK_REDIS__USERNAME
-            valueFrom:
+          valueFrom:
             secretKeyRef:
               name: secret-authentik-redis
               key: username
