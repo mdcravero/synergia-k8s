@@ -8,7 +8,7 @@ data:
   values.yaml: |-
     # Default values for authentik.
     authentik:
-    secret_key: "PleaseGenerateASecureKey"
+    secret_key: "MXyuoc5rJ+ZY7Ets+HyBH4tv8HP86yaW/IHt5tcZzUJ4LcZbbzVVxT4aJisBI8RnoilJX2H9jJdAGwiB"
     # This sends anonymous usage-data, stack traces on errors and
     # performance data to sentry.io, and is fully opt-in
     error_reporting:
@@ -21,16 +21,23 @@ data:
         enabled: true
         hosts:
             - authentik.synergia-it.net.ar
+        
+        volumes:
+          - name: postgres-creds
+            secret:
+              secretName: authentik-postgres-credentials
+        volumeMounts:
+          - name: postgres-creds
+            mountPath: /postgres-creds
+            readOnly: true
 
     postgresql:
       enabled: true
       host: 192.168.1.70
       auth:
-        username: authentik
+        user: file:///postgres-creds/username
+        password: file:///postgres-creds/password
         database: authentik
-        existingSecret: "secret-authentik-postgres"
-        secretKeys:
-          adminPasswordKey: password
 
     redis:
       enabled: true
