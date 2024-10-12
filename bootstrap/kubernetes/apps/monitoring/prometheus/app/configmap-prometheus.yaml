@@ -7,8 +7,12 @@ metadata:
 data:
   values.yaml: |-
     alertRelabelConfigs: {}
+
     alertmanager:
-      enabled: true
+
+      ### DESACTIVADO HASTA QUE SE ENCUENTRE EL PROBLEMA
+      
+      enabled: false
       persistentVolume:
         accessModes:
         - ReadWriteOnce
