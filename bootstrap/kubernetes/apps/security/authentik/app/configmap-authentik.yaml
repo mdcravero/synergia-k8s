@@ -15,7 +15,22 @@ data:
             secretKeyRef:
               name: secret-authentik-key
               key: password
-
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik-postgres
+              key: password
+        - name: AUTHENTIK_REDIS__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik-redis
+              key: password
+        - name: AUTHENTIK_REDIS__USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik-redis
+              key: username
+        
     authentik:
 
       error_reporting:
@@ -48,38 +63,6 @@ data:
           - /
         pathType: Prefix
 
-      env:
-        - name: AUTHENTIK_POSTGRESQL__PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-postgres
-              key: password
-        - name: AUTHENTIK_REDIS__PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-redis
-              key: password
-        - name: AUTHENTIK_REDIS__USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-redis
-              key: username
         
-
     worker:
-      env:
-        - name: AUTHENTIK_POSTGRESQL__PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-postgres
-              key: password
-        - name: AUTHENTIK_REDIS__PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-redis
-              key: password
-        - name: AUTHENTIK_REDIS__USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: secret-authentik-redis
-              key: username
+      # Set worker values if you want to use it
