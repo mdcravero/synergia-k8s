@@ -1,1 +1,2 @@
-
+#Ignore Loki Stack
+bootstrap/kubernetes/apps/monitoring/loki-stack
