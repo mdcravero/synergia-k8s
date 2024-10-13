@@ -1,1 +1,3 @@
 bootstrap/kubernetes/apps/monitoring/*
+bootstrap/kubernetes/apps/tools/transmission_books/*
+bootstrap/kubernetes/apps/media/readarr/*
