@@ -24,7 +24,8 @@ spec:
             claimName: home-assistant-pvc
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:stable
+          image: homeassistant/home-assistant:2024.10.4
+          imagePullPolicy: IfNotPresent
           env:
             - name: TZ
               value: "America/Argentina/Córdoba"
