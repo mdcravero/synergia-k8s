@@ -24,6 +24,7 @@ data:
     env:
       TZ: "America/Argentina/Cordoba"
       forceIpv4First: true
+      LOG_LEVEL=debug
 
     imagePullSecrets: []
     nameOverride: ""
