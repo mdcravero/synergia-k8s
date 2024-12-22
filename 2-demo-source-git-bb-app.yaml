@@ -8,4 +8,4 @@ spec:
   interval: 1m0s
   ref:
     branch: 2-demo
-  url: https://github.com/synerg14/bb-app-source.git
+  url: https://github.com/synerg14/bb-app-source
