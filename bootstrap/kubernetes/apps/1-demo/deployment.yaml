@@ -50,3 +50,5 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+      nodeSelector:
+        type: worker-amd
