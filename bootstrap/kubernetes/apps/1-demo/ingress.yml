@@ -2,11 +2,12 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: block-buster-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: le
 spec:
   rules:
-    - host: block-buster.synergia.net.ar
+    - host: block-buster.synergia-it.ar
       http:
         paths:
           - path: /
@@ -15,4 +16,4 @@ spec:
               service:
                 name: block-buster
                 port:
-                  name: web
+                  number: 80
