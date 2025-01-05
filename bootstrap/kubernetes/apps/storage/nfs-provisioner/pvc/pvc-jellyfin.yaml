@@ -26,3 +26,18 @@ spec:
   resources:
     requests:
       storage: 50Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authentik-media
+  namespace: security
+spec:
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: "nfs-client"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50M

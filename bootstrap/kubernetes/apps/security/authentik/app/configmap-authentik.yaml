@@ -46,6 +46,14 @@ data:
 
     server:
 
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+              claimName: authentik-media
+      volumeMounts:
+        - name: media
+          mountPath: /media
+
       nodeSelector:
         type: worker
 
