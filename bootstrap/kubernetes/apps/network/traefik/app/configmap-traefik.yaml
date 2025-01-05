@@ -54,3 +54,4 @@ data:
             kind: TraefikService
         middlewares: 
           - name: traefik-middlewares-authentik@kubernetescrd
+          - namespace: traefik
