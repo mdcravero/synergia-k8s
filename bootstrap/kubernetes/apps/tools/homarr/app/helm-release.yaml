@@ -36,16 +36,18 @@ spec:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: le
+        traefik.ingress.kubernetes.io/router.middlewares: tools-middlewares-authentik@kubernetescrd
+
       enabled: true
       hosts:
-        - host: homarr.synergia-it.ar
+        - host: homarr.synergia.net.ar
           paths:
             - path: /
               pathType: Prefix
       className: "traefik"
       tls:
         - hosts:
-            - "homarr.synergia-it.ar"
+            - "homarr.synergia.net.ar"
     nameOverride: ""
     persistence:
       - accessMode: ReadWriteOnce
