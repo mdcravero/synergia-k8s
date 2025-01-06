@@ -43,15 +43,17 @@ data:
       spec:
         loadBalancerIP: "192.168.1.50"
 
+    additionalArguments:
+      - "--api.insecure=false" # No usar insecure en producción
+      - "--api.dashboard=true"
+
     ingressRoute:
       dashboard:
         enabled: true
-        annotations: {}
-        labels: {}
-        matchRule: Host(`traefik.synergia.net.ar/`) && PathPrefix(`/dashboard`) || PathPrefix(`/api`)
-        services:
-          - name: api@internal
-            kind: TraefikService
+        entryPoints:
+          - websecure
+        host: traefik.synergia.net.ar
+        pathPrefix: /dashboard
         middlewares: 
-          - name: traefik-middlewares-authentik
+          - name: "traefik-middlewares-authentik@kubernetescrd"
             namespace: traefik
