@@ -53,5 +53,5 @@ data:
           - name: api@internal
             kind: TraefikService
         middlewares: 
-          - name: traefik-middlewares-authentik@kubernetescrd
+          - name: traefik-middlewares-authentik
             namespace: traefik
