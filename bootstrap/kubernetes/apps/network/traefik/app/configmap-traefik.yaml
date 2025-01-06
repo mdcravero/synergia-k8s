@@ -55,5 +55,5 @@ data:
         host: traefik.synergia.net.ar
         pathPrefix: /dashboard
         middlewares: 
-          - name: "traefik-middlewares-authentik@kubernetescrd"
+          - name: "traefik-middlewares-authentik"
             namespace: traefik
