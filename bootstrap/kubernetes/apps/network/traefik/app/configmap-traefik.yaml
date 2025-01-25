@@ -52,8 +52,12 @@ data:
         enabled: true
         entryPoints:
           - websecure
-        host: traefik.synergia.net.ar
-        pathPrefix: /dashboard
+        matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+        # host: traefik.synergia.net.ar
+        # pathPrefix: /dashboard
+        services:
+          - name: api@internal
+            kind: TraefikService
         middlewares: 
           - name: "traefik-middlewares-authentik"
             namespace: traefik
