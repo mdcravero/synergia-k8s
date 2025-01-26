@@ -52,7 +52,7 @@ data:
         enabled: true
         entryPoints:
           - websecure
-        matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+        matchRule:  Host(`traefik.synergia.net.ar`) && PathPrefix(`/dashboard`) || PathPrefix(`/api`)
         # host: traefik.synergia.net.ar
         # pathPrefix: /dashboard
         services:
