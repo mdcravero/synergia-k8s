@@ -15,9 +15,9 @@ data:
 
     image:
       # -- image repository
-      repository: lscr.io/linuxserver/prowlarr:develop
+      repository: ghcr.io/onedr0p/prowlarr-develop
       # @default -- chart.appVersion
-      tag: v1.33.0.4994
+      tag: 1.33.0.4994
       # -- image pull policy
       pullPolicy: IfNotPresent
 
