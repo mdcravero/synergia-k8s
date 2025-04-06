@@ -29,7 +29,7 @@ spec:
     image:
       pullPolicy: IfNotPresent
       repository: ghcr.io/ajnart/homarr
-      tag: 0.13.4
+      tag: 0.14.0
     imagePullSecrets: []
     ingress:
       annotations:
