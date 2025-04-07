@@ -11,13 +11,13 @@ data:
       DEFAULT_COLOR_SCHEME: dark
       TZ: America/Argentina/Cordoba
     fullnameOverride: ""
-    image:
-    # -- Image repository
-    repository: ghcr.io/homarr-labs/homarr
-    # -- Image pull policy
-    pullPolicy: IfNotPresent
-    # -- Overrides the image tag whose default is the chart appVersion
-    tag: "v1.14.0"
+    # image:
+    # # -- Image repository
+    # repository: ghcr.io/homarr-labs/homarr
+    # # -- Image pull policy
+    # pullPolicy: IfNotPresent
+    # # -- Overrides the image tag whose default is the chart appVersion
+    # tag: "v1.14.0"
     ingress:
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
