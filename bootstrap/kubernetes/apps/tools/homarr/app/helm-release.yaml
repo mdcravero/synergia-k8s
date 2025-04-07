@@ -79,7 +79,7 @@ spec:
     podSecurityContext: {}
     readinessProbe:
       httpGet:
-        path: /board
+        path: /onboad
         port: 7575
       initialDelaySeconds: 10
       periodSeconds: 5
