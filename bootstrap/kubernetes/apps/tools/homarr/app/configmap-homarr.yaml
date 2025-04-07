@@ -36,6 +36,12 @@ data:
         - hosts:
             - "homarr.synergia.net.ar"
     nameOverride: ""
+
+    service:
+      port: 7575
+      targetPort: 7575
+      type: LoadBalancer
+
     persistence:
       enabled: true
       name: "homarr-database"
@@ -70,7 +76,3 @@ data:
         path: /api/health/live
         # -- The port on which the liveness check will be performed. This must be the same as the container port exposed by the application.
         port: 7575
-    service:
-      port: 7575
-      targetPort: 7575
-      type: LoadBalancer
