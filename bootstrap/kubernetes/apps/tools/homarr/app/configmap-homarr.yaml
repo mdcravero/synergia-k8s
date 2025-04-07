@@ -37,20 +37,13 @@ data:
             - "homarr.synergia.net.ar"
     nameOverride: ""
     persistence:
-      # -- Enable homarr-database persistent storage
       enabled: true
-      # -- homarr-database persistent storage name
       name: "homarr-database"
-      # -- homarr-database storage class name
       storageClassName: "nfs-client"
-      # -- homarr-database access mode
       accessMode: "ReadWriteOnce"
-      # -- homarr-database storage size
-      size: "50Mi"
-      # -- homarr-database mount path inside the pod
+      size: "1Gi"
       mountPath: "/appdata/db"
-      # -- homarr-database optional volumeClaimName to target specific PV
-      volumeClaimName: ""
+
       
       # - accessMode: ReadWriteOnce
       #   enabled: true
