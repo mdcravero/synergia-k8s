@@ -10,7 +10,7 @@ spec:
       chart: homarr
       reconcileStrategy: ChartVersion
       sourceRef:
-        kind: HelmRepository
+        kind: OCIRepository
         name: homarr
       version: 3.5.0
   interval: 1m0s
