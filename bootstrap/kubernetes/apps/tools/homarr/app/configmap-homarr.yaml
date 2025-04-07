@@ -51,6 +51,9 @@ data:
         size: "1Gi"
         mountPath: "/appdata/db"
 
+    envSecrets:
+      dbCredentials:
+        existingSecret: "secret-homarr-db"
       
       # - accessMode: ReadWriteOnce
       #   enabled: true
