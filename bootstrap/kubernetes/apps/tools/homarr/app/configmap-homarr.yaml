@@ -43,12 +43,13 @@ data:
       type: LoadBalancer
 
     persistence:
-      enabled: true
-      name: "homarr-database"
-      storageClassName: "nfs-client"
-      accessMode: "ReadWriteOnce"
-      size: "1Gi"
-      mountPath: "/appdata/db"
+      homarrDatabase:
+        enabled: true
+        name: "homarr-database"
+        storageClassName: "nfs-client"
+        accessMode: "ReadWriteOnce"
+        size: "1Gi"
+        mountPath: "/appdata/db"
 
       
       # - accessMode: ReadWriteOnce
