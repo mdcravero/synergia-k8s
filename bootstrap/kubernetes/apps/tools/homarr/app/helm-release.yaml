@@ -13,7 +13,7 @@ spec:
         name: homarr
         namespace: tools
   interval: 1m0s
-  releaseName: homarr
+  # releaseName: homarr
   valuesFrom:
     - kind: ConfigMap
       name: homarr-values
