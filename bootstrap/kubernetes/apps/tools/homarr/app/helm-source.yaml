@@ -1,9 +1,9 @@
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
-kind: OCIRepository
+kind: HelmRepository
 metadata:
   name: homarr
   namespace: tools
 spec:
   interval: 1m0s
-  url: oci://ghcr.io/homarr-labs/charts/homarr
+  url: https://ghcr.io/homarr-labs/charts
