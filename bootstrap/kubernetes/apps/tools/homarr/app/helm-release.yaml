@@ -12,85 +12,10 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: homarr
-      version: 1.1.0
+      version: 1.14.0
   interval: 1m0s
   releaseName: homarr
-  values:
-    affinity: {}
-    autoscaling:
-      enabled: false
-      maxReplicas: 100
-      minReplicas: 1
-      targetCPUUtilizationPercentage: 80
-    env:
-      DEFAULT_COLOR_SCHEME: dark
-      TZ: America/Argentina/Cordoba
-    fullnameOverride: ""
-    image:
-      pullPolicy: IfNotPresent
-      repository: ghcr.io/ajnart/homarr
-      tag: 0.14.0
-    imagePullSecrets: []
-    ingress:
-      annotations:
-        traefik.ingress.kubernetes.io/router.entrypoints: websecure
-        traefik.ingress.kubernetes.io/router.tls: "true"
-        traefik.ingress.kubernetes.io/router.tls.certresolver: le
-        traefik.ingress.kubernetes.io/router.middlewares: tools-middlewares-authentik@kubernetescrd
-
-      enabled: true
-      hosts:
-        - host: homarr.synergia.net.ar
-          paths:
-            - path: /
-              pathType: Prefix
-      className: "traefik"
-      tls:
-        - hosts:
-            - "homarr.synergia.net.ar"
-    nameOverride: ""
-    persistence:
-      - accessMode: ReadWriteOnce
-        enabled: true
-        mountPath: /app/data/configs
-        name: homarr-config
-        size: 50Mi
-        storageClassName: nfs-client
-      # - accessMode: ReadWriteOnce
-      #   enabled: true
-      #   mountPath: /app/database
-      #   name: homarr-database
-      #   size: 50Mi
-      #   storageClassName: nfs-client
-      - accessMode: ReadWriteOnce
-        enabled: true
-        mountPath: /app/public/icons
-        name: homarr-icons
-        size: 50Mi
-        storageClassName: nfs-client
-      - accessMode: ReadWriteOnce
-        enabled: true
-        mountPath: /app/data
-        name: homarr-data
-        size: 50Mi
-        storageClassName: nfs-client
-    podAnnotations: {}
-    podLabels: {}
-    podSecurityContext: {}
-    readinessProbe:
-      httpGet:
-        path: /onboad
-        port: 7575
-      initialDelaySeconds: 10
-      periodSeconds: 5
-      timeoutSeconds: 3
-      failureThreshold: 3
-      successThreshold: 1
-    replicaCount: 1
-    resources: {}
-    securityContext: {}
-    service:
-      port: 7575
-      targetPort: 7575
-      type: LoadBalancer
-    tolerations: []
+  valuesFrom:
+    - kind: ConfigMap
+      name: homarr-values
+      valuesKey: values.yaml

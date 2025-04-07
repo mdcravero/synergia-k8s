@@ -6,4 +6,4 @@ metadata:
   namespace: tools
 spec:
   interval: 1m0s
-  url: https://oben01.github.io/charts/
+  url: oci://ghcr.io/homarr-labs/charts/homarr

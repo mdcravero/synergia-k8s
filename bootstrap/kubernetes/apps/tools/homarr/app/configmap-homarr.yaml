@@ -1,0 +1,83 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homarr-values
+  namespace: tools
+data:
+  values.yaml: |-
+    # Default values for homarr.
+    env:
+      DEFAULT_COLOR_SCHEME: dark
+      TZ: America/Argentina/Cordoba
+    fullnameOverride: ""
+    image:
+    # -- Image repository
+    repository: ghcr.io/homarr-labs/homarr
+    # -- Image pull policy
+    pullPolicy: IfNotPresent
+    # -- Overrides the image tag whose default is the chart appVersion
+    tag: "v1.14.0"
+    ingress:
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: le
+        traefik.ingress.kubernetes.io/router.middlewares: tools-middlewares-authentik@kubernetescrd
+
+      enabled: true
+      hosts:
+        - host: homarr.synergia.net.ar
+          paths:
+            - path: /
+              pathType: Prefix
+      className: "traefik"
+      tls:
+        - hosts:
+            - "homarr.synergia.net.ar"
+    nameOverride: ""
+    persistence:
+      # -- Enable homarr-database persistent storage
+      enabled: true
+      # -- homarr-database persistent storage name
+      name: "homarr-database"
+      # -- homarr-database storage class name
+      storageClassName: "nfs-client"
+      # -- homarr-database access mode
+      accessMode: "ReadWriteOnce"
+      # -- homarr-database storage size
+      size: "50Mi"
+      # -- homarr-database mount path inside the pod
+      mountPath: "/appdata/db"
+      # -- homarr-database optional volumeClaimName to target specific PV
+      volumeClaimName: ""
+      
+      # - accessMode: ReadWriteOnce
+      #   enabled: true
+      #   mountPath: /app/data/configs
+      #   name: homarr-config
+      #   size: 50Mi
+      #   storageClassName: nfs-client
+      # - accessMode: ReadWriteOnce
+      #   enabled: true
+      #   mountPath: /app/public/icons
+      #   name: homarr-icons
+      #   size: 50Mi
+      #   storageClassName: nfs-client
+      # - accessMode: ReadWriteOnce
+      #   enabled: true
+      #   mountPath: /app/data
+      #   name: homarr-data
+      #   size: 50Mi
+      #   storageClassName: nfs-client
+
+    livenessProbe:
+      httpGet:
+        # -- This is the liveness check endpoint used by Kubernetes to determine if the application is still running.
+        path: /api/health/live
+        # -- The port on which the liveness check will be performed. This must be the same as the container port exposed by the application.
+        port: 7575
+    service:
+      port: 7575
+      targetPort: 7575
+      type: LoadBalancer
