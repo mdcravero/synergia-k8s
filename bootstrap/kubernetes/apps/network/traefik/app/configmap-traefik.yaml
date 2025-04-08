@@ -6,6 +6,10 @@ metadata:
   namespace: traefik
 data:
   values.yaml: |-
+
+    serversTransport:
+      insecureSkipVerify: true
+      
     logs:
        general:
          level: DEBUG
