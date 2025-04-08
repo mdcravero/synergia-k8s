@@ -7,9 +7,6 @@ metadata:
 data:
   values.yaml: |-
 
-    serversTransport:
-      insecureSkipVerify: true
-      
     logs:
        general:
          level: DEBUG
