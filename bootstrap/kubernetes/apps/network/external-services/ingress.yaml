@@ -81,6 +81,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: pve-controller
+                name: proxmox-service
                 port:
                   number: 8006
