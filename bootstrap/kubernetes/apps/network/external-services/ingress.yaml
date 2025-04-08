@@ -72,8 +72,6 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
-    traefik.ingress.kubernetes.io/service.scheme: https
-    traefik.ingress.kubernetes.io/service.insecureSkipVerify: "true"
 spec:
   rules:
     - host: pve.synergia.net.ar
