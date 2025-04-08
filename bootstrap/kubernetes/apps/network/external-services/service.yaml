@@ -19,21 +19,10 @@ metadata:
   name: proxmox-service
   namespace: external-services
 spec:
+  type: ExternalName
+  externalName: 192.168.1.9
   ports:
     - port: 8006
       targetPort: 8006
       protocol: TCP
       name: https
-
----
-apiVersion: v1
-kind: Endpoints
-metadata:
-  name: proxmox-service
-  namespace: external-services
-subsets:
-  - addresses:
-      - ip: 192.168.1.9
-    ports:
-      - name: https
-        port: 8006
