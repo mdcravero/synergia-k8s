@@ -50,29 +50,19 @@ data:
         accessMode: "ReadWriteOnce"
         size: "1Gi"
         mountPath: "/appdata/db"
+      homarrTrustedCerts:
+        enabled: true
+        type: pvc
+        name: "homarr-trusted-certificates"
+        storageClassName: "nfs-client"
+        accessMode: "ReadWriteOnce"
+        size: "50Mi"
+        mountPath: "/appdata/trusted-certificates"
 
     envSecrets:
       dbCredentials:
         existingSecret: "secret-homarr-db"
-      
-      # - accessMode: ReadWriteOnce
-      #   enabled: true
-      #   mountPath: /app/data/configs
-      #   name: homarr-config
-      #   size: 50Mi
-      #   storageClassName: nfs-client
-      # - accessMode: ReadWriteOnce
-      #   enabled: true
-      #   mountPath: /app/public/icons
-      #   name: homarr-icons
-      #   size: 50Mi
-      #   storageClassName: nfs-client
-      # - accessMode: ReadWriteOnce
-      #   enabled: true
-      #   mountPath: /app/data
-      #   name: homarr-data
-      #   size: 50Mi
-      #   storageClassName: nfs-client
+
 
     livenessProbe:
       httpGet:
