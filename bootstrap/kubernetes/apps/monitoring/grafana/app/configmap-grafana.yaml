@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-values
+  namespace: monitoring
+data:
+  values.yaml: |-
+    global:
+      imageRegistry: null
+      imagePullSecrets: []
+
+    serviceAccount:
+      create: true
+      name: grafana-sa
+
+    replicas: 1
+
+    deploymentStrategy:
+      type: RollingUpdate
+
+    readinessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000
+
+    livenessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000
+      initialDelaySeconds: 60
+      timeoutSeconds: 30
+      failureThreshold: 10
+
+    image:
+      registry: docker.io
+      repository: grafana/grafana
+      tag: "latest"
+      pullPolicy: IfNotPresent
+
+    persistence:
+      enabled: true
+      storageClassName: "nfs-client"
+      accessModes:
+        - ReadWriteOnce
+      size: 5Gi
+
+    adminUser: admin
+    adminPassword: admin123
+
+    service:
+      enabled: true
+      type: LoadBalancer
+      port: 80
+      targetPort: 3000
+
+    ingress:
+      enabled: true
+      pathType: Prefix
+      hosts:
+        - host: grafana.synergia.net.ar
+          paths:
+            - /
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"    
+        traefik.ingress.kubernetes.io/router.tls.certresolver: le
+
+    nodeSelector:
+      type: worker
+
+    tolerations: []
+
+    affinity: {}
