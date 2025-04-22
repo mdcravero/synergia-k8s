@@ -58,8 +58,7 @@ data:
       pathType: Prefix
       hosts:
         - host: grafana.synergia.net.ar
-          paths:
-            - /
+      paths: /
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"    
