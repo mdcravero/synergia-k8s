@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-values
+  namespace: monitoring
+data:
+  values.yaml: |-
+    # yaml-language-server: $schema=values.schema.json
+    # Default values for prometheus.
+    # This is a YAML-formatted file.
+    # Declare variables to be passed into your templates.
+
+    server:
+      ## Prometheus server container name
+      ##
+      name: server
+
+    env:
+      ## Prometheus server container environment variables
+      ##
+      - name: TZ
+        value: "America/Argentina/Cordoba"
+      - name: PUID
+        value: "1000"
+      - name: PGID
+        value: "1000"
+
+
+    ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
+    ruleFiles: {}
+
+    serverFiles:
+      prometheus.yml:
+        rule_files:
+          - /etc/config/recording_rules.yml
+          - /etc/config/alerting_rules.yml
+        scrape_configs:
+          - job_name: prometheus
+            static_configs:
+              - targets:
+                - localhost:9090
+
+    persistentVolumeClaim:
+      enabled: true
+      storageClassName: "nfs-client"
+      accessModes:
+        - ReadWriteOnce
+      size: 8Gi
