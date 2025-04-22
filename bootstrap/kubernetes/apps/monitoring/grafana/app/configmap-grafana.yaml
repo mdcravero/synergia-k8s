@@ -49,6 +49,9 @@ data:
         - ReadWriteOnce
       size: 5Gi
 
+    initChownData:
+      enabled: false
+
     adminUser: admin
     adminPassword: admin123
 
