@@ -37,7 +37,7 @@ data:
       tag: "latest"
       pullPolicy: IfNotPresent
 
-     env: 
+    env: 
       PUID: 1000
       PGID: 1000
       TZ: "America/Argentina/Cordoba"
