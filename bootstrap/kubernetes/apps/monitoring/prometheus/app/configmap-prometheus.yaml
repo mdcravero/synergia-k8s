@@ -15,15 +15,22 @@ data:
       ##
       name: server
 
-    env:
-      ## Prometheus server container environment variables
-      ##
-      - name: TZ
-        value: "America/Argentina/Cordoba"
-      - name: PUID
-        value: "1000"
-      - name: PGID
-        value: "1000"
+      persistentVolume:
+        enabled: true
+        storageClassName: "nfs-client"
+        accessModes:
+          - ReadWriteOnce
+        size: 8Gi
+
+      env:
+        ## Prometheus server container environment variables
+        ##
+        - name: TZ
+          value: "America/Argentina/Cordoba"
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
 
 
     ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
@@ -39,10 +46,3 @@ data:
             static_configs:
               - targets:
                 - localhost:9090
-
-    persistentVolume:
-      enabled: true
-      storageClassName: "nfs-client"
-      accessModes:
-        - ReadWriteOnce
-      size: 8Gi
