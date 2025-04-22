@@ -54,8 +54,8 @@ data:
 
     admin:
       existingSecret: "secret-grafana"
-      userKey: admin-user
-      passwordKey: admin-password
+      userKey: "admin-user"
+      passwordKey: "admin-password"
 
     service:
       enabled: true
