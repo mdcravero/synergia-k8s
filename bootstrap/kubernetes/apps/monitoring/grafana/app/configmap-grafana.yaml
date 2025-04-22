@@ -52,8 +52,9 @@ data:
     initChownData:
       enabled: false
 
-    adminUser: admin
-    adminPassword: admin123
+    admin:
+      existingSecret: username
+      existingSecretKey: password
 
     service:
       enabled: true
