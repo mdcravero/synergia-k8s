@@ -17,7 +17,7 @@ data:
 
       persistentVolume:
         enabled: true
-        storageClassName: "nfs-client"
+        storageClass: "nfs-client"
         accessModes:
           - ReadWriteOnce
         size: 8Gi
