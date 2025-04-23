@@ -46,3 +46,6 @@ data:
             static_configs:
               - targets:
                 - localhost:9090
+
+    alertmanager:
+      enabled: false
