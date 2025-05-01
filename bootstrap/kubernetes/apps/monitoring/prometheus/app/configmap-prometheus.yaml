@@ -32,6 +32,24 @@ data:
         - name: PGID
           value: "1000"
 
+      service:
+        enabled: true
+        annotations: {}
+        type: LoadBalancer
+        servicePort: 80
+      
+      ingress:
+        enabled: true
+        pathType: Prefix
+        hosts:
+        - prometheus.synergia.net.ar
+        path: /
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.tls: "true"    
+          traefik.ingress.kubernetes.io/router.tls.certresolver: le
+
+
 
     ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
     ruleFiles: {}
