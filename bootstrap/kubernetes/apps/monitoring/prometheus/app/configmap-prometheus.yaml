@@ -51,8 +51,15 @@ data:
 
     prometheus-node-exporter:
       enabled: true
+
+      rbac:
+        pspEnabled: false
+
       containerSecurityContext:
         allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 65534
      
 
     ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
