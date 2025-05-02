@@ -59,7 +59,8 @@ data:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
         runAsNonRoot: true
-        runAsUser: 65534
+        runAsUser: 1000
+        fsGroup: 1000
      
 
     ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
