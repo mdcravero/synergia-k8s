@@ -61,6 +61,10 @@ data:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 1000
+
+      hostNetwork: false  # Disable hostNetwork
+      hostPort:           # Remove hostPort usage
+        enabled: false
      
 
     ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
