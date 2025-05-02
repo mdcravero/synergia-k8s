@@ -143,16 +143,17 @@ data:
           
           - job_name: 'kubernetes-nodes-cadvisor'
 
-             scheme: https
+            scheme: https
             
-             tls_config:
-                ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
               
-             bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
-             kubernetes_sd_configs:
+            kubernetes_sd_configs:
               - role: node
-
+            
+            relabel_configs:
               - action: labelmap
               regex: __meta_kubernetes_node_label_(.+)
               - target_label: __address__
