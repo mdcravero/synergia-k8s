@@ -49,7 +49,11 @@ data:
           traefik.ingress.kubernetes.io/router.tls: "true"    
           traefik.ingress.kubernetes.io/router.tls.certresolver: le
 
-
+    prometheus-node-exporter:
+      enabled: true
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+     
 
     ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
     ruleFiles: {}
