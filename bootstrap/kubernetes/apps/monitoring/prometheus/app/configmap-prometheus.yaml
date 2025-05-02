@@ -141,7 +141,7 @@ data:
                 action: replace
                 target_label: node
           
-           - job_name: 'kubernetes-nodes-cadvisor'
+          - job_name: 'kubernetes-nodes-cadvisor'
 
              scheme: https
             
