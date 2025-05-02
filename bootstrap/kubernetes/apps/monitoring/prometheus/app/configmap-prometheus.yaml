@@ -76,10 +76,8 @@ data:
           - /etc/config/recording_rules.yml
           - /etc/config/alerting_rules.yml
         scrape_configs:
-          - job_name: prometheus
+          - job_name: node
             static_configs:
-              - targets:
-                - localhost:9090
-
+              - targets: ['node-exporter:9100']
     alertmanager:
       enabled: false
