@@ -62,8 +62,8 @@ data:
         runAsUser: 1000
         fsGroup: 1000
 
-      hostNetwork: false  # Disable hostNetwork
-      hostPort:           # Remove hostPort usage
+      hostNetwork: false  
+      hostPort:          
         enabled: false
      
 
