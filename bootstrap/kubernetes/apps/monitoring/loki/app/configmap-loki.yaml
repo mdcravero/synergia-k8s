@@ -5,37 +5,44 @@ metadata:
   namespace: monitoring
 data:
   values.yaml: |-
-    global:
-      storageClassName: standard
+    singleBinary:
       replicas: 1
-
-    ingester:
-      lifecycler:
-        ring:
-          kvstore:
-            store: inmemory
-
-    schema_config:
-      configs:
-        - from: 2020-10-24
-          store: boltdb-shipper
-          object_store: filesystem
-          schema: v11
-          index:
-            prefix: index_
-            period: 24h
-
-    storage_config:
-      boltdb_shipper:
-        active_index_directory: /loki/index
-        shared_store: filesystem
-        cache_location: /loki/cache
-      filesystem:
-        directory: /loki/chunks
-
-    limits_config:
-      enforce_metric_name: false
-      reject_old_samples: true
-      reject_old_samples_max_age: 168h
-
-
+      image:
+        registry: null
+        repository: null
+        tag: null
+      priorityClassName: null
+      annotations: {}
+      podAnnotations: {}
+      podLabels: {}
+      selectorLabels: {}
+      service:
+        annotations: {}
+        labels: {}
+      targetModule: "all"
+      extraArgs: []
+      extraEnv: []
+      extraEnvFrom: []
+      extraContainers: []
+      initContainers: []
+      extraVolumeMounts: []
+      extraVolumes: []
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 250m
+        limits:
+          memory: 1Gi
+          cpu: 500m
+      terminationGracePeriodSeconds: 30
+      affinity:
+        podAntiAffinity: {}
+      nodeSelector: {}
+      tolerations: []
+      persistence:
+        enableStatefulSetAutoDeletePVC: true
+        enabled: true
+        size: 10Gi
+        storageClass: "nfs-client"
+        accessModes:
+          - ReadWriteOnce
