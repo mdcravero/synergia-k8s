@@ -8,9 +8,9 @@ data:
     singleBinary:
       replicas: 1
       image:
-        registry: null
-        repository: null
-        tag: null
+        registry: docker.io
+        repository: grafana/loki
+        tag: 2.8.2
       priorityClassName: null
       annotations: {}
       podAnnotations: {}
@@ -36,7 +36,15 @@ data:
           cpu: 500m
       terminationGracePeriodSeconds: 30
       affinity:
-        podAntiAffinity: {}
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - loki
+              topologyKey: "kubernetes.io/hostname"
       nodeSelector: {}
       tolerations: []
       persistence:
