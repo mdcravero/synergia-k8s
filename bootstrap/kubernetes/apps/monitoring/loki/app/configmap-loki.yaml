@@ -5,6 +5,9 @@ metadata:
   namespace: monitoring
 data:
   values.yaml: |-
+    loki:
+      storage:
+        type: "persistent"
     singleBinary:
       replicas: 1
       image:
