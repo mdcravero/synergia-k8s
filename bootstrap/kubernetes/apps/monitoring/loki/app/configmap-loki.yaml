@@ -8,6 +8,8 @@ data:
     loki:
       storage:
         type: "persistent"
+      simpleScalable:
+        replicas: 0
     singleBinary:
       replicas: 1
       image:
