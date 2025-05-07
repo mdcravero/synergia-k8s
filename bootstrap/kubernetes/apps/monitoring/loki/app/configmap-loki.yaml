@@ -39,12 +39,9 @@ data:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
-                matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - loki
-              topologyKey: "kubernetes.io/hostname"
+                matchLabels:
+                  app.kubernetes.io/component: single-binary
+              topologyKey: kubernetes.io/hostname
       nodeSelector: {}
       tolerations: []
       persistence:
