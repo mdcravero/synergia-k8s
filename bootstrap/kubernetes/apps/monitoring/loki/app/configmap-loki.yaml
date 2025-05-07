@@ -52,5 +52,5 @@ data:
         enabled: true
         size: 10Gi
         storageClass: "nfs-client"
-        accessModes:
-          - ReadWriteOnce
+        # accessModes:
+        #   - ReadWriteOnce
