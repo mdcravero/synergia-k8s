@@ -38,3 +38,16 @@ data:
         enabled: true
         storageClassName: "nfs-client"
         size: 10Gi
+
+    # 👇 Desactiva explícitamente los componentes distribuidos
+    read:
+      replicas: 0
+      enabled: false
+
+    write:
+      replicas: 0
+      enabled: false
+
+    backend:
+      replicas: 0
+      enabled: false
