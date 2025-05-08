@@ -4,13 +4,6 @@ metadata:
   name: loki-stack-values
   namespace: monitoring
 data:
-  values.yaml: |-
-    apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: loki-stack-values
-  namespace: monitoring
-data:
   values.yaml: |
     loki:
       enabled: true
@@ -34,7 +27,7 @@ data:
             directory: /var/loki/chunks
       persistence:
         enabled: true
-        storageClassName: "nfs-client"
+        storageClassName: "local-path"
         size: 10Gi
       extraEnv:
         - name: PUID
