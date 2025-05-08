@@ -27,7 +27,9 @@ data:
             directory: /var/loki/chunks
       persistence:
         enabled: true
-        storageClassName: "local-path"
+        storageClassName: "nfs-client"
+        accessModes:
+          - ReadWriteOnce
         size: 10Gi
       extraEnv:
         - name: PUID
