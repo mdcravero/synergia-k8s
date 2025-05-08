@@ -11,10 +11,17 @@ data:
       storage:
         type: "persistent"
     singleBinary:
+      replicas: 0
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 3
+        targetCPUUtilizationPercentage: 60
+        targetMemoryUtilizationPercentage:
       image:
-        registry: docker.io
-        repository: grafana/loki
-        tag: 2.8.2
+        registry: null
+        repository: null
+        tag: null
       priorityClassName: null
       annotations: {}
       podAnnotations: {}
@@ -31,13 +38,7 @@ data:
       initContainers: []
       extraVolumeMounts: []
       extraVolumes: []
-      resources:
-        requests:
-          memory: 512Mi
-          cpu: 250m
-        limits:
-          memory: 1Gi
-          cpu: 500m
+      resources: {}
       terminationGracePeriodSeconds: 30
       affinity:
         podAntiAffinity:
@@ -46,6 +47,7 @@ data:
                 matchLabels:
                   app.kubernetes.io/component: single-binary
               topologyKey: kubernetes.io/hostname
+      dnsConfig: {}
       nodeSelector: {}
       tolerations: []
       persistence:
@@ -53,5 +55,5 @@ data:
         enabled: true
         size: 10Gi
         storageClass: "nfs-client"
-        # accessModes:
-        #   - ReadWriteOnce
+        selector: null
+        annotations: {}
