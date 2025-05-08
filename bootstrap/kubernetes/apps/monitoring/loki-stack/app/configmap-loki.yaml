@@ -8,10 +8,13 @@ data:
     loki:
       enabled: true
       isDefault: true
-      env: 
-        PUID: 1000
-        PGID: 1000
-        TZ: "America/Argentina/Cordoba"
+       extraEnv:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ: 
+          value: "America/Argentina/Cordoba"
       config:
         auth_enabled: false
         server:
