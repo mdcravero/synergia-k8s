@@ -5,55 +5,36 @@ metadata:
   namespace: monitoring
 data:
   values.yaml: |-
+    mode: "single"
     loki:
-      scalable: false
-      deploymentMode: "SingleBinary"
+      auth_enabled: false
+
+      commonConfig:
+        replication_factor: 1
+
       storage:
-        type: "persistent"
+        type: 'filesystem'
+
+      schemaConfig:
+        configs:
+          - from: 2023-01-01
+            store: boltdb-shipper
+            object_store: filesystem
+            schema: v11
+            index:
+              prefix: index_
+              period: 24h
+
+      storageConfig:
+        boltdb_shipper:
+          active_index_directory: /var/loki/index
+          cache_location: /var/loki/cache
+        filesystem:
+          directory: /var/loki/chunks
+
     singleBinary:
-      replicas: 0
-      autoscaling:
-        enabled: false
-        minReplicas: 1
-        maxReplicas: 3
-        targetCPUUtilizationPercentage: 60
-        targetMemoryUtilizationPercentage:
-      image:
-        registry: null
-        repository: null
-        tag: null
-      priorityClassName: null
-      annotations: {}
-      podAnnotations: {}
-      podLabels: {}
-      selectorLabels: {}
-      service:
-        annotations: {}
-        labels: {}
-      targetModule: "all"
-      extraArgs: []
-      extraEnv: []
-      extraEnvFrom: []
-      extraContainers: []
-      initContainers: []
-      extraVolumeMounts: []
-      extraVolumes: []
-      resources: {}
-      terminationGracePeriodSeconds: 30
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app.kubernetes.io/component: single-binary
-              topologyKey: kubernetes.io/hostname
-      dnsConfig: {}
-      nodeSelector: {}
-      tolerations: []
+      replicas: 1
       persistence:
-        enableStatefulSetAutoDeletePVC: true
         enabled: true
+        storageClassName: "nfs-client"
         size: 10Gi
-        storageClass: "nfs-client"
-        selector: null
-        annotations: {}
