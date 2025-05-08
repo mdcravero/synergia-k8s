@@ -8,7 +8,7 @@ data:
     loki:
       enabled: true
       isDefault: true
-       extraEnv:
+      extraEnv:
         - name: PUID
           value: "1000"
         - name: PGID
