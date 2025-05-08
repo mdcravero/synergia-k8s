@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: loki-stack
-      version: 6.29.0
+      version: 2.9.11
   interval: 1m0s
   releaseName: loki-stack
   valuesFrom:
