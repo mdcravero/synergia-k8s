@@ -20,5 +20,5 @@ spec:
       name: sonarr-values
       valuesKey: values.yaml
   dependsOn:
-    - name: nfs-provisioner
-      namespace: storage
+    - name: nfs-proxmox
+      namespace: nfs-storage
