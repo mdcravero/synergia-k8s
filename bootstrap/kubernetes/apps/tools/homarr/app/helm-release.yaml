@@ -18,3 +18,8 @@ spec:
     - kind: ConfigMap
       name: homarr-values
       valuesKey: values.yaml
+  dependsOn:
+    - name: nfs-provisioner
+      namespace: storage
+    - name: external-secrets-operator
+      namespace: security 

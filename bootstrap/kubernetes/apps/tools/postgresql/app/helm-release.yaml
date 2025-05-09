@@ -19,3 +19,8 @@ spec:
     - kind: ConfigMap
       name: postgresql-values
       valuesKey: values.yaml
+  dependsOn:
+    - name: nfs-provisioner
+      namespace: storage
+    - name: external-secrets-operator
+      namespace: security 
