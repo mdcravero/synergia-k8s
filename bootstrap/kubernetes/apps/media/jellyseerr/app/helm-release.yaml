@@ -19,3 +19,6 @@ spec:
     - kind: ConfigMap
       name: jellyseerr-values
       valuesKey: values.yaml
+  dependsOn:
+    - name: nfs-provisioner
+      namespace: storage
