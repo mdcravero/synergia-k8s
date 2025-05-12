@@ -22,15 +22,13 @@ data:
           - ReadWriteOnce
         size: 8Gi
 
-      env:
-        ## Prometheus server container environment variables
-        ##
-        - name: TZ
-          value: "America/Argentina/Cordoba"
-        - name: PUID
-          value: "1000"
-        - name: PGID
-          value: "1000"
+      # env:
+      #   - name: TZ
+      #     value: "America/Argentina/Cordoba"
+      #   - name: PUID
+      #     value: "1000"
+      #   - name: PGID
+      #     value: "1000"
 
       service:
         enabled: true
