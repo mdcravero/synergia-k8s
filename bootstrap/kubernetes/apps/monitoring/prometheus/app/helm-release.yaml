@@ -21,4 +21,4 @@ spec:
       valuesKey: values.yaml
   dependsOn:
     - name: nfs-proxmox
-      namespace: nfs-sorage
+      namespace: nfs-storage
