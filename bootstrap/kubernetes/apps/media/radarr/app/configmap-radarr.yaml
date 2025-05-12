@@ -19,7 +19,7 @@ data:
       repository: lscr.io/linuxserver/radarr
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: "version-5.21.1.9799"
+      tag: "version-5.22.4.9896"
 
     env:
       PUID: 1000
