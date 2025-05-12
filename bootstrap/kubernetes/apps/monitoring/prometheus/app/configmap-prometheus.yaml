@@ -22,13 +22,13 @@ data:
           - ReadWriteOnce
         size: 8Gi
 
-      # env:
-      #   - name: TZ
-      #     value: "America/Argentina/Cordoba"
-      #   - name: PUID
-      #     value: "1000"
-      #   - name: PGID
-      #     value: "1000"
+      env:
+        - name: TZ
+          value: "America/Argentina/Cordoba"
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
 
       service:
         enabled: true
