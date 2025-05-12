@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 metadata:
-  name: trans-movies
+  name: trans-shows
 resources:
-  - PersistentVolumeClaim.yaml
-  - Servoces.yaml
-  - Deploy.yml
+  - deployment.yml
+  - services.yaml
+  - persistentVolume.yaml
