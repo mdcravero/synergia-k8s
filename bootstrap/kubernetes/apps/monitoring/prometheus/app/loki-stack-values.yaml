@@ -40,13 +40,13 @@ data:
         "container.apparmor.security.beta.kubernetes.io/loki": "unconfined"
       extraEnv:
         - name: PUID
-          value: "10001"
+          value: "1000"
         - name: PGID
-          value: "10001"
+          value: "1000"
       securityContext:
-        runAsUser: 10001
-        runAsGroup: 10001
-        fsGroup: 10001
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         runAsNonRoot: true
         allowPrivilegeEscalation: false
         capabilities:
@@ -56,9 +56,9 @@ data:
     promtail:
       enabled: true
       securityContext:
-        runAsUser: 10001
-        runAsGroup: 10001
-        fsGroup: 10001
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       config:
         clients:
           - url: http://loki:3100/loki/api/v1/push
