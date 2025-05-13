@@ -34,14 +34,26 @@ data:
         accessModes:
           - ReadWriteMany
         size: 10Gi
+        annotations:
+          "helm.sh/resource-policy": keep
+      podAnnotations:
+        "container.apparmor.security.beta.kubernetes.io/loki": "unconfined"
       extraEnv:
         - name: PUID
-          value: "1000"
+          value: "10001"
         - name: PGID
-          value: "1000"
+          value: "10001"
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
 
     promtail:
       enabled: true
+      securityContext:
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
       config:
         clients:
           - url: http://loki:3100/loki/api/v1/push
