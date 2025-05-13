@@ -16,6 +16,16 @@ spec:
   interval: 5m
   timeout: 15m
   releaseName: loki-stack
+  # Add remediation strategies
+  install:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+      strategy: rollback
   valuesFrom:
     - kind: ConfigMap
       name: loki-stack-values
