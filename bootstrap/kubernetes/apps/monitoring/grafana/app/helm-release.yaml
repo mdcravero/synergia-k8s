@@ -13,7 +13,8 @@ spec:
         kind: HelmRepository
         name: grafana
       version: 8.12.1
-  interval: 1m0s
+  interval: 5m
+  timeout: 15m
   releaseName: grafana
   valuesFrom:
     - kind: ConfigMap
