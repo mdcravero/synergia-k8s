@@ -5,14 +5,7 @@ metadata:
   namespace: monitoring
 data:
   values.yaml: |-
-    # yaml-language-server: $schema=values.schema.json
-    # Default values for prometheus.
-    # This is a YAML-formatted file.
-    # Declare variables to be passed into your templates.
-
     server:
-      ## Prometheus server container name
-      ##
       name: server
 
       persistentVolume:
@@ -67,8 +60,6 @@ data:
       hostPort:          
         enabled: false
      
-
-    ## Prometheus server ConfigMap entries for rule files (allow prometheus labels interpolation)
     ruleFiles: {}
 
     serverFiles:
