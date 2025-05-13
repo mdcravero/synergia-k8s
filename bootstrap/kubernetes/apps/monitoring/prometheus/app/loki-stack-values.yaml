@@ -47,6 +47,11 @@ data:
         runAsUser: 10001
         runAsGroup: 10001
         fsGroup: 10001
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
 
     promtail:
       enabled: true
