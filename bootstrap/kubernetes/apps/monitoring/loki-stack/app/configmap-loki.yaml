@@ -160,7 +160,7 @@ data:
         jaegerAgentHost: null
       updateStrategy:
         type: RollingUpdate
-      url: http://{{(include "loki.serviceName" .)}}:{{ .Values.loki.service.port }}
+      url: http://loki-stack:3100
       useExistingAlertingGroup:
         configmapName: ""
         enabled: false
