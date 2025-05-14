@@ -135,7 +135,7 @@ data:
         nodePort: null
         port: 3100
         targetPort: http-metrics
-        type: LoadBalancer
+        type: ClusterIP
       serviceAccount:
         annotations: {}
         automountServiceAccountToken: true
