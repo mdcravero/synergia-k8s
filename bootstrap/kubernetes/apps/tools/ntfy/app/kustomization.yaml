@@ -10,5 +10,6 @@ resources:
   - ntfy-ingress.yaml 
 configMapGenerator:
     - name: server-config
+      namespace: tools
       files: 
         - server.yml
