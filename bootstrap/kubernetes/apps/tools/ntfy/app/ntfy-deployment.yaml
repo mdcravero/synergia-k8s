@@ -1,7 +1,9 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ntfy-deployment
+  namespace: tools
   labels:
     app: ntfy-deployment
 spec:
