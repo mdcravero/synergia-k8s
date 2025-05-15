@@ -21,7 +21,7 @@ spec:
         - name: ntfy 
           image: binwiederhier/ntfy:v1.28.0
           args: ["serve"]
-          - env:
+          env:
               - name: TZ
                 value: "America/Argentina/Cordoba"
               - name: NTFY_DEBUG
