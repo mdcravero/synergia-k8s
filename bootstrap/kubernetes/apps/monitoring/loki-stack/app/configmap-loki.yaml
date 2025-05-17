@@ -169,9 +169,9 @@ data:
       enabled: true
       config:
         clients:
-          - url: http://loki-stack:3100/loki/api/v1/push
+          - url: http://loki-stack.monitoring.svc.cluster.local:3100/loki/api/v1/push
         positions:
-          filename: /var/log/positions.yaml
+          filename: /run/promtail/positions.yaml
         scrape_configs:
           - job_name: system
             static_configs:
@@ -180,6 +180,13 @@ data:
                 labels:
                   job: varlogs
                   __path__: /var/log/**/*.log
+      extraVolumeMounts:
+        - name: positions
+          mountPath: /run/promtail
+      extraVolumes:
+        - name: positions
+          emptyDir: {}
+
 
     grafana:
       enabled: false
