@@ -82,7 +82,7 @@ data:
     affinity: {}
 
     datasources:
-      datasources.yaml: 
+      datasources.yaml:
         apiVersion: 1
         datasources:
           - name: loki-home
@@ -90,3 +90,10 @@ data:
             access: proxy
             url: http://loki-stack:3100
             isDefault: true
+            jsonData:
+              maxLines: 1000
+              timeout: 60
+              derivedFields: []
+            version: 1
+            httpHeaderName1: "Content-Type"
+            httpHeaderValue1: "application/json"
