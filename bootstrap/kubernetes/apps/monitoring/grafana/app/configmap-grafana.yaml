@@ -87,6 +87,6 @@ data:
         datasources:
           - name: loki-home
             type: loki
-            access: proxi
+            access: proxy
             url: http://loki-stack:3100
             isDefault: true
