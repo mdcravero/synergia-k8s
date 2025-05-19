@@ -28,6 +28,7 @@ data:
           wal:
             dir: /data/loki/wal
         limits_config:
+          split_queries_by_interval: 15m
           enforce_metric_name: false
           max_entries_limit_per_query: 5000
           reject_old_samples: true
@@ -72,7 +73,6 @@ data:
         query_range:
           align_queries_with_step: true
           max_retries: 5
-          split_queries_by_interval: 15m
       containerSecurityContext:
         allowPrivilegeEscalation: false
         capabilities:
