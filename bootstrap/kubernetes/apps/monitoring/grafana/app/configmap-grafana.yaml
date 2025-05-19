@@ -34,7 +34,7 @@ data:
     image:
       registry: docker.io
       repository: grafana/grafana
-      tag: "latest"
+      tag: "11.3.6"
       pullPolicy: IfNotPresent
 
     env: 
@@ -92,8 +92,5 @@ data:
             isDefault: true
             jsonData:
               maxLines: 1000
-              timeout: 60
-              derivedFields: []
-            version: 1
-            httpHeaderName1: "Content-Type"
-            httpHeaderValue1: "application/json"
+              version: "2.6.1"
+              timeout: 30
