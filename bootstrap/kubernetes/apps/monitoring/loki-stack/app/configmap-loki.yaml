@@ -34,7 +34,7 @@ data:
           reject_old_samples_max_age: 168h
         memberlist:
           join_members:
-          - '{{ include "loki.fullname" . }}-memberlist'
+          - 'loki-stack-memberlist'
         schema_config:
           configs:
           - from: "2020-10-24"
@@ -58,6 +58,21 @@ data:
         table_manager:
           retention_deletes_enabled: false
           retention_period: 0s
+        ruler:
+          storage:
+            type: local
+            local:
+              directory: /data/loki/rules
+          rule_path: /data/loki/rules
+          alertmanager_url: http://alertmanager:9093
+          ring:
+            kvstore:
+              store: inmemory
+          enable_api: true
+        query_range:
+          align_queries_with_step: true
+          max_retries: 5
+          split_queries_by_interval: 15m
       containerSecurityContext:
         allowPrivilegeEscalation: false
         capabilities:
