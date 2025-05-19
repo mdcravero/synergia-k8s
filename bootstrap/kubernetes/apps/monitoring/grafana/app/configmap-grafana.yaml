@@ -34,7 +34,7 @@ data:
     image:
       registry: docker.io
       repository: grafana/grafana
-      tag: "11.3.6"
+      tag: "10.2.3"
       pullPolicy: IfNotPresent
 
     env: 
