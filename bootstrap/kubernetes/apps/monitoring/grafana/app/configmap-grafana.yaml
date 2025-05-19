@@ -85,21 +85,16 @@ data:
       datasources.yaml:
         apiVersion: 1
         datasources:
-          - access: proxy
-            basicAuth: false
-            isDefault: true
-            jsonData:
-              liveEnabled: false
-              maxLines: 1000
-              queryTimeout: 30s
-              timeInterval: 15s
-              timeout: 30
-              version: 2.6.1
-              healthchecks:
-                logQueries:
-                  enabled: true
-                  query: '{container="loki"} |= ""'
-            name: loki-home
-            readOnly: false
-            type: loki
-            url: http://loki-stack:3100/loki/api/v1/push
+        - access: proxy
+          basicAuth: false
+          isDefault: true
+          jsonData:
+            maxLines: 1000
+            timeout: 30
+            alerting: false
+            queryType: "range"
+            metrics: false
+            logs: true
+          name: loki-home
+          type: loki
+          url: http://loki-stack:3100
