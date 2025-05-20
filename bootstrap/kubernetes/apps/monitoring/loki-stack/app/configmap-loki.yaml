@@ -33,6 +33,8 @@ data:
           max_entries_limit_per_query: 5000
           reject_old_samples: true
           reject_old_samples_max_age: 168h
+          max_outstanding_requests: 1000
+          timeout: 1m
         memberlist:
           join_members:
           - 'loki-stack-memberlist'
