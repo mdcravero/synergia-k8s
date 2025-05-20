@@ -46,8 +46,6 @@ data:
             schema: v11
             store: boltdb-shipper
         server:
-          max_requests: 1000
-          timeout: 1m
           grpc_listen_port: 9095
           http_listen_port: 3100
         storage_config:
