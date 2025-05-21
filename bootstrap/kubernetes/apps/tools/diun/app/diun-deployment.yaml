@@ -27,12 +27,12 @@ spec:
             - name: DIUN_NOTIF_TELEGRAM_TOKEN
               valueFrom:
               secretKeyRef:
-                name: diun-secrets
+                name: secret-diun
                 key: diun-notif-telegram-token
             - name: DIUN_NOTIF_TELEGRAM_CHATID
               valueFrom:
               secretKeyRef:
-                name: diun-secrets
+                name: secret-diun
                 key: diun-notif-telegram-chatid
             - name: TZ
               value: "America/Argentina/Cordoba"
