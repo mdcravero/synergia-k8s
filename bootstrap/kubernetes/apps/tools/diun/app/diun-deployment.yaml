@@ -22,6 +22,18 @@ spec:
           imagePullPolicy: Always
           args: ["serve"]
           env:
+            - name: DIUN_NOTIF_TELEGRAM_ENABLED
+              value: "true"
+            - name: DIUN_NOTIF_TELEGRAM_TOKEN
+              valueFrom:
+              secretKeyRef:
+                name: diun-secrets
+                key: diun-notif-telegram-token
+            - name: DIUN_NOTIF_TELEGRAM_CHATID
+              valueFrom:
+              secretKeyRef:
+                name: diun-secrets
+                key: diun-notif-telegram-chatid
             - name: TZ
               value: "America/Argentina/Cordoba"
             - name: LOG_LEVEL
