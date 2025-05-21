@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ntfy-pvc
+  name: diun-pvc
   namespace: tools
 spec:
   accessModes:
