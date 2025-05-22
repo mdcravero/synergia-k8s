@@ -14,6 +14,8 @@ spec:
         app: diun
       annotations:
         diun.enable: "true"
+        diun.notify_on: "update"
+        diun.notify: "telegram"
     spec:
       serviceAccountName: diun
       containers:
@@ -22,8 +24,6 @@ spec:
           imagePullPolicy: Always
           args: ["serve"]
           env:
-            - name: DIUN_NOTIF_TELEGRAM_ENABLED
-              value: "true"
             - name: DIUN_NOTIF_TELEGRAM_TOKEN
               valueFrom:
               secretKeyRef:
