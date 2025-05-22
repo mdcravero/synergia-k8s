@@ -28,12 +28,12 @@ spec:
               valueFrom:
               secretKeyRef:
                 name: secret-diun
-                key: diun-notif-telegram-token
+                key: telegram_chat_id
             - name: DIUN_NOTIF_TELEGRAM_CHATID
               valueFrom:
               secretKeyRef:
                 name: secret-diun
-                key: diun-notif-telegram-chatid
+                key: telegram-chat-id
             - name: TZ
               value: "America/Argentina/Cordoba"
             - name: LOG_LEVEL
