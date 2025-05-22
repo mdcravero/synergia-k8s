@@ -29,7 +29,7 @@ spec:
               secretKeyRef:
                 name: secret-diun
                 key: telegram_chat_id
-            - name: DIUN_NOTIF_TELEGRAM_CHATID
+            - name: DIUN_NOTIF_TELEGRAM_CHATIDS
               valueFrom:
               secretKeyRef:
                 name: secret-diun
