@@ -37,7 +37,7 @@ spec:
             - name: TZ
               value: "America/Argentina/Cordoba"
             - name: LOG_LEVEL
-              value: "info"
+              value: "debug"
             - name: LOG_JSON
               value: "false"
             - name: DIUN_WATCH_WORKERS
