@@ -26,14 +26,14 @@ spec:
           env:
             - name: DIUN_NOTIF_TELEGRAM_TOKEN
               valueFrom:
-              secretKeyRef:
-                name: secret-diun
-                key: telegram-token
+                secretKeyRef:
+                  name: secret-diun
+                  key: telegram-token
             - name: DIUN_NOTIF_TELEGRAM_CHATIDS
               valueFrom:
-              secretKeyRef:
-                name: secret-diun
-                key: telegram-chat-id
+                secretKeyRef:
+                  name: secret-diun
+                  key: telegram-chat-id
             - name: TZ
               value: "America/Argentina/Cordoba"
             - name: LOG_LEVEL
