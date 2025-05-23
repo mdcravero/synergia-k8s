@@ -50,7 +50,7 @@ spec:
               value: "true"
             - name: DIUN_WATCH_DEFAULTTAG
               value: "latest" 
-            - name: DIUN_WATCH_BYDEFAULT
+            - name: DIUN_WATCH_BY_DEFAULT
               value: "true"
           volumeMounts:
             - mountPath: "/data"
