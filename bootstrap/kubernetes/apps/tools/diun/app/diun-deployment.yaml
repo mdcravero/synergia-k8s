@@ -48,6 +48,10 @@ spec:
               value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
+            - name: DIUN_WATCH_DEFAULTTAG=latest
+              value: "true" 
+            - name: DIUN_WATCH_BYDEFAULT
+              value: "true"
           volumeMounts:
             - mountPath: "/data"
               name: "data"
