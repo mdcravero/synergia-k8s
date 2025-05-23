@@ -49,8 +49,6 @@ spec:
               value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
-            - name: DIUN_NOTIF_TELEGRAM_DEBUG
-              value: "true"
           volumeMounts:
             - mountPath: "/data"
               name: "data"
