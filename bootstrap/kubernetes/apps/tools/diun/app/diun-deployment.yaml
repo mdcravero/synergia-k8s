@@ -49,6 +49,8 @@ spec:
               value: "30s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
+            - name: c
+               value: "true"
           volumeMounts:
             - mountPath: "/data"
               name: "data"
