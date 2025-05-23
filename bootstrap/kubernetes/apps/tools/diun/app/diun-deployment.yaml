@@ -14,7 +14,6 @@ spec:
         app: diun
       annotations:
         diun.enable: "true"
-        diun.notify_on: "update"
         diun.notify: "telegram"
         diun.watch_repo: "true"
     spec:
