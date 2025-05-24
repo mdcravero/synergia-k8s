@@ -32,7 +32,7 @@ spec:
           type: "RuntimeDefault"
       containers:
         - name: bitwarden-cli
-          image: mdcravero/bitwarden-cli:2.3
+          image: mdcravero/bitwarden-cli:2.4
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
