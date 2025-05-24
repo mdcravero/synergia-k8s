@@ -9,7 +9,10 @@ metadata:
 spec:
   replicas: 1
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app.kubernetes.io/name: bitwarden-cli
@@ -20,10 +23,28 @@ spec:
         app.kubernetes.io/name: bitwarden-cli
         app.kubernetes.io/instance: bitwarden-cli
     spec:
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
       containers:
         - name: bitwarden-cli
           image: mdcravero/bitwarden-cli:latest
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           env:
             - name: BW_CLIENTID
               valueFrom:
@@ -43,6 +64,7 @@ spec:
           volumeMounts:
           - name: bitwarden-data
             mountPath: /data
+            readOnly: false
           ports:
             - name: http
               containerPort: 8087
