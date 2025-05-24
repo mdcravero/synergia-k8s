@@ -6,5 +6,5 @@ metadata:
 resources:
   - bwn-deployment.yaml
   - bwn-service.yaml
-  - bwn-network-policy.yaml
-  - bwn-cluster-secret-store.yaml
+  - btw-network-policy.yaml
+  - btw-cluster-secret-store.yaml
