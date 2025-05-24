@@ -28,6 +28,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
+        seccompProfile:
+          type: "RuntimeDefault"
       containers:
         - name: bitwarden-cli
           image: mdcravero/bitwarden-cli:latest
@@ -47,6 +49,8 @@ spec:
               cpu: 500m
               memory: 256Mi
           env:
+            - name: HOME
+              value: "/data"
             - name: BW_CLIENTID
               valueFrom:
                 secretKeyRef:
