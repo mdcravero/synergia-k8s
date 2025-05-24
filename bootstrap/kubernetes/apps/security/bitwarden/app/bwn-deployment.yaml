@@ -37,7 +37,8 @@ spec:
             capabilities:
               drop:
                 - ALL
-            readOnlyRootFilesystem: true
+            # Temporalmente comentado para diagnóstico
+            # readOnlyRootFilesystem: true
           resources:
             requests:
               cpu: 100m
