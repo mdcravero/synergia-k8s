@@ -78,3 +78,34 @@ data:
     worker:
       # Set worker values if you want to use it
       name: worker
+      # Aumentar timeouts de probes
+      livenessProbe:
+        exec:
+          command:
+            - ak
+            - healthcheck
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        timeoutSeconds: 10
+        failureThreshold: 3
+        successThreshold: 1
+      readinessProbe:
+        exec:
+          command:
+            - ak
+            - healthcheck
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 10
+        failureThreshold: 3
+        successThreshold: 1
+      # Aumentar recursos
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "200m"
+        limits:
+          memory: "1Gi"
+          cpu: "500m"
+      # Escalar replicas
+      replicas: 2
