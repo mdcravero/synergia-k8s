@@ -13,8 +13,8 @@ spec:
         kind: HelmRepository
         name: authentik
       version: 2025.2.4
-  interval: 5m
-  timeout: 15m
+  interval: 1m0s
+  timeout: 10m
   releaseName: authentik
   valuesFrom:
     - kind: ConfigMap
