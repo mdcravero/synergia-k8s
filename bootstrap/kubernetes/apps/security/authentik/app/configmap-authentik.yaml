@@ -109,3 +109,6 @@ data:
           cpu: "500m"
       # Escalar replicas
       replicas: 2
+      # Restricción de arquitectura ARM64
+      nodeSelector:
+        kubernetes.io/arch: arm64
