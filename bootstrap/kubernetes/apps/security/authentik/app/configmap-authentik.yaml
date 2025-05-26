@@ -78,37 +78,6 @@ data:
     worker:
       # Set worker values if you want to use it
       name: worker
-      # Aumentar timeouts de probes y hacerlos más tolerantes
-      livenessProbe:
-        exec:
-          command:
-            - ak
-            - healthcheck
-        initialDelaySeconds: 60  # Aumentado a 1 minuto
-        periodSeconds: 30        # Cada 30 segundos
-        timeoutSeconds: 30       # 30 segundos
-        failureThreshold: 5      # Más tolerante
-        successThreshold: 1
-      readinessProbe:
-        exec:
-          command:
-            - ak
-            - healthcheck
-        initialDelaySeconds: 10  # Aumentado a 10 segundos
-        periodSeconds: 30        # Cada 30 segundos
-        timeoutSeconds: 30       # 30 segundos
-        failureThreshold: 5      # Más tolerante
-        successThreshold: 1
-      # Aumentar recursos
-      resources:
-        requests:
-          memory: "512Mi"
-          cpu: "200m"
-        limits:
-          memory: "1Gi"
-          cpu: "500m"
-      # Escalar replicas
-      replicas: 2
       # Solo en nodos ARM64
       nodeSelector:
         kubernetes.io/arch: arm64
