@@ -46,7 +46,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: data
-              mountPath: /home/bitwarden
+              mountPath: /home/.config
           livenessProbe:
             exec:
               command:
