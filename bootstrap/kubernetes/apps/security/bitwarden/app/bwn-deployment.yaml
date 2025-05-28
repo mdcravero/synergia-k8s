@@ -46,10 +46,12 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: data
-              mountPath: /app/config
+              mountPath: /app/data
           env:
-            - name: BW_CONFIG_DIR
-              value: /app/config
+            - name: HOME
+              value: /app
+            - name: CONFIG_DIR
+              value: /app/data
           livenessProbe:
             exec:
               command:
@@ -81,6 +83,10 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        supplementalGroups:
+          - 1000
         runAsNonRoot: true
         readOnlyRootFilesystem: true
       volumes:
