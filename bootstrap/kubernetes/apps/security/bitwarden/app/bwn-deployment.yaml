@@ -44,6 +44,9 @@ spec:
             - name: http
               containerPort: 8087
               protocol: TCP
+          volumeMounts:
+            - name: btw-config
+              mountPath: /root/.config/Bitwarden CLI
           livenessProbe:
             exec:
               command:
@@ -71,10 +74,14 @@ spec:
             periodSeconds: 5
       nodeSelector:
         type: worker-amd
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      volumes:
+        - name: btw-config
+          persistentVolumeClaim:
+            claimName: btw-config
       volumeMounts:
         - name: btw-config
-          mountPath: /data
-    volumes:
-      - name: btw-config
-        persistentVolumeClaim:
-          claimName: btw-config 
+          mountPath: /root/.config/Bitwarden CLI
