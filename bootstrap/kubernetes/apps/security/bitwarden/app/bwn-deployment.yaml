@@ -23,10 +23,10 @@ spec:
       initContainers:
         - name: fix-permissions
           image: busybox
-          command: ["sh", "-c", "chown -R 1000:1000 /app/config && chmod -R 700 /app/config"]
+          command: ["sh", "-c", "mkdir -p /home/bitwarden && chown -R 1000:1000 /home/bitwarden && chmod -R 700 /home/bitwarden"]
           volumeMounts:
             - name: data
-              mountPath: /app/config
+              mountPath: /home/bitwarden
       containers:
         - name: bitwarden-cli
           image: mdcravero/bitwarden-cli:latest
@@ -48,9 +48,9 @@ spec:
                   name: bitwarden-cli
                   key: BW_PASSWORD
             - name: BW_CONFIG_DIR
-              value: /app/config
+              value: /home/bitwarden
             - name: HOME
-              value: /app/config
+              value: /home/bitwarden
           ports:
             - name: http
               containerPort: 8087
