@@ -71,3 +71,10 @@ spec:
             periodSeconds: 5
       nodeSelector:
         type: worker-amd
+      volumeMounts:
+        - name: btw-config
+          mountPath: /data
+    volumes:
+      - name: btw-config
+        persistentVolumeClaim:
+          claimName: btw-config 
