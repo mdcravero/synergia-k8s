@@ -82,6 +82,3 @@ spec:
         - name: btw-config
           persistentVolumeClaim:
             claimName: btw-config
-      volumeMounts:
-        - name: btw-config
-          mountPath: /root/.config/Bitwarden CLI
