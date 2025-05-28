@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: bitwarden-cli
-          image: mdcravero/bitwarden-cli:latest
+          image: mdcravero/bitwarden-cli:4.0
           imagePullPolicy: IfNotPresent
           env:
             - name: BW_HOST
@@ -40,6 +40,26 @@ spec:
                 secretKeyRef:
                   name: bitwarden-cli
                   key: BW_PASSWORD
+            - name: BITWARDENCLI_APPDATA_DIR
+              value: "/home/.config/Bitwarden CLI"
+            # Skip interactive prompts
+            - name: BW_NOINTERACTION
+              value: "true"
+            # Additional authentication parameters
+            - name: BW_DEVICENAME
+              value: "kubernetes-pod-bitwarden-cli"
+            - name: BW_CLIENTID
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-cli
+                  key: BW_CLIENTID
+                  optional: true
+            - name: BW_CLIENTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-cli
+                  key: BW_CLIENTSECRET
+                  optional: true
           ports:
             - name: http
               containerPort: 8087
