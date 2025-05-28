@@ -4,8 +4,9 @@ metadata:
   name: bitwarden-cli
   namespace: security
 resources:
+  - btw-pvc.yaml
   - bwn-deployment.yaml
   - bwn-service.yaml
   - btw-network-policy.yaml
   - btw-cluster-secret-store.yaml
-  - btw-pvc.yaml
+  
