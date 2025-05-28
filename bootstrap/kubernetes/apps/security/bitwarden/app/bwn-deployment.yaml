@@ -20,6 +20,13 @@ spec:
         app.kubernetes.io/name: bitwarden-cli
         app.kubernetes.io/instance: bitwarden-cli
     spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 1000:1000 /app/config && chmod -R 700 /app/config"]
+          volumeMounts:
+            - name: data
+              mountPath: /app/config
       containers:
         - name: bitwarden-cli
           image: mdcravero/bitwarden-cli:latest
