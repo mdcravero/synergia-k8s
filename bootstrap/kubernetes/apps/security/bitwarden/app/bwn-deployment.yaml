@@ -45,7 +45,7 @@ spec:
               containerPort: 8087
               protocol: TCP
           volumeMounts:
-            - name: btw-config
+            - name: data
               mountPath: /root/.config/Bitwarden CLI
           livenessProbe:
             exec:
