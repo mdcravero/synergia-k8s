@@ -46,7 +46,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: data
-              mountPath: /root/.config/Bitwarden CLI
+              mountPath: /home/.config/Bitwarden CLI
           livenessProbe:
             exec:
               command:
