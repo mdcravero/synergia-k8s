@@ -46,7 +46,10 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: data
-              mountPath: /home/1000/.config/Bitwarden CLI
+              mountPath: /app/config
+          env:
+            - name: BW_CONFIG_DIR
+              value: /app/config
           livenessProbe:
             exec:
               command:
@@ -78,6 +81,8 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
       volumes:
         - name: data
           persistentVolumeClaim:
