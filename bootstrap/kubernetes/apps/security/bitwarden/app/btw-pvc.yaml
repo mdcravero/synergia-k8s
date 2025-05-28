@@ -10,7 +10,3 @@ spec:
   resources:
     requests:
       storage: 200Mi
-  volumeMode: Filesystem
-  selector:
-    matchLabels:
-      app: bitwarden
