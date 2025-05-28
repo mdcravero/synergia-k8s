@@ -25,6 +25,10 @@ spec:
           image: mdcravero/bitwarden-cli:latest
           imagePullPolicy: IfNotPresent
           env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
             - name: BW_HOST
               valueFrom:
                 secretKeyRef:
@@ -74,10 +78,6 @@ spec:
             periodSeconds: 5
       nodeSelector:
         type: worker-amd
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
       volumes:
         - name: data
           persistentVolumeClaim:
