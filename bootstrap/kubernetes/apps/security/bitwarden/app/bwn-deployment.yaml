@@ -22,8 +22,8 @@ spec:
     spec:
       containers:
         - name: bitwarden-cli
-          image: mdcravero/bitwarden-cli:4.0
-          imagePullPolicy: IfNotPresent
+          image: mdcravero/bitwarden-cli:4.3
+          imagePullPolicy: Always
           env:
             - name: BW_HOST
               valueFrom:
@@ -40,6 +40,11 @@ spec:
                 secretKeyRef:
                   name: bitwarden-cli
                   key: BW_PASSWORD
+            - name: BW_APIKEY
+              valueFrom:
+                secretKeyRef:
+                  name: bitwarden-cli
+                  key: BW_APIKEY
             - name: BITWARDENCLI_APPDATA_DIR
               value: "/home/.config/Bitwarden CLI"
             # Skip interactive prompts
