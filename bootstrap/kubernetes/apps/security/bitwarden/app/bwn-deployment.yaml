@@ -73,16 +73,12 @@ spec:
             - name: data
               mountPath: /home/.config
           livenessProbe:
-            exec:
-              command:
-                - wget
-                - -q
-                - http://127.0.0.1:8087/sync?force=true
-                - --post-data=''
-            initialDelaySeconds: 20
+            tcpSocket:
+              port: 8087
+            initialDelaySeconds: 30
             failureThreshold: 3
-            timeoutSeconds: 10
-            periodSeconds: 120
+            timeoutSeconds: 5
+            periodSeconds: 60
           readinessProbe:
             tcpSocket:
               port: 8087
