@@ -81,3 +81,13 @@ data:
       # Solo en nodos ARM64
       nodeSelector:
         kubernetes.io/arch: arm64
+      livenessProbe:
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+      readinessProbe:
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
