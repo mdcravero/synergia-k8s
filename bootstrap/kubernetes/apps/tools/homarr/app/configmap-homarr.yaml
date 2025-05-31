@@ -17,7 +17,7 @@ data:
     # # -- Image pull policy
     # pullPolicy: IfNotPresent
     # # -- Overrides the image tag whose default is the chart appVersion
-    # tag: "v1.14.0"
+    # tag: "v1.22.0"
     ingress:
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
