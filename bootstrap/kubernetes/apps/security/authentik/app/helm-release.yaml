@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: authentik
-      version: 2025.2.4
+      version: 2025.6.1
   interval: 1m0s
   timeout: 30m
   releaseName: authentik
