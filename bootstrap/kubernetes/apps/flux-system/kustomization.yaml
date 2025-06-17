@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- external-secrets-crds.yaml
+- https://github.com/external-secrets/external-secrets/releases/download/v0.17.0/crds.yaml
 - gotk-components.yaml
 - gotk-sync.yaml
