@@ -4,10 +4,3 @@ resources:
   - ../crds/
   - helm-release.yaml
 
-kind: Kustomization
-resources:
-  - ../crds/
-  - helm-release.yaml
-
-# Asegura que el HelmRelease se aplique solo después de los CRDs
-# Esto solo funciona si usas Flux Kustomization para este directorio
