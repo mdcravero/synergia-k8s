@@ -19,6 +19,4 @@ spec:
     - kind: ConfigMap
       name: prometheus-values
       valuesKey: values.yaml
-  dependsOn:
-    - name: nfs-proxmox
       namespace: nfs-storage
