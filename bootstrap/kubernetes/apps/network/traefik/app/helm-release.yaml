@@ -5,7 +5,7 @@ metadata:
   name: traefik
   namespace: traefik
 spec:
-      namespace: traefik
+  targetNamespace: traefik
   chart:
     spec:
       chart: traefik
