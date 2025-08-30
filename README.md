@@ -54,28 +54,6 @@ Cada aplicación debe tener su archivo `namespace.yaml` como primer recurso en `
 - **External Secrets** → **Authentik**: Secretos necesarios para configuración
 - **MetalLB** → **Traefik**: LoadBalancer para servicios
 
-## Solución de Problemas Comunes
-
-### Error: "namespace not found"
-**Solución**: Agregar `namespace.yaml` como primer recurso en `kustomization.yaml`
-
-### Error: "metallb.io/v1beta1: resource not found"
-**Solución**: Separar instalación de MetalLB de su configuración usando dependencias de Flux
-
-### Error: "violates PodSecurity baseline"
-**Solución**: Configurar namespace con `pod-security.kubernetes.io/enforce: privileged`
-
-### Error: "FRR startup probe failed"
-**Solución**: Deshabilitar FRR en MetalLB usando:
-```yaml
-values:
-  frrk8s:
-    enabled: false
-  speaker:
-    frr:
-      enabled: false
-```
-
 ## Comandos Útiles
 
 ```bash
@@ -92,13 +70,6 @@ flux reconcile kustomization apps-network
 kubectl get pods -n metallb-system
 kubectl get ipaddresspool -n metallb-system
 ```
-
-## Configuración de Red
-
-- **Cluster**: Talos Linux en Raspberry Pi
-- **MetalLB Pool**: 192.168.1.50-192.168.1.90
-- **NFS Server**: 192.168.1.10:/srv/nfs4/k8s
-- **Repositorio Git**: https://github.com/mdcravero/synergia-k8s.git
 
 ## Notas de Seguridad
 
