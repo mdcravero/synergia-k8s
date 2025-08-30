@@ -21,3 +21,9 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  values:
+    frrk8s:
+      enabled: false
+    speaker:
+      frr:
+        enabled: false
