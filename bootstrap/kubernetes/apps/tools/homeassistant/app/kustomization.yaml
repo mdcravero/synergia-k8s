@@ -3,7 +3,7 @@ kind: Kustomization
 metadata:
   name: home-assistant
 resources:
-  - deployment.yaml
-  - service.yaml
   - pvc-home-assistant.yaml
+  - service.yaml
+  - deployment.yaml
   - ingress.yaml
