@@ -19,4 +19,3 @@ spec:
     - kind: ConfigMap
       name: jellyseerr-values
       valuesKey: values.yaml
-      namespace: nfs-storage
