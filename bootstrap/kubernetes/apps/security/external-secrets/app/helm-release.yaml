@@ -8,11 +8,9 @@ spec:
   chart:
     spec:
       chart: external-secrets
-      reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: external-secrets-operator
-      version: 0.17.0
   interval: 1m0s
   releaseName: external-secrets-operator
   valuesFrom:

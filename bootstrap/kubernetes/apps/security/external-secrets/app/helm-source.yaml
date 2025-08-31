@@ -5,5 +5,5 @@ metadata:
   name: external-secrets-operator
   namespace: security
 spec:
-  interval: 1m0s
+  interval: 1h
   url: https://charts.external-secrets.io/
