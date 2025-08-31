@@ -19,7 +19,7 @@ metadata:
   name: flux-system
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/flux-system
   prune: true
   sourceRef:
@@ -32,7 +32,7 @@ metadata:
   name: apps-namespaces
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/namespaces
   prune: true
   sourceRef:
@@ -47,7 +47,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-namespaces
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/network/metallb/install
   prune: true
   sourceRef:
@@ -62,7 +62,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-metallb-install
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/network
   prune: true
   sourceRef:
@@ -77,7 +77,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-network
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/storage
   prune: true
   sourceRef:
@@ -92,7 +92,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-storage
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/tools
   prune: true
   sourceRef:
@@ -107,7 +107,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-tools
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/security
   prune: true
   sourceRef:
@@ -122,7 +122,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-security
-  interval: 10m0s
+  interval: 5m0s
   path: ./bootstrap/kubernetes/apps/declarations
   prune: true
   sourceRef:
