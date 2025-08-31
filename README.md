@@ -8,12 +8,15 @@ Este repositorio contiene la configuración de un cluster Kubernetes usando Talo
 
 Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 
-1. **MetalLB Install** - Instala MetalLB y sus CRDs
-2. **Network** - Configuración de MetalLB + Traefik
-3. **Storage** - NFS Provisioner
-4. **Tools** - PostgreSQL + Redis (dependencias de Authentik)
-5. **Security** - External Secrets + Bitwarden + Authentik
-6. **Apps** - Resto de aplicaciones
+1. **Namespaces** - Crea todos los namespaces necesarios
+2. **MetalLB Install** - Instala MetalLB y sus CRDs
+3. **Network** - Configuración de MetalLB + Traefik
+4. **Storage** - NFS Provisioner
+5. **External Secrets** - Sistema de gestión de secretos
+6. **Bitwarden** - Backend de secretos
+7. **Tools** - PostgreSQL + Redis (con acceso a secretos)
+8. **Authentik** - Sistema de autenticación (usa PostgreSQL/Redis)
+9. **Apps** - Resto de aplicaciones
 
 ### Componentes Principales
 
@@ -28,14 +31,18 @@ Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 ```
 bootstrap/kubernetes/apps/
 ├── flux-system/          # Configuración de Flux CD
+├── namespaces/           # Todos los namespaces centralizados
 ├── network/              # MetalLB + Traefik
 │   ├── metallb/
 │   │   ├── install/      # Instalación de MetalLB
 │   │   └── app/          # Configuración de MetalLB
 │   └── traefik/app/      # Traefik ingress controller
 ├── storage/              # NFS provisioner
+├── security/             # External Secrets + Bitwarden + Authentik
+│   ├── external-secrets/ # Gestión de secretos
+│   ├── bitwarden/        # Backend de secretos
+│   └── authentik/        # Sistema de autenticación
 ├── tools/                # PostgreSQL + Redis
-├── security/             # Authentik + External Secrets
 └── declarations/         # Aplicaciones principales
 ```
 
@@ -47,12 +54,16 @@ bootstrap/kubernetes/apps/
 - **Pool de IPs**: 192.168.1.50-192.168.1.90
 
 ### Namespaces
-Cada aplicación debe tener su archivo `namespace.yaml` como primer recurso en `kustomization.yaml` para evitar errores de "namespace not found".
+- **Centralizados**: Todos los namespaces se crean en la primera etapa desde `apps/namespaces/`
+- **Privilegios especiales**: `metallb-system` tiene `pod-security.kubernetes.io/enforce: privileged`
+- **Sin duplicación**: Ya no es necesario crear `namespace.yaml` en cada aplicación
 
 ### Dependencias Críticas
+- **External Secrets** → **Tools**: Secretos necesarios para PostgreSQL/Redis
 - **PostgreSQL/Redis** → **Authentik**: Bases de datos requeridas
-- **External Secrets** → **Authentik**: Secretos necesarios para configuración
+- **Bitwarden** → **Tools**: Backend de secretos para configuración
 - **MetalLB** → **Traefik**: LoadBalancer para servicios
+- **Namespaces** → **Todo**: Evita errores de "namespace not found"
 
 ## Comandos Útiles
 

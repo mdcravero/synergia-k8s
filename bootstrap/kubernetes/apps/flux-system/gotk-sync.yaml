@@ -87,11 +87,41 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps-tools
+  name: apps-secrets
   namespace: flux-system
 spec:
   dependsOn:
     - name: apps-storage
+  interval: 5m0s
+  path: ./bootstrap/kubernetes/apps/security/external-secrets
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps-bitwarden
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: apps-secrets
+  interval: 5m0s
+  path: ./bootstrap/kubernetes/apps/security/bitwarden
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps-tools
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: apps-bitwarden
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/tools
   prune: true
@@ -102,13 +132,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps-security
+  name: apps-authentik
   namespace: flux-system
 spec:
   dependsOn:
     - name: apps-tools
   interval: 5m0s
-  path: ./bootstrap/kubernetes/apps/security
+  path: ./bootstrap/kubernetes/apps/security/authentik
   prune: true
   sourceRef:
     kind: GitRepository
@@ -121,7 +151,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: apps-security
+    - name: apps-authentik
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/declarations
   prune: true
