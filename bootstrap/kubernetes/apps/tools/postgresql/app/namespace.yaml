@@ -5,3 +5,12 @@ metadata:
   name: tools
   labels:
     name: tools
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: media
+  labels:
+    name: media
