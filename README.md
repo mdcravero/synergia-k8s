@@ -14,9 +14,10 @@ Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 4. **Storage** - NFS Provisioner
 5. **External Secrets** - Sistema de gestión de secretos
 6. **Bitwarden** - Backend de secretos
-7. **Tools** - PostgreSQL + Redis (con acceso a secretos)
-8. **Authentik** - Sistema de autenticación (usa PostgreSQL/Redis)
-9. **Apps** - Resto de aplicaciones
+7. **Secrets Config** - Secretos específicos (PostgreSQL, Redis, etc.)
+8. **Tools** - PostgreSQL + Redis (con secretos disponibles)
+9. **Authentik** - Sistema de autenticación (usa PostgreSQL/Redis)
+10. **Apps** - Resto de aplicaciones
 
 ### Componentes Principales
 
@@ -42,6 +43,7 @@ bootstrap/kubernetes/apps/
 │   ├── external-secrets/ # Gestión de secretos
 │   ├── bitwarden/        # Backend de secretos
 │   └── authentik/        # Sistema de autenticación
+├── secrets/              # Secretos específicos (SOPS)
 ├── tools/                # PostgreSQL + Redis
 └── declarations/         # Aplicaciones principales
 ```
@@ -59,9 +61,10 @@ bootstrap/kubernetes/apps/
 - **Sin duplicación**: Ya no es necesario crear `namespace.yaml` en cada aplicación
 
 ### Dependencias Críticas
-- **External Secrets** → **Tools**: Secretos necesarios para PostgreSQL/Redis
+- **External Secrets** → **Bitwarden**: Sistema de gestión de secretos
+- **Bitwarden** → **Secrets Config**: Backend de secretos disponible
+- **Secrets Config** → **Tools**: Secretos específicos para PostgreSQL/Redis
 - **PostgreSQL/Redis** → **Authentik**: Bases de datos requeridas
-- **Bitwarden** → **Tools**: Backend de secretos para configuración
 - **MetalLB** → **Traefik**: LoadBalancer para servicios
 - **Namespaces** → **Todo**: Evita errores de "namespace not found"
 
