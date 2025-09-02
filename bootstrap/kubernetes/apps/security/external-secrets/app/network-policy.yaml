@@ -17,6 +17,10 @@ spec:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: kube-system
+    # Allow traffic from Flux for reconciliation
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: flux-system
     # Allow traffic from other pods in the same namespace (e.g., cert-controller to webhook)
     - podSelector:
         matchLabels:
@@ -24,7 +28,7 @@ spec:
     ports:
     # Port for the webhook
     - protocol: TCP
-      port: 443
+      port: 10250
     # Port for metrics
     - protocol: TCP
       port: 8080
