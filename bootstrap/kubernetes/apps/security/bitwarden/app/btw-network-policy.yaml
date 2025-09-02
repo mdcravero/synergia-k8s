@@ -18,20 +18,7 @@ spec:
               app.kubernetes.io/instance: external-secrets
               app.kubernetes.io/name: external-secrets
   egress:
-    # 1. Allow DNS lookups
-    - to:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: kube-system
-        podSelector:
-          matchLabels:
-            k8s-app: kube-dns
-      ports:
-      - protocol: UDP
-        port: 53
-      - protocol: TCP
-        port: 53
-    # 2. Allow connection to the Bitwarden server (likely on the internet)
+    # Allow all egress traffic for DNS lookups and connection to Bitwarden servers
     - to:
       - ipBlock:
           cidr: 0.0.0.0/0
