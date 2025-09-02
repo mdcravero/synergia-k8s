@@ -9,5 +9,5 @@ resources:
   - bwn-service.yaml
   - btw-network-policy.yaml
   - btw-cluster-secret-store.yaml
-  - eso-network-policy.yaml
+  
   
