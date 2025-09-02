@@ -15,8 +15,7 @@ spec:
     - from:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/instance: external-secrets
-              app.kubernetes.io/name: external-secrets
+              app.kubernetes.io/instance: external-secrets-operator
   egress:
     # Allow all egress traffic for DNS lookups and connection to Bitwarden servers
     - to:
