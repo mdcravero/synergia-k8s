@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: external-secrets-access
+  namespace: security
+spec:
+  # Apply to all pods of the external-secrets operator
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: external-secrets-operator
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    # Allow traffic from the Kube API Server for the webhook
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    # Allow traffic from other pods in the same namespace (e.g., cert-controller to webhook)
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: external-secrets-operator
+    ports:
+    # Port for the webhook
+    - protocol: TCP
+      port: 443
+    # Port for metrics
+    - protocol: TCP
+      port: 8080
+  egress:
+  # Allow all egress traffic for DNS, connection to Bitwarden, etc.
+  - {}
