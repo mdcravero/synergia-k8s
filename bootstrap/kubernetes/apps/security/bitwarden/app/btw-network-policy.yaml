@@ -14,8 +14,13 @@ spec:
   ingress:
     - from:
         - podSelector:
+            matchLabels: {} # Allow all pods in the same namespace
+          namespaceSelector:
             matchLabels:
-              app.kubernetes.io/instance: external-secrets-operator
+              kubernetes.io/metadata.name: security
+      ports:
+        - protocol: TCP
+          port: 8087
   egress:
     # Allow all egress traffic for DNS lookups and connection to Bitwarden servers
     - to:
