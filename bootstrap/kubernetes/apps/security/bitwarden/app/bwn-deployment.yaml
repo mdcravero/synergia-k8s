@@ -30,16 +30,6 @@ spec:
                 secretKeyRef:
                   name: bitwarden-cli
                   key: BW_HOST
-            - name: BW_USER
-              valueFrom:
-                secretKeyRef:
-                  name: bitwarden-cli
-                  key: BW_USERNAME
-            - name: BW_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: bitwarden-cli
-                  key: BW_PASSWORD
             - name: BW_APIKEY
               valueFrom:
                 secretKeyRef:
