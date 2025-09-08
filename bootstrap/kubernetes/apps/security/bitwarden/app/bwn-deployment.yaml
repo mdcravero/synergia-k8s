@@ -46,7 +46,7 @@ spec:
                   name: bitwarden-cli
                   key: BW_APIKEY
             - name: BITWARDENCLI_APPDATA_DIR
-              value: "/home/.config/Bitwarden CLI"
+              value: "/home/.config/bitwarden-cli"
             # Skip interactive prompts
             - name: BW_NOINTERACTION
               value: "true"
