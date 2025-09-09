@@ -6,8 +6,6 @@ metadata:
   namespace: tools
 data:
   values.yaml: |-
-    defaultStorageClass: nfs-client
-
     image:
       registry: docker.io
       repository: bitnami/postgresql
@@ -22,7 +20,6 @@ data:
       existingSecret: "postgres-secret"
       secretKeys:
         adminPasswordKey: password
-        userPasswordKey: username
       usePasswordFiles: false
 
     primary:
