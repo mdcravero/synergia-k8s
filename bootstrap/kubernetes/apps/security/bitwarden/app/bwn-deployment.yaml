@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: bitwarden-cli
-          image: mdcravero/bitwarden-cli:4.5
+          image: mdcravero/bitwarden-cli:4.6
           imagePullPolicy: IfNotPresent
           env:
             - name: BW_HOST
