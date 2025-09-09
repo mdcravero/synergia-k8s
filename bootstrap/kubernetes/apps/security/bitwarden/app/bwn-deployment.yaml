@@ -61,7 +61,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: data
-              mountPath: /home/.config
+              mountPath: /home/.config/bitwarden-cli
           livenessProbe:
             httpGet:
               path: /health
