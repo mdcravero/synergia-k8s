@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: postgresql
-      version: 16.0.1
+      version: 16.7.27
   interval: 1m0s
   releaseName: postgresql
   valuesFrom:
