@@ -58,10 +58,7 @@ data:
     #   size: 8Gi
 
     persistence:
-   
       enabled: true
-      volumeName: "data"
-      mountPath: /bitnami/postgresql
       storageClass: nfs-client
       accessModes:
         - ReadWriteOnce
