@@ -14,13 +14,16 @@ data:
       debug: true
 
     auth:
-      ## @param auth.enablePostgresUser Assign a password to the "postgres" admin user. Otherwise, remote access will be blocked for this user
-      ##
       enablePostgresUser: true
       existingSecret: "postgres-secret"
       secretKeys:
-        adminPasswordKey: password
+        adminPasswordKey: postgresql_password
       usePasswordFiles: false
+      database: "authentik"
+      username: "authentik"
+      existingSecret: "postgres-secret"
+      secretKeys:
+        passwordKey: authentik_password
 
     primary:
       containerSecurityContext:
@@ -55,3 +58,4 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 8Gi
+      
