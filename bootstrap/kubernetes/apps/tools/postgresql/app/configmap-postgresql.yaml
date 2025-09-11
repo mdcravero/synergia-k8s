@@ -6,6 +6,14 @@ metadata:
   namespace: tools
 data:
   values.yaml: |-
+    global:
+      postgresql:
+        auth:
+          existingSecret: "secret-postgresql"
+          secretKeys:
+            adminPasswordKey: password
+            userPasswordKey: authentik-password
+
     image:
       registry: docker.io
       repository: bitnami/postgresql
