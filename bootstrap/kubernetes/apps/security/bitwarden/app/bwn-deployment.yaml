@@ -25,6 +25,7 @@ spec:
           image: mdcravero/bitwarden-cli:simple
           imagePullPolicy: Always
 
+
           env:
             - name: BW_HOST
               valueFrom:
@@ -73,6 +74,7 @@ spec:
       securityContext:
         runAsUser: 0
         runAsGroup: 0
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       volumes:
