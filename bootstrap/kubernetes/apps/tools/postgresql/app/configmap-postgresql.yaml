@@ -15,15 +15,13 @@ data:
 
     auth:
       enablePostgresUser: true
-      existingSecret: "secret-postgresql"
+      existingSecret: "postgresql-secret"
       secretKeys:
-        adminPasswordKey: postgresql_password
+        adminPasswordKey: postgresql-password
+        userPasswordKey: authentik-password
       usePasswordFiles: false
       database: "authentik"
       username: "authentik"
-      existingSecret: "secret-postgresql"
-      secretKeys:
-        passwordKey: authentik_password
 
     primary:
       containerSecurityContext:
