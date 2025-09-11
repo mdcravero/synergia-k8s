@@ -15,13 +15,13 @@ data:
 
     auth:
       enablePostgresUser: true
-      existingSecret: "postgres-secret"
+      existingSecret: "postgresql-secret"
       secretKeys:
         adminPasswordKey: postgresql_password
       usePasswordFiles: false
       database: "authentik"
       username: "authentik"
-      existingSecret: "postgres-secret"
+      existingSecret: "postgresql-secret"
       secretKeys:
         passwordKey: authentik_password
 
