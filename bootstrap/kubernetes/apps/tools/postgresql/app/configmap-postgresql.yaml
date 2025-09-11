@@ -15,7 +15,7 @@ data:
 
     auth:
       enablePostgresUser: true
-      existingSecret: "postgresql-secret"
+      existingSecret: "secret-postgresql"
       secretKeys:
         adminPasswordKey: password
         userPasswordKey: authentik-password
