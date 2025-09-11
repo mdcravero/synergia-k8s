@@ -3761,7 +3761,6 @@ spec:
                   provider:
                     description: Provider is the name of the decryption engine.
                     enum:
-                    - sops
                     type: string
                   secretRef:
                     description: The secret name containing the private OpenPGP keys
@@ -4224,7 +4223,6 @@ spec:
                   provider:
                     description: Provider is the name of the decryption engine.
                     enum:
-                    - sops
                     type: string
                   secretRef:
                     description: The secret name containing the private OpenPGP keys
@@ -4788,7 +4786,6 @@ spec:
                   provider:
                     description: Provider is the name of the decryption engine.
                     enum:
-                    - sops
                     type: string
                   secretRef:
                     description: The secret name containing the private OpenPGP keys
