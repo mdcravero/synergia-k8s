@@ -48,26 +48,14 @@ data:
         seccompProfile:
           type: "RuntimeDefault"
       initdb:
-        scripts:
-          00-create-authentik.sql: |-
-            -- Crear rol authentik si no existe
-            DO
-            $do$
-            BEGIN
-              IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'authentik') THEN
-                CREATE ROLE authentik LOGIN PASSWORD '$(AUTHENTIK_PASSWORD)';
-              END IF;
-            END
-            $do$;
-            
-            -- Crear base de datos authentik si no existe (fuera de DO)
-            SELECT 'CREATE DATABASE authentik OWNER authentik'
-            WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'authentik')\gexec
+        scriptsSecret: secret-postgresql
       pgHbaConfiguration: |-
         local   all             all                                     trust
         host    all             all             127.0.0.1/32            trust
         host    all             all             ::1/128                 trust
         host    all             all             0.0.0.0/0               md5
+      postgresqlConfiguration: |-
+        listen_addresses = '*'
       podSecurityContext:
         enabled: true
         fsGroupChangePolicy: Always
