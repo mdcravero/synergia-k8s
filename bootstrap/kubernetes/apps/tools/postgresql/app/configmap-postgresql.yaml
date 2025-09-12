@@ -12,7 +12,6 @@ data:
           existingSecret: "secret-postgresql"
           secretKeys:
             adminPasswordKey: password
-            userPasswordKey: authentik-password
 
     image:
       registry: docker.io
@@ -26,10 +25,7 @@ data:
       existingSecret: "secret-postgresql"
       secretKeys:
         adminPasswordKey: password
-        userPasswordKey: authentik-password
       usePasswordFiles: false
-      database: "authentik"
-      username: "authentik"
 
     primary:
       containerSecurityContext:
@@ -45,6 +41,8 @@ data:
           drop: ["ALL"]
         seccompProfile:
           type: "RuntimeDefault"
+      initdb:
+        scriptsSecret: secret-postgresql
       podSecurityContext:
         enabled: true
         fsGroupChangePolicy: Always
@@ -64,4 +62,3 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 8Gi
-      
