@@ -20,3 +20,5 @@ spec:
     - kind: ConfigMap
       name: traefik-values
       valuesKey: values.yaml
+  values:
+    installCRDs: false
