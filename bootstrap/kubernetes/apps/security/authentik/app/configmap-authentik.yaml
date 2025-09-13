@@ -54,6 +54,9 @@ data:
         - name: media
           mountPath: /media
 
+      nodeSelector:
+        kubernetes.io/arch: arm64
+
       podLabels:
         app: authentik
 
