@@ -5,6 +5,9 @@ metadata:
   name: homarr
   namespace: tools
 spec:
+  dependsOn:
+    - name: authentik
+      namespace: security
   chart:
     spec:
       chart: homarr

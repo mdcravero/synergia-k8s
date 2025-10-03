@@ -51,4 +51,4 @@ data:
           http:
             port: 8096
         type: LoadBalancer
-        loadBalancerIP: 192.168.1.60
+        loadBalancerIP: 10.42.20.60

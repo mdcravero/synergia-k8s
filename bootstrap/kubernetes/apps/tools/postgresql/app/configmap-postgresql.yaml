@@ -67,7 +67,7 @@ data:
         type: LoadBalancer
         ports:
           postgresql: 5432
-        loadBalancerIP: 192.168.1.70
+        loadBalancerIP: 10.42.20.70
       
       persistence:
         enabled: true

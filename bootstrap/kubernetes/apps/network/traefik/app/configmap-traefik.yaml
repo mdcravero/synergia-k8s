@@ -44,7 +44,7 @@ data:
       single: true
       type: LoadBalancer
       spec:
-        loadBalancerIP: "192.168.1.50"
+        loadBalancerIP: "10.42.20.40"
 
     ingressRoute:
       dashboard:
