@@ -10,15 +10,16 @@ Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 
 1. **Namespaces** - Crea todos los namespaces necesarios
 2. **MetalLB Install** - Instala MetalLB y sus CRDs
-3. **Network** - Configuración de MetalLB + Traefik
-4. **Storage** - NFS Provisioner
-5. **External Secrets** - Sistema de gestión de secretos
-6. **Bitwarden** - Backend de secretos
-7. **Secrets Config** - Secretos específicos (PostgreSQL, Redis, etc.)
-8. **Monitoring** - Grafana + Loki + Prometheus (requiere secrets)
-9. **Authentik** - Sistema de autenticación (requiere secrets)
-10. **Tools** - PostgreSQL + Redis + Homarr (Homarr espera a Authentik)
-11. **Media** - Jellyfin, Radarr, Sonarr, etc. (usa Authentik para autenticación)
+3. **Network** - Configuración de MetalLB + Traefik (instala CRDs)
+4. **Traefik Middlewares** - Middlewares de Traefik (espera a CRDs)
+5. **Storage** - NFS Provisioner
+6. **External Secrets** - Sistema de gestión de secretos
+7. **Bitwarden** - Backend de secretos
+8. **Secrets Config** - Secretos específicos (PostgreSQL, Redis, etc.)
+9. **Monitoring** - Grafana + Loki + Prometheus (requiere secrets)
+10. **Authentik** - Sistema de autenticación (requiere secrets)
+11. **Tools** - PostgreSQL + Redis + Homarr (Homarr espera a Authentik)
+12. **Media** - Jellyfin, Radarr, Sonarr, etc. (usa Authentik para autenticación)
 
 ### Componentes Principales
 

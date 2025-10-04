@@ -5,5 +5,4 @@ resources:
   - configmap-traefik.yaml
   - helm-source.yaml
   - helmrelease-crds.yaml
-  - middleware-authentik.yaml
   - helm-release.yaml
