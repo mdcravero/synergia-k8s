@@ -9,7 +9,8 @@ Este repositorio contiene la configuración de un cluster Kubernetes usando Talo
 Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 
 1. **Namespaces** - Crea todos los namespaces necesarios
-2. **MetalLB Install** - Instala MetalLB y sus CRDs
+2. **Metrics Server** - Servidor de métricas para HPA y kubectl top
+3. **MetalLB Install** - Instala MetalLB y sus CRDs
 3. **Network** - Configuración de MetalLB + Traefik (instala CRDs)
 4. **Traefik Middlewares** - Middlewares de Traefik (espera a CRDs)
 5. **Storage** - NFS Provisioner
@@ -23,6 +24,7 @@ Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 
 ### Componentes Principales
 
+- **Metrics Server**: Servidor de métricas para HPA y monitoreo de recursos
 - **MetalLB**: Load balancer para bare metal (rango IP: 10.42.20.50-10.42.20.90)
 - **Traefik**: Ingress controller y reverse proxy con middlewares de Authentik
 - **NFS Provisioner**: Storage dinámico usando NFS (servidor: 10.42.20.10)
@@ -36,11 +38,13 @@ Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
 bootstrap/kubernetes/apps/
 ├── flux-system/          # Configuración de Flux CD
 ├── namespaces/           # Todos los namespaces centralizados
+├── system/               # Componentes del sistema
+│   └── metrics-server/   # Servidor de métricas
 ├── network/              # MetalLB + Traefik
 │   ├── metallb/
 │   │   ├── install/      # Instalación de MetalLB
 │   │   └── app/          # Configuración de MetalLB
-│   └── traefik/app/      # Traefik ingress controller
+│   └── traefik/          # Traefik ingress controller + middlewares
 ├── storage/              # NFS provisioner
 ├── security/             # External Secrets + Bitwarden + Authentik
 │   ├── external-secrets/ # Gestión de secretos
@@ -80,6 +84,7 @@ bootstrap/kubernetes/apps/
 - **Transmission Shows**: 10.42.20.68
 
 ### Dependencias Críticas
+- **Namespaces** → **Metrics Server**: Namespace kube-system debe existir
 - **External Secrets** → **Monitoring**: Grafana requiere secretos para datasources
 - **External Secrets** → **Bitwarden**: Sistema de gestión de secretos
 - **Bitwarden** → **Secrets Config**: Backend de secretos disponible
@@ -108,6 +113,10 @@ kubectl get ipaddresspool -n metallb-system
 
 # Ver servicios con IPs asignadas
 kubectl get svc -A | grep LoadBalancer
+
+# Ver métricas de nodos/pods
+kubectl top nodes
+kubectl top pods -A
 
 # Acceder a Grafana (usuario/admin, contraseña de secret)
 kubectl port-forward -n monitoring svc/grafana 3000:80
