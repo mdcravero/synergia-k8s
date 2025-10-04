@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - configmap-traefik.yaml
-  - middleware-authentik.yaml
   - helm-source.yaml
   - helmrelease-crds.yaml
+  - middleware-authentik.yaml
   - helm-release.yaml
