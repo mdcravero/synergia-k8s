@@ -20,6 +20,3 @@ spec:
     - kind: ConfigMap
       name: grafana-values
       valuesKey: values.yaml
-      namespace: nfs-storage
-    - name: external-secrets-operator
-      namespace: security 
