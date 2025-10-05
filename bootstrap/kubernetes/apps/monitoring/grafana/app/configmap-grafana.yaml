@@ -74,8 +74,8 @@ data:
         traefik.ingress.kubernetes.io/router.tls: "true"    
         traefik.ingress.kubernetes.io/router.tls.certresolver: le
 
-    nodeSelector:
-      type: worker
+    # nodeSelector:
+    #   type: worker
 
     tolerations: []
 
