@@ -29,6 +29,8 @@ data:
 
     primary:
       extraEnvVars:
+        - name: PGDATA
+          value: /var/lib/postgresql/data
         - name: AUTHENTIK_PASSWORD
           valueFrom:
             secretKeyRef:
