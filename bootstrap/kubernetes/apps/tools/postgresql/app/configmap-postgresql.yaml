@@ -15,8 +15,8 @@ data:
 
     image:
       registry: docker.io
-      repository: bitnami/postgresql
-      tag: 16.4.0
+      repository: postgres
+      tag: "16"
       digest: ""
       debug: true
 
@@ -37,8 +37,8 @@ data:
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
-        runAsUser: 1000
-        runAsGroup: 1000
+        runAsUser: 999
+        runAsGroup: 999
         runAsNonRoot: true
         privileged: false
         readOnlyRootFilesystem: true
@@ -61,7 +61,7 @@ data:
         fsGroupChangePolicy: Always
         sysctls: []
         supplementalGroups: []
-        fsGroup: 1000
+        fsGroup: 999
         
       service:
         type: LoadBalancer

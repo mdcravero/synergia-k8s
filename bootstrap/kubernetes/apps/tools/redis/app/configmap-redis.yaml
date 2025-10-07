@@ -16,8 +16,8 @@ data:
 
     image:
       registry: docker.io
-      repository: bitnami/redis
-      tag: 7.2.5
+      repository: redis
+      tag: "7"
       digest: ""
       pullPolicy: IfNotPresent
       debug: true
@@ -70,13 +70,13 @@ data:
         fsGroupChangePolicy: Always
         sysctls: []
         supplementalGroups: []
-        fsGroup: 1001
+        fsGroup: 999
      
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
-        runAsUser: 1001
-        runAsGroup: 1001
+        runAsUser: 999
+        runAsGroup: 999
         runAsNonRoot: true
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
@@ -116,13 +116,13 @@ data:
         fsGroupChangePolicy: Always
         sysctls: []
         supplementalGroups: []
-        fsGroup: 1000
+        fsGroup: 999
       
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
-        runAsUser: 1000
-        runAsGroup: 1000
+        runAsUser: 999
+        runAsGroup: 999
         runAsNonRoot: true
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
