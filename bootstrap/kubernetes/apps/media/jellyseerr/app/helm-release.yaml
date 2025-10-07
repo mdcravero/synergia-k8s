@@ -7,12 +7,11 @@ metadata:
 spec:
   chart:
     spec:
-      chart: jellyseerr
+      chart: seerr-chart
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: jellyseerr
-      version: 1.0.2
   interval: 1m0s
   releaseName: jellyseerr
   valuesFrom:
