@@ -5,6 +5,5 @@ metadata:
   name: sonarr
   namespace: media
 spec:
-  type: oci
-  url: oci://ghcr.io/onedr0p/sonarr
+  url: https://bjw-s.github.io/helm-charts
   interval: 1m0s
