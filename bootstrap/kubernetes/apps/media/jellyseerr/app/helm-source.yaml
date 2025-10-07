@@ -6,4 +6,4 @@ metadata:
   namespace: media
 spec:
   interval: 1m0s
-  url: https://etiennebarbier.github.io/k8s-home-helm-charts
+  url: https://bjw-s.github.io/helm-charts
