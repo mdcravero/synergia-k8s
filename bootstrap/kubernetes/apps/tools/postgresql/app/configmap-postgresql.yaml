@@ -29,8 +29,6 @@ data:
 
     primary:
       extraEnvVars:
-        - name: PGDATA
-          value: /var/lib/postgresql/data
         - name: AUTHENTIK_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -43,7 +41,7 @@ data:
         runAsGroup: 1000
         runAsNonRoot: true
         privileged: false
-        readOnlyRootFilesystem: false
+        readOnlyRootFilesystem: true
         allowPrivilegeEscalation: false
         capabilities:
           drop: ["ALL"]
@@ -77,16 +75,3 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 8Gi
-        mountPath: /var/lib/postgresql
-      extraVolumes:
-        - name: run-postgresql
-          emptyDir: {}
-      extraVolumeMounts:
-        - name: run-postgresql
-          mountPath: /var/run/postgresql
-        - name: postgresql-config
-          mountPath: /var/lib/postgresql/data/postgresql.conf
-          subPath: postgresql.conf
-        - name: postgresql-config
-          mountPath: /var/lib/postgresql/data/pg_hba.conf
-          subPath: pg_hba.conf
