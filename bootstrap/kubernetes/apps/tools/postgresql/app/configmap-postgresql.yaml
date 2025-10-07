@@ -15,7 +15,7 @@ data:
 
     image:
       registry: docker.io
-      repository: bitnamicontainers/postgresql
+      repository: bitnami/postgresql
       tag: 17.6.0
       digest: ""
       debug: true
