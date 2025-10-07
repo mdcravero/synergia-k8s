@@ -15,8 +15,8 @@ data:
 
     image:
       registry: docker.io
-      repository: postgres
-      tag: "16"
+      repository: bitnami/postgresql
+      tag: "latest"
       digest: ""
       debug: true
 
@@ -37,11 +37,11 @@ data:
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
-        runAsUser: 999
-        runAsGroup: 999
+        runAsUser: 1000
+        runAsGroup: 1000
         runAsNonRoot: true
         privileged: false
-        readOnlyRootFilesystem: true
+        readOnlyRootFilesystem: false
         allowPrivilegeEscalation: false
         capabilities:
           drop: ["ALL"]
@@ -61,7 +61,7 @@ data:
         fsGroupChangePolicy: Always
         sysctls: []
         supplementalGroups: []
-        fsGroup: 999
+        fsGroup: 1000
         
       service:
         type: LoadBalancer
@@ -75,3 +75,16 @@ data:
         accessModes:
           - ReadWriteOnce
         size: 8Gi
+        mountPath: /var/lib/postgresql
+      extraVolumes:
+        - name: run-postgresql
+          emptyDir: {}
+      extraVolumeMounts:
+        - name: run-postgresql
+          mountPath: /var/run/postgresql
+        - name: postgresql-config
+          mountPath: /var/lib/postgresql/data/postgresql.conf
+          subPath: postgresql.conf
+        - name: postgresql-config
+          mountPath: /var/lib/postgresql/data/pg_hba.conf
+          subPath: pg_hba.conf
