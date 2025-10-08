@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: jellyseerr
+  name: jellyseerr
+  namespace: media
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: jellyseerr
+  template:
+    metadata:
+      labels:
+        run: jellyseerr
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+            - name: forceIpv4First
+              value: "true"
+            - name: LOG_LEVEL
+              value: "debug"
+          image: fallenbagel/jellyseerr:2.7.0
+          name: jellyseerr
+          ports:
+            - containerPort: 5055
+              name: webui
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: jellyseerr-config

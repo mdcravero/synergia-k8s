@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyseerr
+  namespace: media
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 5055
+      protocol: TCP
+      targetPort: 5055
+      name: webui
+  selector:
+    run: jellyseerr
+  loadBalancerIP: 10.42.20.61
