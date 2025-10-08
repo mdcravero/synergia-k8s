@@ -5,3 +5,4 @@ metadata:
 resources:
   - pvc-jellyfin.yaml
   - pvc-bitwarden.yaml
+  - pvc-jellyseerr.yaml
