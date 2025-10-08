@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: jellyseerr-jellyseerr-chart-config
+  name: jellyseerr-config
   namespace: media
 spec:
   storageClassName: "nfs-client"

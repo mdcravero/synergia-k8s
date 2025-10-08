@@ -17,7 +17,7 @@ data:
       # Overrides the image tag whose default is the chart appVersion.
       tag: 2.6.0
 
-    env:
+    extraEnv:
       TZ: "America/Argentina/Cordoba"
       forceIpv4First: true
       LOG_LEVEL: debug
@@ -65,8 +65,7 @@ data:
     
     config:
       persistence:
-        enabled: true
-        existingClaim: jellyseerr-jellyseerr-chart-config
+        volumeName: jellyseerr-config
 
     resources: {}
   
