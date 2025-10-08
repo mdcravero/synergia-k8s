@@ -5,5 +5,5 @@ metadata:
   name: sonarr
   namespace: media
 spec:
-  url: https://bjw-s.github.io/helm-charts
+  url: https://charts.pree.dev
   interval: 1m0s
