@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: jellyfin
+  name: jellyfin
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: jellyfin
+  template:
+    metadata:
+      labels:
+        run: jellyfin
+    spec:
+      nodeSelector:
+        type: worker-amd
+      containers:
+        - env:
+            - name: TZ
+              value: "Argentina/Cordoba/Arroyito"
+          image: jellyfin/jellyfin:10.10.4
+          name: jellyfin
+          ports:
+            - containerPort: 8096
+              name: webui
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: jellyfin-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: jellyfin-media

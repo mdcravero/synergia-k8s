@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+  namespace: media
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8096
+      protocol: TCP
+      targetPort: 8096
+      name: webui
+  selector:
+    run: jellyfin
+  loadBalancerIP: 10.42.20.60
