@@ -6,5 +6,5 @@ metadata:
   namespace: media
 spec:
   type: oci
-  url: oci://ghcr.io/fallenbagel/jellyseerr/jellyseerr-chart
+  url: oci://ghcr.io/fallenbagel/jellyseerr
   interval: 1m0s
