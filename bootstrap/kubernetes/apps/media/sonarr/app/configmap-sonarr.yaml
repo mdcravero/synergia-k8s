@@ -22,9 +22,12 @@ data:
       tag: "version-4.0.14.2939"
 
     env:
-      PUID: 1000
-      PGID: 1000
-      TZ: "America/Argentina/Cordoba"
+      - name: PUID
+        value: "1000"
+      - name: PGID
+        value: "1000"
+      - name: TZ
+        value: "America/Argentina/Cordoba"
 
     imagePullSecrets: []
     nameOverride: ""
@@ -44,19 +47,22 @@ data:
       # runAsUser: 1000
 
     service:
-      type: LoadBalancer
-      port: 8989
-      loadBalancerIP: 10.42.20.64
+      main:
+        type: LoadBalancer
+        ports:
+          http:
+            port: 8989
+            loadBalancerIP: 10.42.20.64
 
     ingress:
-      enabled: true
-      ingressClassName: traefik
-      hosts:
-        - host: sonarr.synergia.net.ar
-          paths:
-            - path: /
-              pathType: Prefix
-              backend:
+      main:
+        enabled: true
+        ingressClassName: traefik
+        hosts:
+          - host: sonarr.synergia.net.ar
+            paths:
+              - path: /
+                pathType: Prefix
                 service:
                   name: sonarr
                   port:

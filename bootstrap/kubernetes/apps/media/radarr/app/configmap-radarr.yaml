@@ -22,9 +22,12 @@ data:
       tag: "version-5.25.0.10024"
 
     env:
-      PUID: 1000
-      PGID: 1000
-      TZ: "America/Argentina/Cordoba"
+      - name: PUID
+        value: "1000"
+      - name: PGID
+        value: "1000"
+      - name: TZ
+        value: "America/Argentina/Cordoba"
 
     imagePullSecrets: []
     nameOverride: ""
@@ -44,28 +47,30 @@ data:
       # runAsUser: 1000
 
     service:
-      type: LoadBalancer
-      port: 7878
-      loadBalancerIP: 10.42.20.63
+      main:
+        type: LoadBalancer
+        ports:
+          http:
+            port: 7878
+            loadBalancerIP: 10.42.20.63
 
     ingress:
-      enabled: true
-      ingressClassName: traefik
-      hosts:
-        - host: radarr.synergia.net.ar
-          paths:
-            - path: /
-              pathType: Prefix
-              backend:
+      main:
+        enabled: true
+        ingressClassName: traefik
+        hosts:
+          - host: radarr.synergia.net.ar
+            paths:
+              - path: /
+                pathType: Prefix
                 service:
                   name: radarr
                   port:
                     number: 7878
-
-      tls:
-        - secretName: le
-          hosts:
-            - radarr.synergia.net.ar
+        tls:
+          - secretName: le
+            hosts:
+              - radarr.synergia.net.ar
 
 
     extraVolumes:
