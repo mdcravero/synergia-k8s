@@ -68,7 +68,8 @@ data:
     
     config:
       persistence:
-        volumeName: jellyseerr-config
+        enabled: true
+        existingClaim: jellyseerr-config
 
     resources: {}
   
