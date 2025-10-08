@@ -17,7 +17,7 @@ data:
       # Overrides the image tag whose default is the chart appVersion.
       tag: 2.6.0
 
-    extraEnv:
+    env:
       - name: TZ
         value: "America/Argentina/Cordoba"
       - name: forceIpv4First
