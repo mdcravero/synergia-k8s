@@ -15,7 +15,7 @@ data:
       repository: fallenbagel/jellyseerr
       pullPolicy: IfNotPresent
       # Overrides the image tag whose default is the chart appVersion.
-      tag: 2.6.0
+      tag: 2.7.0
 
     env:
       - name: TZ
@@ -68,8 +68,8 @@ data:
     
     config:
       persistence:
-        enabled: true
-        existingClaim: jellyseerr-config
+        enabled: false
+        volumeName: jellyseerr-config
 
     resources: {}
   
