@@ -63,14 +63,13 @@ data:
     extraVolumeMounts: []
 
     
-    persistence:
-      config:
+    config:
+      persistence:
         enabled: true
-        storageClass: "nfs-client"
-        annotations: {}
+        size: 100Mi
+        storageClassName: "nfs-client"
         accessModes:
           - ReadWriteOnce
-        size: 100Mi
         name: jellyseerr-config
 
     # persistence:
