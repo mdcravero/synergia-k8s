@@ -68,6 +68,7 @@ data:
     
     config:
       persistence:
+        storageClassName: "nfs-client"
         size: 100Mi
         annotations: {}
         name: 'jellyseerr-config'
