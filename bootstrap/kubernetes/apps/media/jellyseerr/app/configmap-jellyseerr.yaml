@@ -71,8 +71,8 @@ data:
         size: 100Mi
         annotations: {}
         name: 'jellyseerr-config'
-        storageClassName: 'nfs-client'
-        accessMode: ReadWriteOnce
+        storageClass: 'nfs-client'
+        accessModes: ReadWriteOnce
         volumeName: ''
 
     resources: {}
