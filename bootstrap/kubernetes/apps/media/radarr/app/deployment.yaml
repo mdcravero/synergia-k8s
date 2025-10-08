@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: radarr
+  name: radarr
+  namespace: media
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: radarr
+  template:
+    metadata:
+      labels:
+        run: radarr
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+          image: lscr.io/linuxserver/radarr:version-5.25.0.10024
+          name: radarr
+          ports:
+            - containerPort: 7878
+              name: webui
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+            - name: downloads
+              mountPath: /downloads
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: radarr-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: jellyfin-media
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: trans-movies-down

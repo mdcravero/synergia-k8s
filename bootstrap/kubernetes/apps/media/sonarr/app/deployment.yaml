@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: sonarr
+  name: sonarr
+  namespace: media
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: sonarr
+  template:
+    metadata:
+      labels:
+        run: sonarr
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+          image: lscr.io/linuxserver/sonarr:version-4.0.14.2939
+          name: sonarr
+          ports:
+            - containerPort: 8989
+              name: webui
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+            - name: downloads
+              mountPath: /downloads
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: sonarr-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: jellyfin-media
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: trans-shows-down
