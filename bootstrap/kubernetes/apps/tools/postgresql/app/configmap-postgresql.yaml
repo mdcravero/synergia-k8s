@@ -39,6 +39,11 @@ data:
             secretKeyRef:
               name: secret-postgresql
               key: password
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-postgresql
+              key: password
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
