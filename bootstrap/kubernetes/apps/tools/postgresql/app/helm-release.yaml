@@ -19,8 +19,3 @@ spec:
     - kind: ConfigMap
       name: postgresql-values
       valuesKey: values.yaml
-  # Add dependency management for external secrets
-  dependsOn:
-    - name: secret-postgresql
-      namespace: tools
-      kind: ExternalSecret
