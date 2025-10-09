@@ -11,7 +11,8 @@ data:
     $do$
     BEGIN
        IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'authentik') THEN
-          CREATE ROLE authentik LOGIN PASSWORD '{{ .authentik_password }}';
+          -- Create role without password first, will be updated by external secret
+          CREATE ROLE authentik LOGIN;
        END IF;
     END
     $do$;
@@ -29,6 +30,23 @@ data:
     WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'authentik_outposts')\gexec
 
     GRANT ALL PRIVILEGES ON DATABASE authentik_outposts TO authentik;
+
+    -- Set authentik password from secret file if available
+    DO $$
+    DECLARE
+        secret_password TEXT;
+    BEGIN
+        -- Try to read password from secret file
+        BEGIN
+            secret_password := trim(pg_read_file('/mnt/secret/authentik_password'));
+            IF secret_password != '' THEN
+                EXECUTE 'ALTER ROLE authentik PASSWORD ''' || replace(secret_password, '''', '''''') || '''';
+                RAISE NOTICE 'Authentik password set from secret';
+            END IF;
+        EXCEPTION WHEN OTHERS THEN
+            RAISE NOTICE 'Could not read authentik password from secret, will be set later';
+        END;
+    END $$;
 
   01-postgresql-tuning.sql: |
     -- PostgreSQL performance tuning for Authentik workload

@@ -100,12 +100,47 @@ data:
             - name: secret-volume
               mountPath: /mnt/secret
               readOnly: true
+        - name: init-postgresql
+          image: bitnami/postgresql:15
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              # Ensure proper directory structure and permissions
+              mkdir -p /bitnami/postgresql/conf
+              chmod 755 /bitnami/postgresql/conf
+
+              # Wait for pg_hba.conf to be available
+              while [ ! -f /bitnami/postgresql/conf/pg_hba.conf ]; do
+                echo "Waiting for pg_hba.conf to be mounted..."
+                sleep 2
+              done
+
+              # Verify pg_hba.conf contains our custom rules
+              if grep -q "10.244.0.0/16" /bitnami/postgresql/conf/pg_hba.conf; then
+                echo "Custom pg_hba.conf is properly mounted"
+              else
+                echo "WARNING: Custom pg_hba.conf rules not found!"
+                exit 1
+              fi
+
+              echo "PostgreSQL initialization ready"
+          volumeMounts:
+            - name: postgresql-configuration
+              mountPath: /bitnami/postgresql/conf
+              readOnly: true
+            - name: secret-volume
+              mountPath: /mnt/secret
+              readOnly: true
 
       # Additional volumes for init containers
       extraVolumes:
         - name: secret-volume
           secret:
             secretName: secret-postgresql
+        - name: postgresql-configuration
+          configMap:
+            name: postgresql-values
 
       extraVolumeMounts:
         - name: secret-volume
