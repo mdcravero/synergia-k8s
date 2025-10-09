@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-init-scripts
+  namespace: tools
+data:
+  00-create-authentik.sql: |
+    -- Create authentik role if it does not exist
+    DO
+    $do$
+    BEGIN
+       IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'authentik') THEN
+          CREATE ROLE authentik LOGIN PASSWORD '{{ .authentik_password }}';
+       END IF;
+    END
+    $do$;
+
+    -- Create Authentik database if it does not exist
+    SELECT 'CREATE DATABASE authentik OWNER authentik'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'authentik')\gexec
+
+    -- Grant additional permissions to the authentik role
+    GRANT ALL PRIVILEGES ON DATABASE authentik TO authentik;
+    ALTER ROLE authentik CREATEDB;
+
+    -- Create additional databases for authentik services if needed
+    SELECT 'CREATE DATABASE authentik_outposts OWNER authentik'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'authentik_outposts')\gexec
+
+    GRANT ALL PRIVILEGES ON DATABASE authentik_outposts TO authentik;
+
+  01-postgresql-tuning.sql: |
+    -- PostgreSQL performance tuning for Authentik workload
+    -- These settings are applied after initial database setup
+
+    -- Ensure proper encoding and collation
+    SET client_encoding = 'UTF8';
+
+    -- Create indexes for better performance (if tables exist)
+    DO $$
+    BEGIN
+        -- Create indexes only if the tables exist and indexes don't exist
+        IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'auth_user') THEN
+            IF NOT EXISTS (SELECT FROM pg_indexes WHERE tablename = 'auth_user' AND indexname = 'idx_auth_user_username') THEN
+                CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_auth_user_username ON auth_user(username);
+            END IF;
+        END IF;
+
+        IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'authentik_stages_authenticator_validate') THEN
+            IF NOT EXISTS (SELECT FROM pg_indexes WHERE tablename = 'authentik_stages_authenticator_validate' AND indexname = 'idx_auth_validate_stage') THEN
+                CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_auth_validate_stage ON authentik_stages_authenticator_validate(stage);
+            END IF;
+        END IF;
+    END $$;

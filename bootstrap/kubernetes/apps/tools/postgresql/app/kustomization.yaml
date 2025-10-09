@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - helm-source.yaml
   - configmap-postgresql.yaml
+  - configmap-postgresql-init.yaml
   - helm-release.yaml

@@ -28,22 +28,6 @@ data:
       usePasswordFiles: false
 
     primary:
-      extraEnvVars:
-        - name: AUTHENTIK_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-postgresql
-              key: authentik-password
-        - name: PGPASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-postgresql
-              key: password
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: secret-postgresql
-              key: password
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
@@ -57,12 +41,13 @@ data:
           drop: ["ALL"]
         seccompProfile:
           type: "RuntimeDefault"
-      initdb:
-        scriptsSecret: secret-postgresql
       pgHbaConfiguration: |-
         local   all             all                                     trust
         host    all             all             127.0.0.1/32            trust
         host    all             all             ::1/128                 trust
+        host    all             all             10.0.0.0/8              trust
+        host    all             all             172.16.0.0/12           trust
+        host    all             all             192.168.0.0/16          trust
         host    all             all             0.0.0.0/0               md5
       # postgresqlConfiguration: |-
       #   listen_addresses = '*'
@@ -84,4 +69,64 @@ data:
         storageClass: nfs-client
         accessModes:
           - ReadWriteOnce
-        size: 8Gi
+        size: 20Gi
+        annotations:
+          nfs.io/storage-path: "postgresql"
+
+      # Enhanced security context for pods
+      podSecurityContext:
+        enabled: true
+        fsGroupChangePolicy: Always
+        sysctls: []
+        supplementalGroups: []
+        fsGroup: 1000
+
+      # Init containers for dependency management
+      initContainers:
+        - name: wait-for-secret
+          image: bitnami/postgresql:15
+          command:
+            - /bin/bash
+            - -ec
+            - |
+              # Wait for the secret to be available
+              while [ ! -f /mnt/secret/password ]; do
+                echo "Waiting for secret to be mounted..."
+                sleep 2
+              done
+              echo "Secret is available, proceeding with PostgreSQL initialization"
+          volumeMounts:
+            - name: secret-volume
+              mountPath: /mnt/secret
+              readOnly: true
+
+      # Additional volumes for init containers
+      extraVolumes:
+        - name: secret-volume
+          secret:
+            secretName: secret-postgresql
+
+      extraVolumeMounts:
+        - name: secret-volume
+          mountPath: /mnt/secret
+          readOnly: true
+
+      # Enhanced PostgreSQL configuration
+      postgresqlConfiguration: |
+        listen_addresses = '*'
+        max_connections = 200
+        shared_buffers = 256MB
+        effective_cache_size = 1GB
+        maintenance_work_mem = 64MB
+        checkpoint_completion_target = 0.9
+        wal_buffers = 16MB
+        default_statistics_target = 100
+        random_page_cost = 1.5
+        effective_io_concurrency = 200
+        work_mem = 4MB
+        min_wal_size = 1GB
+        max_wal_size = 4GB
+
+      # Use initialization scripts from ConfigMap
+      initdb:
+        scriptsConfigMap: postgresql-init-scripts
