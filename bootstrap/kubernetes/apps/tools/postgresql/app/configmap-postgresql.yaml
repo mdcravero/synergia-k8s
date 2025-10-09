@@ -34,6 +34,11 @@ data:
             secretKeyRef:
               name: secret-postgresql
               key: authentik-password
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-postgresql
+              key: password
       containerSecurityContext:
         enabled: true
         seLinuxOptions: {}
