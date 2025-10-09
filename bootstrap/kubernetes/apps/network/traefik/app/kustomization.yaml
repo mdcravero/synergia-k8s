@@ -4,5 +4,5 @@ resources:
   - namespace.yaml
   - configmap-traefik.yaml
   - helm-source.yaml
-  - helmrelease-crds.yaml
+  # - helmrelease-crds.yaml    <-- Uncomment if you want to manage CRDs with Helm
   - helm-release.yaml
