@@ -85,7 +85,7 @@ data:
       # Init containers for dependency management
       initContainers:
         - name: wait-for-secret
-          image: bitnami/postgresql:15
+          image: bitnami/postgresql:latest
           command:
             - /bin/bash
             - -ec
@@ -101,7 +101,7 @@ data:
               mountPath: /mnt/secret
               readOnly: true
         - name: init-postgresql
-          image: bitnami/postgresql:15
+          image: bitnami/postgresql:latest
           command:
             - /bin/bash
             - -ec
