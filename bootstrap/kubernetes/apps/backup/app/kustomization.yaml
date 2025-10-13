@@ -6,7 +6,6 @@ metadata:
 
 resources:
   # Core infrastructure
-  - namespace.yaml
   - deployment-rclone.yaml
 
   # Backup jobs and templates
