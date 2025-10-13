@@ -4,10 +4,10 @@ metadata:
   name: postgresql-cnpg
 
 resources:
-  # CNPG Operator deployment (deploy first)
+  # Phase 1: CNPG Operator (creates CRDs)
   - helm-source-cnpg.yaml
   - helm-release-cnpg.yaml
 
-  # CNPG Cluster configuration (deploy last)
+  # Phase 2: PostgreSQL Cluster (uses CRDs)
   - cluster-cnpg.yaml
   - service-cnpg.yaml
