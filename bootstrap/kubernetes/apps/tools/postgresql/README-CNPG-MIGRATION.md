@@ -62,18 +62,32 @@ GRANT ALL PRIVILEGES ON DATABASE authentik TO authentik;
 ALTER USER authentik CREATEDB;
 ```
 
-## Configuration Mapping
+## Deployment Order
 
-| Component | Bitnami | CNPG |
-|-----------|---------|------|
-| Image | `bitnami/postgresql:latest` | `ghcr.io/cloudnative-pg/postgresql:16.0` |
-| Storage | 20Gi NFS | 20Gi NFS (same) |
-| LoadBalancer IP | `10.42.20.70` | `10.42.20.70` (preserved) |
-| Authentication | External Secrets | External Secrets + Kubernetes Secrets |
-| Init Scripts | ConfigMap scripts | ConfigMap scripts (same) |
-| Monitoring | External | Built-in PodMonitor |
+### Step 1: Deploy CNPG Operator (First)
+```bash
+# Deploy the operator first - this creates the CRDs
+kubectl apply -f helm-source-cnpg.yaml
+kubectl apply -f helm-release-cnpg.yaml
 
-## Files Created
+# Wait for CRDs to be ready
+kubectl wait --for=condition=available --timeout=300s deployment/cnpg -n tools
+```
+
+### Step 2: Deploy Secrets (Second)
+```bash
+# Deploy the modified secret-postgres.yaml
+kubectl apply -f ../../../secrets/secret-postgres.yaml
+```
+
+### Step 3: Deploy PostgreSQL Cluster (Last)
+```bash
+# Deploy the cluster after operator and secrets are ready
+kubectl apply -f cluster-cnpg.yaml
+kubectl apply -f service-cnpg.yaml
+```
+
+## Files Structure
 
 ### Core CNPG Files
 - `cluster-cnpg.yaml` - Main PostgreSQL cluster definition
@@ -82,38 +96,18 @@ ALTER USER authentik CREATEDB;
 - `service-cnpg.yaml` - LoadBalancer service (preserves IP)
 
 ### Authentication & Secrets
-- `secret-cnpg.yaml` - Database user secrets
-- External secrets integration maintained
+- `../../../secrets/secret-postgres.yaml` - Modified for CNPG compatibility
 
-### Initialization
-- `configmap-cnpg-init.yaml` - Database initialization scripts
-- Authentik database creation preserved
+## Configuration Mapping
 
-### Backup Strategy
-- `backup-cnpg-mega.yaml` - Mega.nz backup configuration
-- Scheduled backups with retention policy
-
-## Deployment Order
-
-1. **Deploy CNPG Operator**
-   ```bash
-   kubectl apply -k .
-   ```
-
-2. **Wait for CRDs to be ready**
-   ```bash
-   kubectl wait --for=condition=available --timeout=300s deployment/cnpg -n tools
-   ```
-
-3. **Deploy PostgreSQL Cluster**
-   ```bash
-   kubectl apply -f cluster-cnpg.yaml
-   ```
-
-4. **Verify cluster status**
-   ```bash
-   kubectl get cluster postgresql-cnpg -n tools -o yaml
-   ```
+| Component | Bitnami | CNPG |
+|-----------|---------|------|
+| Image | `bitnami/postgresql:latest` | `ghcr.io/cloudnative-pg/postgresql:16.0` |
+| Storage | 20Gi NFS | 20Gi NFS (same) |
+| LoadBalancer IP | `10.42.20.70` | `10.42.20.70` (preserved) |
+| Authentication | External Secrets | External Secrets (reutilizado) |
+| Init Scripts | ConfigMap scripts | ❌ Eliminado (manual) |
+| Monitoring | External | Built-in PodMonitor |
 
 ## Migration Steps
 
@@ -123,39 +117,42 @@ ALTER USER authentik CREATEDB;
 kubectl exec -it postgresql-0 -- bash -c "pg_dumpall -U postgres > /tmp/final_backup.sql"
 ```
 
-### 2. Deploy CNPG Cluster
+### 2. Deploy CNPG System
 ```bash
-# Deploy new CNPG cluster (already configured)
-kubectl apply -f cluster-cnpg.yaml
+# Deploy in correct order
+kubectl apply -k synergia-k8s/bootstrap/kubernetes/apps/tools/postgresql/app/
 ```
 
-### 3. Data Migration
+### 3. Wait for Resources
+```bash
+# Wait for operator
+kubectl wait --for=condition=available --timeout=300s deployment/cnpg -n tools
+
+# Wait for cluster
+kubectl wait --for=condition=ready --timeout=600s cluster/postgresql-cnpg -n tools
+```
+
+### 4. Manual Database Setup
+```bash
+# Connect to new cluster
+kubectl exec -it postgresql-cnpg-1 -- psql -U postgres
+
+# Create your application users and databases manually
+# CREATE USER authentik WITH PASSWORD 'your-password';
+# CREATE DATABASE authentik OWNER authentik;
+```
+
+### 5. Data Migration
 ```bash
 # Restore data to CNPG cluster when ready
-kubectl exec -it postgresql-cnpg-1 -- bash -c "psql -U postgres < /tmp/final_backup.sql"
+kubectl exec -it postgresql-cnpg-1 -- psql -U postgres < /tmp/final_backup.sql
 ```
 
-### 4. Validation
+### 6. Validation
 - Verify all databases exist
 - Check data integrity
 - Validate application connectivity
 - Confirm backup functionality
-
-## Rollback Plan
-
-If issues occur, rollback to Bitnami:
-
-1. **Keep Bitnami deployment** (commented out in kustomization.yaml)
-2. **Update applications** back to old service
-3. **Remove CNPG resources** if needed
-
-## Monitoring Integration
-
-CNPG provides built-in monitoring:
-
-- **PodMonitor** for Prometheus integration
-- **Cluster status** via `kubectl get cluster`
-- **Backup status** via `kubectl get scheduledbackup`
 
 ## Troubleshooting
 
@@ -173,9 +170,16 @@ CNPG provides built-in monitoring:
    - Check PVC creation
    - Verify storage class availability
 
+4. **CRD not found error**
+   - Deploy CNPG operator first
+   - Wait for CRDs to be installed
+
 ### Useful Commands
 
 ```bash
+# Check deployment order
+kubectl get events -n tools --sort-by=.metadata.creationTimestamp
+
 # Check cluster status
 kubectl get cluster postgresql-cnpg -n tools
 
@@ -185,9 +189,25 @@ kubectl describe cluster postgresql-cnpg -n tools
 # Check pod logs
 kubectl logs -l postgresql=postgresql-cnpg -n tools
 
-# View backup status
-kubectl get scheduledbackup -n tools
+# Check secret creation
+kubectl get secret postgresql-cnpg-secret -n tools -o yaml
 ```
+
+## Rollback Plan
+
+If issues occur, rollback to Bitnami:
+
+1. **Keep Bitnami deployment** (in other app directories)
+2. **Update applications** back to old service
+3. **Remove CNPG resources** if needed
+
+## Monitoring Integration
+
+CNPG provides built-in monitoring:
+
+- **PodMonitor** for Prometheus integration
+- **Cluster status** via `kubectl get cluster`
+- **Events** via `kubectl get events`
 
 ## Post-Migration Tasks
 
@@ -201,8 +221,8 @@ kubectl get scheduledbackup -n tools
 - **Better HA capabilities** - Native Kubernetes operator patterns
 - **Official PostgreSQL images** - No vendor lock-in
 - **Enhanced monitoring** - Built-in Prometheus integration
-- **Improved backup/restore** - Native Kubernetes backup strategies
-- **Better resource management** - More efficient resource utilization
+- **Improved resource management** - More efficient resource utilization
+- **Simplified configuration** - Less files to maintain
 
 ## Support
 

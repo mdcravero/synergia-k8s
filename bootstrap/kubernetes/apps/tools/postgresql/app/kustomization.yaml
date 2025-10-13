@@ -1,10 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+metadata:
+  name: postgresql-cnpg
+
 resources:
-  # CNPG Operator deployment
+  # CNPG Operator deployment (deploy first)
   - helm-source-cnpg.yaml
   - helm-release-cnpg.yaml
 
-  # CNPG Cluster configuration
+  # CNPG Cluster configuration (deploy last)
   - cluster-cnpg.yaml
   - service-cnpg.yaml

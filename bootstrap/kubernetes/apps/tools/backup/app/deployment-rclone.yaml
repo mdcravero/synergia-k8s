@@ -26,12 +26,12 @@ spec:
         - name: RCLONE_CONFIG_MEGA_USER
           valueFrom:
             secretKeyRef:
-              name: mega-credentials
+              name: secret-mega
               key: username
         - name: RCLONE_CONFIG_MEGA_PASS
           valueFrom:
             secretKeyRef:
-              name: mega-credentials
+              name: secret-mega
               key: password
         volumeMounts:
         - name: rclone-config
