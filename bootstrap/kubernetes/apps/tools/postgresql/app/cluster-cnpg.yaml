@@ -37,9 +37,6 @@ spec:
       work_mem: "4MB"
       min_wal_size: "1GB"
       max_wal_size: "4GB"
-
-  # Security context
-  postgresql:
     securityContext:
       enabled: true
       fsGroup: 1000
