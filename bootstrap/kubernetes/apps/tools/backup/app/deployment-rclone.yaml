@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rclone-backup
+  namespace: backup-system
+  labels:
+    app: rclone-backup
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rclone-backup
+  template:
+    metadata:
+      labels:
+        app: rclone-backup
+    spec:
+      containers:
+      - name: rclone
+        image: rclone/rclone:latest
+        command: ["sleep", "infinity"]
+        env:
+        - name: RCLONE_CONFIG_MEGA_TYPE
+          value: "mega"
+        - name: RCLONE_CONFIG_MEGA_USER
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: username
+        - name: RCLONE_CONFIG_MEGA_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: password
+        volumeMounts:
+        - name: rclone-config
+          mountPath: /config/rclone
+          readOnly: true
+        - name: backup-temp
+          mountPath: /tmp/backup
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: rclone-config
+        secret:
+          secretName: rclone-config
+      - name: backup-temp
+        emptyDir:
+          sizeLimit: 1Gi
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rclone-backup-service
+  namespace: backup-system
+spec:
+  selector:
+    app: rclone-backup
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

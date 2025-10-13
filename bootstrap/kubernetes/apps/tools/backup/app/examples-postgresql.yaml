@@ -1,0 +1,169 @@
+---
+# Example: PostgreSQL backup configuration for different projects
+# Copy and customize this for your specific PostgreSQL instances
+
+---
+# Example for Authentik PostgreSQL backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: authentik-postgresql-backup
+  namespace: backup-system
+spec:
+  schedule: "0 1 * * *"  # Daily at 1 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: authentik-postgres-backup
+            image: postgres:16
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/databases/authentik/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Backup Authentik database
+              BACKUP_FILE="authentik-backup-$(date +%Y%m%d-%H%M%S).sql"
+
+              echo "Creating Authentik PostgreSQL backup..."
+              pg_dump -h $POSTGRES_HOST -U $POSTGRES_USER -d authentik -f /tmp/$BACKUP_FILE
+
+              # Upload to Mega.nz
+              rclone copy /tmp/$BACKUP_FILE $BACKUP_PATH/
+
+              # Cleanup
+              rm /tmp/$BACKUP_FILE
+
+              echo "Authentik backup completed"
+            env:
+            - name: POSTGRES_HOST
+              value: "postgresql.tools.svc.cluster.local"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: username
+                  optional: true
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgresql-secret
+                  key: password
+                  optional: true
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14
+
+---
+# Example for Grafana PostgreSQL backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: grafana-postgresql-backup
+  namespace: backup-system
+spec:
+  schedule: "0 4 * * *"  # Daily at 4 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: grafana-postgres-backup
+            image: postgres:16
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/databases/grafana/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Backup Grafana database
+              BACKUP_FILE="grafana-backup-$(date +%Y%m%d-%H%M%S).sql"
+
+              echo "Creating Grafana PostgreSQL backup..."
+              pg_dump -h $POSTGRES_HOST -U $POSTGRES_USER -d grafana -f /tmp/$BACKUP_FILE
+
+              # Upload to Mega.nz
+              rclone copy /tmp/$BACKUP_FILE $BACKUP_PATH/
+
+              # Cleanup
+              rm /tmp/$BACKUP_FILE
+
+              echo "Grafana backup completed"
+            env:
+            - name: POSTGRES_HOST
+              value: "postgresql.tools.svc.cluster.local"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-postgres-secret
+                  key: username
+                  optional: true
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: grafana-postgres-secret
+                  key: password
+                  optional: true
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14

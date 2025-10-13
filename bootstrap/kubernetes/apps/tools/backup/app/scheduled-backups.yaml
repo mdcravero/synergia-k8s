@@ -1,0 +1,233 @@
+---
+# Daily PostgreSQL backup at 2 AM
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-postgresql-backup
+  namespace: backup-system
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:16
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/postgresql/daily/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Perform PostgreSQL backup
+              BACKUP_FILE="postgresql-backup-$(date +%Y%m%d-%H%M%S).sql"
+
+              echo "Creating PostgreSQL backup..."
+              pg_dumpall -h $POSTGRES_HOST -U $POSTGRES_USER -f /tmp/$BACKUP_FILE
+
+              # Upload to Mega.nz
+              rclone copy /tmp/$BACKUP_FILE $BACKUP_PATH/
+
+              # Cleanup
+              rm /tmp/$BACKUP_FILE
+
+              echo "Daily PostgreSQL backup completed"
+            env:
+            - name: POSTGRES_HOST
+              value: "postgresql.tools.svc.cluster.local"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+                  optional: true
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+                  optional: true
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+
+---
+# Weekly full backup on Sundays at 3 AM
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: weekly-postgresql-backup
+  namespace: backup-system
+spec:
+  schedule: "0 3 * * 0"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: postgres:16
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/postgresql/weekly/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Perform comprehensive PostgreSQL backup
+              BACKUP_FILE="postgresql-full-backup-$(date +%Y%m%d-%H%M%S).sql"
+
+              echo "Creating full PostgreSQL backup..."
+              pg_dumpall -h $POSTGRES_HOST -U $POSTGRES_USER -f /tmp/$BACKUP_FILE
+
+              # Upload to Mega.nz
+              rclone copy /tmp/$BACKUP_FILE $BACKUP_PATH/
+
+              # Cleanup
+              rm /tmp/$BACKUP_FILE
+
+              echo "Weekly PostgreSQL backup completed"
+            env:
+            - name: POSTGRES_HOST
+              value: "postgresql.tools.svc.cluster.local"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: username
+                  optional: true
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: password
+                  optional: true
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 4
+  failedJobsHistoryLimit: 10
+
+---
+# ConfigMap backup every 6 hours
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: configmap-backup
+  namespace: backup-system
+spec:
+  schedule: "0 */6 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: config-backup
+            image: rclone/rclone:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/configmaps/$(date +%Y-%m-%d-%H)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Backup all ConfigMaps from all namespaces
+              for namespace in $(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}'); do
+                echo "Backing up ConfigMaps from namespace: $namespace"
+
+                # Create namespace directory
+                rclone mkdir "$BACKUP_PATH/$namespace"
+
+                # Get all ConfigMaps in the namespace and save them
+                kubectl get configmaps -n $namespace -o yaml | rclone rcat "$BACKUP_PATH/$namespace/configmaps.yaml"
+              done
+
+              echo "ConfigMap backup completed"
+            env:
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14

@@ -1,7 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - helm-source.yaml
-  - configmap-postgresql.yaml
-  - configmap-postgresql-init.yaml
-  - helm-release.yaml
+  # CNPG Operator deployment
+  - helm-source-cnpg.yaml
+  - helm-release-cnpg.yaml
+
+  # CNPG Cluster configuration
+  - cluster-cnpg.yaml
+  - service-cnpg.yaml

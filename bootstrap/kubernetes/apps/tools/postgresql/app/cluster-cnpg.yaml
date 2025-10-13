@@ -1,0 +1,64 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgresql-cnpg
+  namespace: tools
+spec:
+  instances: 1
+
+  # PostgreSQL version
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.0
+
+  # Primary storage configuration
+  storage:
+    storageClass: nfs-client
+    size: 20Gi
+
+  # Service configuration - maintain current LoadBalancer IP
+  serviceAccountTemplate:
+    metadata:
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-resource-group: "${loadbalancer_resource_group}"
+
+  # Network configuration
+  postgresql:
+    parameters:
+      listen_addresses: "*"
+      max_connections: "200"
+      shared_buffers: "256MB"
+      effective_cache_size: "1GB"
+      maintenance_work_mem: "64MB"
+      checkpoint_completion_target: "0.9"
+      wal_buffers: "16MB"
+      default_statistics_target: "100"
+      random_page_cost: "1.5"
+      effective_io_concurrency: "200"
+      work_mem: "4MB"
+      min_wal_size: "1GB"
+      max_wal_size: "4GB"
+
+  # Security context
+  postgresql:
+    securityContext:
+      enabled: true
+      fsGroup: 1000
+      fsGroupChangePolicy: "OnRootMismatch"
+
+  # Monitoring and metrics
+  monitoring:
+    enabled: true
+    podMonitor:
+      enabled: true
+      labels:
+        release: prometheus
+
+
+  # Resources (can be adjusted based on needs)
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"

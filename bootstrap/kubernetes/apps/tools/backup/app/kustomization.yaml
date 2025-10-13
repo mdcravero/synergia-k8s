@@ -1,0 +1,58 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: backup-system
+
+resources:
+  # Core infrastructure
+  - namespace.yaml
+  - secret-mega.yaml
+  - deployment-rclone.yaml
+
+  # Backup jobs and templates
+  - backup-jobs.yaml
+  - scheduled-backups.yaml
+
+  # Examples (commented out by default)
+  # - examples-postgresql.yaml
+  # - examples-filesystem.yaml
+
+# Common labels for all resources
+commonLabels:
+  app.kubernetes.io/name: backup-system
+  app.kubernetes.io/component: mega-backup
+  app.kubernetes.io/part-of: synergia-k8s
+
+# Namespace for all resources
+namespace: backup-system
+
+# Images configuration
+images:
+  - name: rclone/rclone
+    newTag: latest
+  - name: postgres
+    newTag: "16"
+
+# Resource configurations
+patchesStrategicMerge: []
+
+# JSON patches for specific configurations
+patches: []
+
+# ConfigMap generator for rclone configuration
+configMapGenerator:
+  - name: rclone-config-template
+    literals:
+      - rclone.conf=[mega]\ntype = mega\nuser = {{MEGA_USER}}\npass = {{MEGA_PASS}}
+
+# Secret generator for Mega credentials (will be populated by external-secrets)
+secretGenerator:
+  - name: mega-credentials-template
+    type: Opaque
+    literals:
+      - username=""
+      - password=""
+
+# Namespace override
+namespace: backup-system

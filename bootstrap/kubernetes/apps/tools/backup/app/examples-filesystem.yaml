@@ -1,0 +1,223 @@
+---
+# Filesystem backup examples for different types of data
+
+---
+# Example: PVC backup for Jellyfin media
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: jellyfin-media-backup
+  namespace: backup-system
+spec:
+  schedule: "0 5 * * 0"  # Weekly on Sunday at 5 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: jellyfin-backup
+            image: rclone/rclone:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/media/jellyfin/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Backup Jellyfin media files (selective sync)
+              echo "Backing up Jellyfin media..."
+              rclone sync /source/media mega:/backups/media/jellyfin/current --progress \
+                --include="**/*.mp4" \
+                --include="**/*.mkv" \
+                --include="**/*.avi" \
+                --include="**/*.mov" \
+                --exclude="**/*"
+
+              echo "Jellyfin media backup completed"
+            env:
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+            - name: media-source
+              mountPath: /source/media
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          - name: media-source
+            persistentVolumeClaim:
+              claimName: jellyfin-media-pvc
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 4
+  failedJobsHistoryLimit: 8
+
+---
+# Example: Configuration files backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kubernetes-config-backup
+  namespace: backup-system
+spec:
+  schedule: "0 6 * * *"  # Daily at 6 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: config-backup
+            image: rclone/rclone:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/config/kubernetes/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Backup Kubernetes configurations
+              echo "Backing up Kubernetes configurations..."
+
+              # Backup Flux kustomizations
+              kubectl get gitrepositories -A -o yaml > /tmp/flux-git-repos.yaml
+              kubectl get kustomizations -A -o yaml > /tmp/flux-kustomizations.yaml
+
+              # Upload configurations
+              rclone copy /tmp/flux-git-repos.yaml $BACKUP_PATH/
+              rclone copy /tmp/flux-kustomizations.yaml $BACKUP_PATH/
+
+              # Cleanup
+              rm /tmp/flux-*.yaml
+
+              echo "Kubernetes config backup completed"
+            env:
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14
+
+---
+# Example: Application logs backup
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: application-logs-backup
+  namespace: backup-system
+spec:
+  schedule: "0 0 * * *"  # Daily at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: logs-backup
+            image: rclone/rclone:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Wait for rclone config
+              while [ ! -f /config/rclone/rclone.conf ]; do
+                echo "Waiting for rclone config..."
+                sleep 5
+              done
+
+              BACKUP_PATH="mega:/backups/logs/$(date +%Y-%m-%d)"
+
+              # Create backup directory
+              rclone mkdir $BACKUP_PATH
+
+              # Backup application logs from different namespaces
+              for namespace in media security tools; do
+                echo "Backing up logs from namespace: $namespace"
+
+                # Create namespace directory
+                rclone mkdir "$BACKUP_PATH/$namespace"
+
+                # Copy logs (you would need to mount log volumes)
+                # This is a template - adjust paths based on your log storage
+                if [ -d "/source/logs/$namespace" ]; then
+                  rclone sync /source/logs/$namespace $BACKUP_PATH/$namespace/ \
+                    --include="**/*.log" \
+                    --max-age=7d \
+                    --progress
+                fi
+              done
+
+              echo "Application logs backup completed"
+            env:
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            volumeMounts:
+            - name: rclone-config
+              mountPath: /config/rclone
+              readOnly: true
+            - name: logs-source
+              mountPath: /source/logs
+          volumes:
+          - name: rclone-config
+            secret:
+              secretName: rclone-config
+          - name: logs-source
+            # Mount your log storage here
+            emptyDir: {}
+          restartPolicy: Never
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14

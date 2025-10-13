@@ -1,0 +1,219 @@
+---
+# Generic backup job template
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: generic-backup-job
+  namespace: backup-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: rclone-backup
+        image: rclone/rclone:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Wait for rclone config to be available
+          while [ ! -f /config/rclone/rclone.conf ]; do
+            echo "Waiting for rclone config..."
+            sleep 5
+          done
+
+          # Create backup directory structure on Mega
+          rclone mkdir mega:/backups/$(BACKUP_NAME)
+
+          # Perform backup based on type
+          if [ "$BACKUP_TYPE" = "filesystem" ]; then
+            echo "Performing filesystem backup..."
+            rclone sync /backup/source mega:/backups/$(BACKUP_NAME)/$(BACKUP_TIMESTAMP) --progress
+          elif [ "$BACKUP_TYPE" = "database" ]; then
+            echo "Performing database backup..."
+            # Database backup logic here
+            pg_dump $DATABASE_URL | rclone rcat mega:/backups/$(BACKUP_NAME)/$(BACKUP_TIMESTAMP)/database.sql
+          fi
+
+          echo "Backup completed successfully"
+        env:
+        - name: BACKUP_NAME
+          value: "generic-backup"
+        - name: BACKUP_TYPE
+          value: "filesystem"
+        - name: BACKUP_TIMESTAMP
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.creationTimestamp
+        - name: RCLONE_CONFIG_MEGA_TYPE
+          value: "mega"
+        - name: RCLONE_CONFIG_MEGA_USER
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: username
+        - name: RCLONE_CONFIG_MEGA_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: password
+        volumeMounts:
+        - name: rclone-config
+          mountPath: /config/rclone
+          readOnly: true
+        - name: backup-source
+          mountPath: /backup/source
+      volumes:
+      - name: rclone-config
+        secret:
+          secretName: rclone-config
+      - name: backup-source
+        # This will be overridden by specific backup configurations
+        emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 3
+  activeDeadlineSeconds: 3600
+
+---
+# PostgreSQL backup job template
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgresql-backup-job
+  namespace: backup-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: postgres-backup
+        image: postgres:16
+        command:
+        - /bin/bash
+        - -c
+        - |
+          # Wait for rclone config
+          while [ ! -f /config/rclone/rclone.conf ]; do
+            echo "Waiting for rclone config..."
+            sleep 5
+          done
+
+          # Create backup directory
+          rclone mkdir mega:/backups/postgresql/$(date +%Y-%m-%d)
+
+          # Perform PostgreSQL backup
+          BACKUP_FILE="postgresql-backup-$(date +%Y%m%d-%H%M%S).sql"
+
+          echo "Creating PostgreSQL backup..."
+          pg_dumpall -h $POSTGRES_HOST -U $POSTGRES_USER -f /tmp/$BACKUP_FILE
+
+          # Upload to Mega.nz
+          rclone copy /tmp/$BACKUP_FILE mega:/backups/postgresql/$(date +%Y-%m-%d)/
+
+          # Cleanup
+          rm /tmp/$BACKUP_FILE
+
+          echo "PostgreSQL backup completed"
+        env:
+        - name: POSTGRES_HOST
+          value: "postgresql.tools.svc.cluster.local"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: username
+              optional: true
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+              optional: true
+        - name: RCLONE_CONFIG_MEGA_TYPE
+          value: "mega"
+        - name: RCLONE_CONFIG_MEGA_USER
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: username
+        - name: RCLONE_CONFIG_MEGA_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: password
+        volumeMounts:
+        - name: rclone-config
+          mountPath: /config/rclone
+          readOnly: true
+      volumes:
+      - name: rclone-config
+        secret:
+          secretName: rclone-config
+      restartPolicy: Never
+  backoffLimit: 3
+  activeDeadlineSeconds: 1800
+
+---
+# Filesystem backup job template
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: filesystem-backup-job
+  namespace: backup-system
+spec:
+  template:
+    spec:
+      containers:
+      - name: filesystem-backup
+        image: rclone/rclone:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Wait for rclone config
+          while [ ! -f /config/rclone/rclone.conf ]; do
+            echo "Waiting for rclone config..."
+            sleep 5
+          done
+
+          BACKUP_PATH="mega:/backups/filesystem/$(SOURCE_NAMESPACE)/$(date +%Y-%m-%d)"
+
+          # Create backup directory
+          rclone mkdir $BACKUP_PATH
+
+          # Perform backup
+          echo "Backing up $SOURCE_PATH to $BACKUP_PATH"
+          rclone sync $SOURCE_PATH $BACKUP_PATH --progress --exclude="**/.git/**"
+
+          echo "Filesystem backup completed"
+        env:
+        - name: SOURCE_PATH
+          value: "/backup/source"
+        - name: SOURCE_NAMESPACE
+          value: "default"
+        - name: RCLONE_CONFIG_MEGA_TYPE
+          value: "mega"
+        - name: RCLONE_CONFIG_MEGA_USER
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: username
+        - name: RCLONE_CONFIG_MEGA_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mega-credentials
+              key: password
+        volumeMounts:
+        - name: rclone-config
+          mountPath: /config/rclone
+          readOnly: true
+        - name: source-data
+          mountPath: /backup/source
+      volumes:
+      - name: rclone-config
+        secret:
+          secretName: rclone-config
+      - name: source-data
+        # This will be overridden by specific configurations
+        emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 3
+  activeDeadlineSeconds: 3600

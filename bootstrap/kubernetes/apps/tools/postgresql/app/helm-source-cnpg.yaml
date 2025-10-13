@@ -2,8 +2,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: postgresql
+  name: cnpg
   namespace: tools
 spec:
   interval: 1m0s
-  url: https://charts.bitnami.com/bitnami
+  url: https://cloudnative-pg.github.io/charts
