@@ -21,10 +21,9 @@ spec:
       annotations:
         service.beta.kubernetes.io/azure-load-balancer-resource-group: "${loadbalancer_resource_group}"
 
-  # Network configuration
+  # Network configuration - no automatic initialization
   postgresql:
     parameters:
-      listen_addresses: "*"
       max_connections: "200"
       shared_buffers: "256MB"
       effective_cache_size: "1GB"
@@ -37,18 +36,11 @@ spec:
       work_mem: "4MB"
       min_wal_size: "1GB"
       max_wal_size: "4GB"
-    securityContext:
-      enabled: true
-      fsGroup: 1000
-      fsGroupChangePolicy: "OnRootMismatch"
 
-  # Monitoring and metrics
-  monitoring:
-    enabled: true
-    podMonitor:
-      enabled: true
-      labels:
-        release: prometheus
+  # Disable automatic bootstrap - manual setup only
+  bootstrap:
+    initdb: {}
+
 
 
   # Resources (can be adjusted based on needs)
