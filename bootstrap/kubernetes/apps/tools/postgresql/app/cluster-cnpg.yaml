@@ -10,6 +10,10 @@ spec:
   # PostgreSQL version
   imageName: ghcr.io/cloudnative-pg/postgresql:16.0
 
+  # PostgreSQL user configuration - use standard CNPG values
+  postgresUID: 26
+  postgresGID: 26
+
   # Primary storage configuration
   storage:
     storageClass: nfs-client
@@ -39,6 +43,10 @@ spec:
       owner: app
       secret:
         name: postgresql-cnpg-secret
+
+  # Security context to ensure proper file ownership
+  securityContext:
+    fsGroup: 26
 
 
 
