@@ -14,8 +14,10 @@ spec:
   storage:
     storageClass: nfs-client
     size: 20Gi
-    accessModes:
-      - ReadWriteOnce
+
+  # Service account configuration - explicitly empty to override existing
+  serviceAccountTemplate:
+    metadata: {}
 
 
   # Network configuration - no automatic initialization
