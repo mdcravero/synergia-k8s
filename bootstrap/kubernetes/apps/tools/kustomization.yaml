@@ -7,3 +7,4 @@ resources:
   - ./homeassistant/app
   - ./transmission_movies/app
   - ./transmission_shows/app
+  # - ./backup/app

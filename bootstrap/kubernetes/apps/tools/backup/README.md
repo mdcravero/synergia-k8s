@@ -42,6 +42,11 @@ mega-backup-credentials:
   username: "your-mega-email@example.com"
   password: "your-mega-password"
 ```
+Is neccesary to obfuscate a password with rclone
+You can use a docker image:
+```bash
+docker run --rm rclone/rclone obscure "mypassword"
+```
 
 ### 3. Deploy Backup System
 

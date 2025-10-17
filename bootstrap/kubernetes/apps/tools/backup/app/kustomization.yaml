@@ -38,19 +38,5 @@ patchesStrategicMerge: []
 # JSON patches for specific configurations
 patches: []
 
-# ConfigMap generator for rclone configuration
-configMapGenerator:
-  - name: rclone-config-template
-    literals:
-      - rclone.conf=[mega]\ntype = mega\nuser = {{MEGA_USER}}\npass = {{MEGA_PASS}}
-
-# Secret generator for Mega credentials (will be populated by external-secrets)
-secretGenerator:
-  - name: mega-credentials-template
-    type: Opaque
-    literals:
-      - username=""
-      - password=""
-
 # Namespace override
 namespace: backup-system
