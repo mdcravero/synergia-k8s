@@ -15,10 +15,6 @@ spec:
     storageClass: nfs-client
     size: 20Gi
 
-  # Service account configuration - explicitly empty to override existing
-  serviceAccountTemplate:
-    metadata: {}
-
 
   # Network configuration - no automatic initialization
   postgresql:
