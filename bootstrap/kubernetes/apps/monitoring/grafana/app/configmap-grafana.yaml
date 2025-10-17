@@ -90,7 +90,7 @@ data:
           isDefault: true
           jsonData:
             maxLines: 1000
-            timeout: 30
+            timeout: 60
             alerting: false
             queryType: "range"
             metrics: false

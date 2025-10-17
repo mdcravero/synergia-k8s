@@ -28,11 +28,12 @@ data:
           wal:
             dir: /data/loki/wal
         limits_config:
-          split_queries_by_interval: 15m
+          split_queries_by_interval: 30m
           enforce_metric_name: false
           max_entries_limit_per_query: 5000
           reject_old_samples: true
           reject_old_samples_max_age: 168h
+          max_query_parallelism: 2
         memberlist:
           join_members:
           - 'loki-stack-memberlist'
@@ -72,7 +73,7 @@ data:
           enable_api: true
         query_range:
           align_queries_with_step: true
-          max_retries: 5
+          max_retries: 2
       containerSecurityContext:
         allowPrivilegeEscalation: false
         capabilities:
@@ -138,7 +139,13 @@ data:
           port: http-metrics
         initialDelaySeconds: 45
       replicas: 1
-      resources: {}
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
       securityContext:
         fsGroup: 10001
         runAsGroup: 10001
