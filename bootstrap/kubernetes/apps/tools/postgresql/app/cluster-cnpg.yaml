@@ -11,8 +11,8 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:16.0
 
   # PostgreSQL user configuration - use standard CNPG values
-  postgresUID: 26
-  postgresGID: 26
+  postgresUID: 1000
+  postgresGID: 1000
 
   # Primary storage configuration
   storage:
