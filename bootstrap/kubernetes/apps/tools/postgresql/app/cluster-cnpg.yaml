@@ -44,10 +44,6 @@ spec:
       secret:
         name: postgresql-cnpg-secret
 
-  # Security context to ensure proper file ownership
-  securityContext:
-    fsGroup: 26
-
 
 
   # Resources (can be adjusted based on needs)
