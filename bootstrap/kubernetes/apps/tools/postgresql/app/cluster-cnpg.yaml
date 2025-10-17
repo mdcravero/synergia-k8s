@@ -14,11 +14,9 @@ spec:
   storage:
     storageClass: nfs-client
     size: 20Gi
+    accessModes:
+      - ReadWriteOnce
 
-  # Service configuration - maintain current LoadBalancer IP
-  serviceAccountTemplate:
-    metadata:
-      annotations: {}
 
   # Network configuration - no automatic initialization
   postgresql:
