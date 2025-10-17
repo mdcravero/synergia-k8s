@@ -36,17 +36,13 @@ spec:
       min_wal_size: "1GB"
       max_wal_size: "4GB"
 
-  # Bootstrap configuration with database and user creation
+  # Bootstrap configuration - simplified for CNPG 0.21.0
   bootstrap:
     initdb:
       database: app
       owner: app
       secret:
         name: postgresql-cnpg-secret
-    scripts:
-      - name: bootstrap-script
-        secret:
-          name: postgresql-bootstrap-sql
 
 
 
