@@ -18,8 +18,7 @@ spec:
   # Service configuration - maintain current LoadBalancer IP
   serviceAccountTemplate:
     metadata:
-      annotations:
-        service.beta.kubernetes.io/azure-load-balancer-resource-group: "${loadbalancer_resource_group}"
+      annotations: {}
 
   # Network configuration - no automatic initialization
   postgresql:
@@ -37,9 +36,17 @@ spec:
       min_wal_size: "1GB"
       max_wal_size: "4GB"
 
-  # Disable automatic bootstrap - manual setup only
+  # Bootstrap configuration with database and user creation
   bootstrap:
-    initdb: {}
+    initdb:
+      database: app
+      owner: app
+      secret:
+        name: postgresql-cnpg-secret
+    scripts:
+      - name: bootstrap-script
+        secret:
+          name: postgresql-bootstrap-sql
 
 
 
