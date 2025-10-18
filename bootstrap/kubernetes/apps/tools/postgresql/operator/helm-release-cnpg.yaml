@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: cnpg
-      version: "1.23.2"  # Latest stable version with init containers support
+      version: "0.26.0"
   interval: 1m0s
   releaseName: cnpg
   targetNamespace: tools
