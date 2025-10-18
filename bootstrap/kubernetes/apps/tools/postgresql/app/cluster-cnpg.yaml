@@ -36,6 +36,10 @@ spec:
       min_wal_size: "1GB"
       max_wal_size: "4GB"
 
+  # Use default postgres UID and fix ownership with init container approach
+  # postgresUID: 1000
+  # postgresGID: 1000
+
   # Bootstrap configuration - simplified for CNPG 0.21.0
   bootstrap:
     initdb:
@@ -44,11 +48,12 @@ spec:
       secret:
         name: postgresql-cnpg-secret
 
-  # Security context to handle UID 1000 properly
+  # Security context - run as postgres (26) but with fsGroup 1000 for PVC access
   securityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
+    runAsUser: 26
+    runAsGroup: 0
     fsGroup: 1000
+    runAsNonRoot: true
 
 
 
