@@ -10,9 +10,9 @@ spec:
   # PostgreSQL version
   imageName: ghcr.io/cloudnative-pg/postgresql:16.0
 
-  # Use default postgres UID (26) to match container user
-  # postgresUID: 1000
-  # postgresGID: 1000
+  # PostgreSQL user configuration - match PVC ownership (UID 1000)
+  postgresUID: 1000
+  postgresGID: 1000
 
   # Primary storage configuration
   storage:
@@ -43,6 +43,12 @@ spec:
       owner: app
       secret:
         name: postgresql-cnpg-secret
+
+  # Security context to handle UID 1000 properly
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
 
 
 
