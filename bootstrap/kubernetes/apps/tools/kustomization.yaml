@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./postgresql/operator  # Deploy operator first ONLY
-  # - ./postgresql/cluster   # Enable after operator upgrade
+  - ./postgresql/operator  # Deploy operator first
+  - ./postgresql/cluster   # Then deploy cluster
   - ./redis/app
   - ./homarr/app
   - ./homeassistant/app

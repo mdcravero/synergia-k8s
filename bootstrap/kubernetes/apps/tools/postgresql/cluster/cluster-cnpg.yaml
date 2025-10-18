@@ -8,7 +8,7 @@ spec:
   instances: 1
 
   # PostgreSQL version
-  imageName: ghcr.io/cloudnative-pg/postgresql:16.0
+  imageName: ghcr.io/cloudnative-pg/cloudnative-pg:1.27.0
 
   # Fix PVC ownership before PostgreSQL starts (init container)
   initContainers:
