@@ -7,7 +7,3 @@ resources:
   # PostgreSQL Cluster (uses CRDs)
   - cluster-cnpg.yaml
   - service-cnpg.yaml
-
-# Wait for operator to be ready
-dependsOn:
-  - name: cnpg-operator
