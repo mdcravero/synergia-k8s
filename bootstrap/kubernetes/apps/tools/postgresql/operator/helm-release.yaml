@@ -1,0 +1,22 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: zalando-operator
+  namespace: tools
+spec:
+  chart:
+    spec:
+      chart: postgres-operator
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: postgres-operator
+      version: "1.14.0"
+  interval: 1m0s
+  releaseName: zalando-operator
+  targetNamespace: tools
+  valuesFrom:
+    - kind: ConfigMap
+      name: zalando-values
+      valuesKey: values.yaml
