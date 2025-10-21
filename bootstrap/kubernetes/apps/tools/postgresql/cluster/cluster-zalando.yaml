@@ -34,7 +34,7 @@ spec:
   enableMasterPoolerLoadBalancer: false
   enableReplicaPoolerLoadBalancer: false
   allowedSourceRanges:  # load balancers' source ranges for both master and replica services
-  - 10.42.20.70/32
+  - 10.42.0.0/16
   databases:
     foo: authentik
   preparedDatabases:
