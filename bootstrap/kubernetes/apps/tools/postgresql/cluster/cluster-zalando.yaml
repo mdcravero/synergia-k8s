@@ -111,8 +111,9 @@ spec:
 #  spiloFSGroup: 103
 #  podAnnotations:
 #    annotation.key: value
-#  serviceAnnotations:
-#    annotation.key: value
+  serviceAnnotations:
+    metallb.universe.tf/address-pool: main-pool
+    metallb.universe.tf/loadBalancerIPs: 10.42.20.70
 #  podPriorityClassName: "spilo-pod-priority"
 #  tolerations:
 #  - key: postgres
