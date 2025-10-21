@@ -109,8 +109,12 @@ spec:
   spiloRunAsUser: 1000
   spiloRunAsGroup: 1000
   spiloFSGroup: 1000
-#  podAnnotations:
-#    annotation.key: value
+  podAnnotations:
+    annotation.key: value
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
   serviceAnnotations:
     metallb.io/address-pool: main-pool
     metallb.io/load-balancer-ip: 10.42.20.70
@@ -188,6 +192,27 @@ spec:
 #        memory: 100Mi
 
   initContainers:
+  - name: init-permissions
+    image: busybox
+    command:
+    - /bin/sh
+    - -c
+    - |
+      # Create necessary directories with correct permissions
+      mkdir -p /run/tmp /run/certs
+      chmod 1777 /run/tmp
+      chmod 755 /run/certs
+      
+      # Set up PostgreSQL data directory permissions
+      chown -R 1000:1000 /home/postgres/pgdata
+      
+      # Create symbolic link for locale
+      ln -sf /usr/lib/locale/locale-archive /run/locale-archive || true
+    volumeMounts:
+    - name: pgdata
+      mountPath: /home/postgres/pgdata
+    securityContext:
+      privileged: true
   - name: date
     image: busybox
     command: [ "/bin/date" ]
