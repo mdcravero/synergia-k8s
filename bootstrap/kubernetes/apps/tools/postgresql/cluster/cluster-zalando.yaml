@@ -111,10 +111,6 @@ spec:
   spiloFSGroup: 1000
   podAnnotations:
     annotation.key: value
-  podSecurityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
   serviceAnnotations:
     metallb.io/address-pool: main-pool
     metallb.io/load-balancer-ip: 10.42.20.70
