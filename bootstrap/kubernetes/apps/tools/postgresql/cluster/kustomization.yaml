@@ -4,5 +4,4 @@ metadata:
   name: zalando-postgresql-cluster
 
 resources:
-  # PostgreSQL Cluster (uses CRDs)
   - cluster-zalando.yaml
