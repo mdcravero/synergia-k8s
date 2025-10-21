@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: homarr-values
+  name: zalando-values
   namespace: tools
 data:
   values.yaml: |-
