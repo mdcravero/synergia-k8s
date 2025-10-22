@@ -71,13 +71,13 @@ spec:
 #        service: postgres
 #     subPath: $(NODE_NAME)/$(POD_NAME)
 #     isSubPathExpr: true
-  # additionalVolumes:
-  #   - name: empty
-  #     mountPath: /opt/empty
-  #     targetContainers:
-  #       - all
-  #     volumeSource:
-  #       emptyDir: {}
+  additionalVolumes:
+  - name: certs
+    mountPath: /run/certs
+    targetContainers:
+      - postgres
+    volumeSource:
+      emptyDir: {}
 #    - name: data
 #      mountPath: /home/postgres/pgdata/partitions
 #      targetContainers:
@@ -198,15 +198,22 @@ spec:
       mkdir -p /run/tmp /run/certs
       chmod 1777 /run/tmp
       chmod 755 /run/certs
-      
+
       # Set up PostgreSQL data directory permissions
       chown -R 1000:1000 /home/postgres/pgdata
-      
+
       # Create symbolic link for locale
       ln -sf /usr/lib/locale/locale-archive /run/locale-archive || true
+
+      # Create required certificate files
+      openssl req -x509 -newkey rsa:4096 -keyout /run/certs/server.key -out /run/certs/server.crt -days 365 -nodes -subj "/CN=postgres-authentik"
+      chmod 600 /run/certs/server.key
+      chmod 644 /run/certs/server.crt
     volumeMounts:
     - name: pgdata
       mountPath: /home/postgres/pgdata
+    - name: certs
+      mountPath: /run/certs
     securityContext:
       privileged: true
   - name: date
