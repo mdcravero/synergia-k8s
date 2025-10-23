@@ -14,6 +14,8 @@ spec:
   dockerImage: ghcr.io/zalando/spilo-17:4.0-p3
   teamId: "acid"
   numberOfInstances: 1
+  spiloRunAsUser: 1000
+  spiloRunAsGroup: 1000
   users:  # Application/Robot users
     zalando:
     - superuser
@@ -193,9 +195,20 @@ spec:
 #        memory: 100Mi
 
   initContainers:
-  - name: date
+  - name: fix-permissions
     image: busybox
-    command: [ "/bin/date" ]
+    command: 
+    - sh
+    - -c
+    - |
+      mkdir -p /home/postgres/pgdata/pgroot
+      chmod 700 /home/postgres/pgdata/pgroot
+    volumeMounts:
+    - name: pgdata
+      mountPath: /home/postgres/pgdata
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
 #  sidecars:
 #   - name: "telegraf-sidecar"
 #     image: "telegraf:latest"
