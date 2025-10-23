@@ -18,8 +18,6 @@ spec:
     zalando:
     - superuser
     - login
-    authentik:
-    - login
     foo_user: []
 #    flyway: []
 #  usersIgnoringSecretRotation:
@@ -38,7 +36,7 @@ spec:
   allowedSourceRanges:  # load balancers' source ranges for both master and replica services
   - 10.42.0.0/16
   databases:
-    authentik: authentik
+    foo: authentik
   preparedDatabases:
     bar:
       defaultUsers: true
@@ -80,6 +78,13 @@ spec:
         - postgres
       volumeSource:
         emptyDir: {}
+    - name: etc-passwd
+      mountPath: /etc/passwd
+      subPath: passwd
+      targetContainers:
+        - postgres
+      volumeSource:
+        emptyDir: {}
 #    - name: data
 #      mountPath: /home/postgres/pgdata/partitions
 #      targetContainers:
@@ -108,6 +113,14 @@ spec:
 #          name: my-config-map
 
   enableShmVolume: false
+  spiloRunAsUser: 1000
+  spiloRunAsGroup: 1000
+  spiloFSGroup: 1000
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
   podAnnotations:
     annotation.key: value
   serviceAnnotations:
@@ -187,6 +200,22 @@ spec:
 #        memory: 100Mi
 
   initContainers:
+  - name: init-permissions
+    image: busybox
+    command:
+    - /bin/sh
+    - -c
+    - |
+      # Set up PostgreSQL data directory permissions
+      chown -R 1000:1000 /home/postgres/pgdata || echo "Warning: chown failed, but continuing..."
+      # Create passwd file for the container
+      echo "postgres:x:1000:1000:PostgreSQL Server:/home/postgres:/bin/bash" > /tmp/passwd-mount/passwd
+      chown 1000:1000 /tmp/passwd-mount/passwd
+    volumeMounts:
+    - name: pgdata
+      mountPath: /home/postgres/pgdata
+    - name: etc-passwd
+      mountPath: /tmp/passwd-mount
   - name: date
     image: busybox
     command: [ "/bin/date" ]
