@@ -214,8 +214,6 @@ spec:
       mountPath: /home/postgres/pgdata
     - name: certs
       mountPath: /run/certs
-    securityContext:
-      privileged: true
   - name: date
     image: busybox
     command: [ "/bin/date" ]
