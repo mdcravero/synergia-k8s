@@ -195,7 +195,7 @@ spec:
     - -c
     - |
       # Set up PostgreSQL data directory permissions
-      chown -R 1000:1000 /home/postgres/pgdata || true
+      chown -R 1000:1000 /home/postgres/pgdata || echo "Warning: chown failed, but continuing..."
     volumeMounts:
     - name: pgdata
       mountPath: /home/postgres/pgdata
