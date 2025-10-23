@@ -88,8 +88,8 @@ spec:
         - postgres
       volumeSource:
         emptyDir: {}
-    - name: etc-volume
-      mountPath: /etc
+    - name: run-certs-volume
+      mountPath: /run/certs
       targetContainers:
         - postgres
       volumeSource:
