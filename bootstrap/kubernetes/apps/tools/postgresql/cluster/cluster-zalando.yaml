@@ -80,12 +80,6 @@ spec:
         - postgres
       volumeSource:
         emptyDir: {}
-    - name: run-postgresql
-      mountPath: /run/postgresql
-      targetContainers:
-        - postgres
-      volumeSource:
-        emptyDir: {}
 #    - name: data
 #      mountPath: /home/postgres/pgdata/partitions
 #      targetContainers:
@@ -193,19 +187,6 @@ spec:
 #        memory: 100Mi
 
   initContainers:
-  - name: fix-permissions
-    image: busybox
-    command:
-    - /bin/sh
-    - -c
-    - |
-      chown -R 999:999 /home/postgres/pgdata
-      chmod 700 /home/postgres/pgdata
-    volumeMounts:
-    - name: pgdata
-      mountPath: /home/postgres/pgdata
-    securityContext:
-      runAsUser: 0
   - name: date
     image: busybox
     command: [ "/bin/date" ]
