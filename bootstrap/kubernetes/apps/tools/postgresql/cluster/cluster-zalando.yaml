@@ -116,11 +116,6 @@ spec:
   spiloRunAsUser: 1000
   spiloRunAsGroup: 1000
   spiloFSGroup: 1000
-  podSecurityContext:
-    runAsUser: 1000
-    runAsGroup: 1000
-    fsGroup: 1000
-    runAsNonRoot: true
   podAnnotations:
     annotation.key: value
   serviceAnnotations:
