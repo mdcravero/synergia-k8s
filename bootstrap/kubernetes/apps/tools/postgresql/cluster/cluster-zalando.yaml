@@ -195,7 +195,7 @@ spec:
     - -c
     - |
       # Set up PostgreSQL data directory permissions
-      chown -R 1000:1000 /home/postgres/pgdata
+      chown -R 1000:1000 /home/postgres/pgdata || true
     volumeMounts:
     - name: pgdata
       mountPath: /home/postgres/pgdata
