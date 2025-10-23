@@ -58,9 +58,9 @@ spec:
       shared_buffers: "32MB"
       max_connections: "10"
       log_statement: "all"
-#  env:
-#  - name: wal_s3_bucket
-#    value: my-custom-bucket
+  env:
+  - name: SPILO_IGNORE_OWNERSHIP
+    value: "true"
 
   volume:
     size: 10Gi
@@ -84,6 +84,12 @@ spec:
         emptyDir: {}
     - name: run-postgresql-volume
       mountPath: /run/postgresql
+      targetContainers:
+        - postgres
+      volumeSource:
+        emptyDir: {}
+    - name: etc-volume
+      mountPath: /etc
       targetContainers:
         - postgres
       volumeSource:
