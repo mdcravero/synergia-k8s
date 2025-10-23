@@ -71,13 +71,19 @@ spec:
 #        service: postgres
 #     subPath: $(NODE_NAME)/$(POD_NAME)
 #     isSubPathExpr: true
-  # additionalVolumes:
-  #   - name: certs
-  #     mountPath: /run/certs
-  #     targetContainers:
-  #       - postgres
-  #     volumeSource:
-  #       emptyDir: {}
+  additionalVolumes:
+    - name: run-tmp
+      mountPath: /run/tmp
+      targetContainers:
+        - postgres
+      volumeSource:
+        emptyDir: {}
+    - name: run-certs
+      mountPath: /run/certs
+      targetContainers:
+        - postgres
+      volumeSource:
+        emptyDir: {}
 #    - name: data
 #      mountPath: /home/postgres/pgdata/partitions
 #      targetContainers:
@@ -109,6 +115,11 @@ spec:
   spiloRunAsUser: 1000
   spiloRunAsGroup: 1000
   spiloFSGroup: 1000
+  podSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    runAsNonRoot: true
   podAnnotations:
     annotation.key: value
   serviceAnnotations:
