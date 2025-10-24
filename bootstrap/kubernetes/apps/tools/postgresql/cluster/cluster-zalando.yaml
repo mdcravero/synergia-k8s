@@ -82,18 +82,6 @@ spec:
         - postgres
       volumeSource:
         emptyDir: {}
-    - name: run-postgresql-volume
-      mountPath: /run/postgresql
-      targetContainers:
-        - postgres
-      volumeSource:
-        emptyDir: {}
-    - name: run-certs-volume
-      mountPath: /run/certs
-      targetContainers:
-        - postgres
-      volumeSource:
-        emptyDir: {}
 #    - name: data
 #      mountPath: /home/postgres/pgdata/partitions
 #      targetContainers:
