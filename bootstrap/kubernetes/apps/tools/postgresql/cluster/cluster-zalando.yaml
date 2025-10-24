@@ -56,9 +56,9 @@ spec:
       shared_buffers: "32MB"
       max_connections: "10"
       log_statement: "all"
-  env:
-  - name: USE_SSL
-    value: "false"
+#  env:
+#  - name: USE_SSL
+#    value: "false"
 
   volume:
     size: 10Gi
@@ -73,13 +73,13 @@ spec:
 #        service: postgres
 #     subPath: $(NODE_NAME)/$(POD_NAME)
 #     isSubPathExpr: true
-# additionalVolumes:
-#   - name: run-volume
-#     mountPath: /run
-#     targetContainers:
-#       - postgres
-#     volumeSource:
-#       emptyDir: {}
+  additionalVolumes:
+    - name: run-volume
+      mountPath: /run
+      targetContainers:
+        - postgres
+      volumeSource:
+        emptyDir: {}
 #    - name: data
 #      mountPath: /home/postgres/pgdata/partitions
 #      targetContainers:
@@ -187,20 +187,9 @@ spec:
 #        memory: 100Mi
 
   initContainers:
-  - name: fix-permissions
+  - name: date
     image: busybox
-    command: 
-    - sh
-    - -c
-    - |
-      mkdir -p /home/postgres/pgdata/pgroot
-      chmod 700 /home/postgres/pgdata/pgroot
-    volumeMounts:
-    - name: pgdata
-      mountPath: /home/postgres/pgdata
-    securityContext:
-      runAsUser: 1000
-      runAsGroup: 1000
+    command: [ "/bin/date" ]
 #  sidecars:
 #   - name: "telegraf-sidecar"
 #     image: "telegraf:latest"
