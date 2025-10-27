@@ -190,6 +190,27 @@ spec:
   - name: date
     image: busybox
     command: [ "/bin/date" ]
+  - name: fix-uid
+    image: busybox
+    command:
+      - sh
+      - -c
+      - |
+        sed 's/postgres:x:101:103/postgres:x:1000:1000/' /etc/passwd > /tmp/passwd.new && \
+        mount -o remount,rw /etc && \
+        cp /tmp/passwd.new /etc/passwd && \
+        mount -o remount,ro /etc
+    volumeMounts:
+    - name: etc-passwd
+      mountPath: /etc/passwd
+      subPath: passwd
+    securityContext:
+      runAsUser: 0
+      privileged: true
+  volumes:
+  - name: etc-passwd
+    hostPath:
+      path: /etc/passwd
 #  sidecars:
 #   - name: "telegraf-sidecar"
 #     image: "telegraf:latest"
