@@ -224,6 +224,9 @@ data:
       # group ID with write-access to volumes (required to run Spilo as non-root process)
       spilo_fsgroup: 1000
 
+      # UID of the postgres user in the container
+      spilo_uid: 1000
+
       # whether the Spilo container should run in privileged mode
       spilo_privileged: false
       # whether the Spilo container should run with additional permissions other than parent.
