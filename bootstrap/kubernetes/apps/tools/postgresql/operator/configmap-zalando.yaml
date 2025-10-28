@@ -222,7 +222,7 @@ data:
       spilo_runasgroup: 1000
 
       # group ID with write-access to volumes (required to run Spilo as non-root process)
-      spilo_fsgroup: 1000
+      spilo_fsgroup: 103
 
       # UID of the postgres user in the container
       spilo_uid: 1000
