@@ -23,10 +23,9 @@ spec:
     - login
     authentik:
     - login
-    foo_user: []
 #    flyway: []
-#  usersIgnoringSecretRotation:
-#  - bar_user
+  usersIgnoringSecretRotation:
+  - authentik
 #  usersWithSecretRotation:
 #  - foo_user
 #  usersWithInPlaceSecretRotation:
@@ -42,17 +41,7 @@ spec:
   - 10.42.0.0/16
   databases:
     authentik: authentik
-  preparedDatabases:
-    bar:
-      defaultUsers: true
-      extensions:
-        pg_partman: public
-        pgcrypto: public
-      schemas:
-        data: {}
-        history:
-          defaultRoles: true
-          defaultUsers: false
+
   postgresql:
     version: "17"
     parameters:  # Expert section
