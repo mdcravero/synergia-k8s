@@ -127,6 +127,11 @@ spec:
       encoding: "UTF8"
       locale: "en_US.UTF-8"
       data-checksums: "true"
+    bootstrap:
+      method: initdb
+      initdb:
+        - auth-host: md5
+        - auth-local: trust
 #    pg_hba:
 #      - hostssl all all 0.0.0.0/0 md5
 #      - host    all all 0.0.0.0/0 md5
@@ -139,7 +144,7 @@ spec:
 #        plugin: pgoutput
     ttl: 30
     loop_wait: 10
-    retry_timeout: 10
+    retry_timeout: 30
     synchronous_mode: false
     synchronous_mode_strict: false
     synchronous_node_count: 1
