@@ -53,6 +53,8 @@ spec:
     value: "initdb"
   - name: PATRONI_BOOTSTRAP_INITDB_DATA_CHECKSUMS
     value: "true"
+  - name: PATRONI_KUBERNETES_USE_ENDPOINTS
+    value: "true"
 
   volume:
     size: 10Gi
@@ -140,8 +142,8 @@ spec:
 #        database: foo
 #        plugin: pgoutput
     ttl: 30
-    loop_wait: 10
-    retry_timeout: 30
+    loop_wait: 1
+    retry_timeout: 14
     synchronous_mode: false
     synchronous_mode_strict: false
     synchronous_node_count: 1
