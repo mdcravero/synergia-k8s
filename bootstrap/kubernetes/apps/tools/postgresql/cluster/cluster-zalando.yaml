@@ -142,7 +142,7 @@ spec:
 #        database: foo
 #        plugin: pgoutput
     ttl: 30
-    loop_wait: 1
+    loop_wait: 30
     retry_timeout: 14
     synchronous_mode: false
     synchronous_mode_strict: false
