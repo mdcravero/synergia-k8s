@@ -48,9 +48,11 @@ spec:
       shared_buffers: "32MB"
       max_connections: "10"
       log_statement: "all"
-#  env:
-#  - name: USE_SSL
-#    value: "false"
+  env:
+  - name: PATRONI_BOOTSTRAP_METHOD
+    value: "initdb"
+  - name: PATRONI_BOOTSTRAP_INITDB_DATA_CHECKSUMS
+    value: "true"
 
   volume:
     size: 10Gi
