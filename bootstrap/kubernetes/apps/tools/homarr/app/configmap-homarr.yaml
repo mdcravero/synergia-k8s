@@ -25,7 +25,7 @@ data:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: le
-        traefik.ingress.kubernetes.io/router.middlewares: tools-middlewares-authentik@kubernetescrd
+        traefik.ingress.kubernetes.io/router.middlewares: traefik-middlewares-authentik@kubernetescrd
 
       enabled: true
       hosts:
