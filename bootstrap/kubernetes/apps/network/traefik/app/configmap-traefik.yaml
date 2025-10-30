@@ -52,11 +52,11 @@ data:
         entryPoints:
           - websecure
         matchRule:  Host(`traefik-dash.synergia.net.ar`)
-        # host: traefik.synergia.net.ar
-        # pathPrefix: /dashboard
+        host: traefik.synergia.net.ar
+        pathPrefix: /dashboard
         services:
           - name: api@internal
             kind: TraefikService
-        # middlewares: 
-        #   - name: "middlewares-authentik"
-        #     namespace: traefik
+        middlewares: 
+          - name: "middlewares-authentik"
+            namespace: traefik
