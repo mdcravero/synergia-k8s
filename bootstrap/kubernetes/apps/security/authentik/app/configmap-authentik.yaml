@@ -45,6 +45,7 @@ data:
         architecture: standalone
 
     server:
+      replicas: 1
 
       volumes:
         - name: media
