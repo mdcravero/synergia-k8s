@@ -25,7 +25,16 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Argentina/Cordoba"
-
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: transmission-secret-movies
+                  key: username
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  name: transmission-secret-movies
+                  key: password
           volumeMounts:
             - name: config
               mountPath: /config

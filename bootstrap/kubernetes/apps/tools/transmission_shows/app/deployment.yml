@@ -25,6 +25,16 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Argentina/Cordoba"
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: transmission-secret-shows
+                  key: username
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  name: transmission-secret-shows
+                  key: password
           #Sonarr depens on to downloads folder to move shows
           volumeMounts:
             - name: config
