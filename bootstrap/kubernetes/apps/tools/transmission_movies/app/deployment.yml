@@ -28,12 +28,12 @@ spec:
             - name: USER
               valueFrom:
                 secretKeyRef:
-                  name: transmission-secret-movies
+                  name: secret-transmission-movies
                   key: username
             - name: PASS
               valueFrom:
                 secretKeyRef:
-                  name: transmission-secret-movies
+                  name: secret-transmission-movies
                   key: password
           volumeMounts:
             - name: config
