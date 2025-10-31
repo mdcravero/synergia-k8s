@@ -28,7 +28,7 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Argentina/Cordoba"
-          image: lscr.io/linuxserver/radarr:version-5.25.0.10024
+          image: lscr.io/linuxserver/radarr:version-5.28.0.10274
           name: radarr
           ports:
             - containerPort: 7878
