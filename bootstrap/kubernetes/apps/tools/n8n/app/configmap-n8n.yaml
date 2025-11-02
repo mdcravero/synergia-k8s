@@ -1,0 +1,97 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-values
+  namespace: tools
+data:
+  values.yaml: |
+    image:
+      repository: n8nio/n8n
+      tag: "1.70.0"
+      pullPolicy: IfNotPresent
+
+    replicaCount: 1
+
+    service:
+      type: LoadBalancer
+      port: 5678
+      annotations:
+        metallb.universe.tf/address-pool: main-pool
+        metallb.universe.tf/loadBalancerIPs: 10.42.20.71
+
+    ingress:
+      enabled: true
+      className: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: le
+      hosts:
+        - host: n8n.synergia.net.ar
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: n8n-tls
+          hosts:
+            - n8n.synergia.net.ar
+
+    persistence:
+      enabled: true
+      storageClass: "nfs-client"
+      accessMode: ReadWriteOnce
+      size: 10Gi
+
+    env:
+      - name: DB_TYPE
+        value: "postgresdb"
+      - name: DB_POSTGRESDB_DATABASE
+        value: "n8n"
+      - name: DB_POSTGRESDB_HOST
+        value: "postgres-authentik"
+      - name: DB_POSTGRESDB_PORT
+        value: "5432"
+      - name: DB_POSTGRESDB_USER
+        value: "n8n"
+      - name: N8N_ENCRYPTION_KEY
+        valueFrom:
+          secretKeyRef:
+            name: n8n-encryption-key
+            key: encryption-key
+      - name: N8N_USER_MANAGEMENT_JWT_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: n8n-jwt-secret
+            key: jwt-secret
+      - name: DB_POSTGRESDB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: n8n-postgres-password
+            key: postgres-password
+      - name: WEBHOOK_URL
+        value: "https://n8n.synergia.net.ar/"
+      - name: N8N_HOST
+        value: "n8n.synergia.net.ar"
+      - name: N8N_PORT
+        value: "5678"
+      - name: N8N_PROTOCOL
+        value: "https"
+      - name: NODE_ENV
+        value: "production"
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+
+    podSecurityContext:
+      fsGroup: 1000

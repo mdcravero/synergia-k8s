@@ -23,6 +23,8 @@ spec:
     - login
     authentik:
     - login
+    # n8n:
+    # - login
 #    flyway: []
   usersIgnoringSecretRotation:
   - authentik
@@ -41,6 +43,7 @@ spec:
   - 10.0.0.0/8
   databases:
     authentik: authentik
+    # n8n: n8n
 
   postgresql:
     version: "17"
@@ -55,6 +58,21 @@ spec:
     value: "true"
   - name: PATRONI_KUBERNETES_USE_ENDPOINTS
     value: "true"
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: secret-zalando-s3-bkp
+        key: access-key-id
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: secret-zalando-s3-bkp
+        key: secret-access-key
+  - name: WAL_S3_BUCKET
+    valueFrom:
+      secretKeyRef:
+        name: secret-zalando-s3-bkp
+        key: secret-access-key
 
   volume:
     size: 10Gi
@@ -159,9 +177,9 @@ spec:
 #    s3_wal_path: "s3://custom/path/to/bucket"
 
 # run periodic backups with k8s cron jobs
-#  enableLogicalBackup: true
-#  logicalBackupRetention: "3 months"
-#  logicalBackupSchedule: "30 00 * * *"
+  enableLogicalBackup: true
+  logicalBackupRetention: "1 week"
+  logicalBackupSchedule: "0 2 * * *"
 
 #  maintenanceWindows:
 #  - 01:00-06:00  #UTC
