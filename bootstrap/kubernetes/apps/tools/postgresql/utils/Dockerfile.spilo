@@ -1,0 +1,9 @@
+FROM ghcr.io/zalando/spilo-17:4.0-p3
+
+USER root
+# Ensure permissions and install missing backup dependencies
+RUN usermod -u 1000 postgres && groupmod -g 1000 postgres && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends pigz && \
+    rm -rf /var/lib/apt/lists/*
+USER postgres
