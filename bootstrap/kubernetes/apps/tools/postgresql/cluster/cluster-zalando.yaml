@@ -72,7 +72,7 @@ spec:
     valueFrom:
       secretKeyRef:
         name: secret-zalando-s3-bkp
-        key: secret-access-key
+        key: bucket-name
 
   volume:
     size: 10Gi
