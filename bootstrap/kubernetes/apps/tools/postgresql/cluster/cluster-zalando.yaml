@@ -11,7 +11,7 @@ metadata:
 #    "delete-date": "2020-08-31"  # can only be deleted on that day if "delete-date "key is configured
 #    "delete-clustername": "acid-test-cluster"  # can only be deleted when name matches if "delete-clustername" key is configured
 spec:
-  dockerImage: mdcravero/spilo-17:4.0-p3-uid1000-arm64-v2
+  dockerImage: mdcravero/spilo-17:4.0-p3-uid1000-arm64
   teamId: "acid"
   numberOfInstances: 1
   spiloRunAsUser: 1000
