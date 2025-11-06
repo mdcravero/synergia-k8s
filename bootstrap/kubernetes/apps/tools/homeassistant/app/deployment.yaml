@@ -24,7 +24,7 @@ spec:
             claimName: home-assistant-data
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:2025.6.1
+          image: homeassistant/home-assistant:2025.11
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
@@ -74,7 +74,7 @@ spec:
             - --port
             - "12321"
             - "/config"
-          image: "ghcr.io/coder/code-server:4.105.1 "
+          image: "ghcr.io/coder/code-server:4.105.1"
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 12321
