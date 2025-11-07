@@ -34,3 +34,12 @@ data:
     # Disable Parca Agent for now due to eBPF issues in home lab environment
     parca-agent:
       enabled: false
+
+    # Configure static targets for manual profiling
+    parca:
+      config: |
+        scrape_configs:
+          - job_name: 'parca-server'
+            static_configs:
+              - targets: ['localhost:7070']
+            scrape_interval: 10s
