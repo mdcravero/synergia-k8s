@@ -58,6 +58,13 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: parca
+  labels:
+    name: parca
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: backup-system
   labels:
     name: backup-system

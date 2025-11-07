@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: parca
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: parca
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: parca
+      version: 0.21.0
+  interval: 1m0s
+  releaseName: parca
+  valuesFrom:
+    - kind: ConfigMap
+      name: parca-values
+      valuesKey: values.yaml

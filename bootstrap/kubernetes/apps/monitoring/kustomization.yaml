@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - ./grafana/app
   - ./loki-stack/app
+  - ./parca/app
   - ./prometheus/app
