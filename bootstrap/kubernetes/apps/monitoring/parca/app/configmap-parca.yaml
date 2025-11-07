@@ -31,9 +31,17 @@ data:
         traefik.ingress.kubernetes.io/router.tls.certresolver: le
         traefik.ingress.kubernetes.io/router.middlewares: traefik-middlewares-authentik@kubernetescrd
 
-    # Disable Parca Agent for now due to eBPF issues in home lab environment
+    # Enable Parca Agent with simplified eBPF configuration for home lab compatibility
     parca-agent:
-      enabled: false
+      enabled: true
+      config:
+        # Disable complex eBPF features that cause "argument list too long" errors
+        dwarf-unwinding: false
+        python-unwinding: false
+        # Use simpler profiling approach
+        perf-event-buffer-size: 8192
+        # Reduce complexity
+        bpf-program-buffer-size: 4096
 
     # Configure static targets for manual profiling
     parca:
