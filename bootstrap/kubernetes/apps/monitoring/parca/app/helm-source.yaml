@@ -6,4 +6,4 @@ metadata:
   namespace: monitoring
 spec:
   interval: 1m0s
-  url: https://parca.dev/helm/
+  url: https://parca-dev.github.io/helm-charts/
