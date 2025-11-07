@@ -106,10 +106,8 @@ data:
         type: LoadBalancer
         portNames:
           redis: "tcp-redis"
-          profiler: "tcp-profiler"
         ports:
           redis: 6379
-          profiler: 7071
         loadBalancerIP: "10.42.20.71"
         
       serviceAccount:
