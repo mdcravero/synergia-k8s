@@ -36,10 +36,11 @@ data:
       disableCommands:
         - FLUSHDB
         - FLUSHALL
-      
+
       enableServiceLinks: true
       containerPorts:
         redis: 6379
+        profiler: 7071
       
       startupProbe:
         enabled: false
@@ -84,7 +85,13 @@ data:
           type: RuntimeDefault
         capabilities:
           drop: ["ALL"]
-      
+
+      extraEnvVars:
+        - name: MALLOC_CONF
+          value: "prof:true,prof_prefix:/tmp/jeprof,lg_prof_interval:30"
+        - name: JEPROF_TMPDIR
+          value: "/tmp"
+
       kind: StatefulSet
 
       persistence:
@@ -99,8 +106,10 @@ data:
         type: LoadBalancer
         portNames:
           redis: "tcp-redis"
+          profiler: "tcp-profiler"
         ports:
           redis: 6379
+          profiler: 7071
         loadBalancerIP: "10.42.20.71"
         
       serviceAccount:
