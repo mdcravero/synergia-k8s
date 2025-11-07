@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - ./grafana/app
   - ./loki-stack/app
-  - ./parca/app
+  - ./parca/server
+  - ./parca/agent
   - ./prometheus/app
