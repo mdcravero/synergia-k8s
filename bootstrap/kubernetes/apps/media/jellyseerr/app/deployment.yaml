@@ -26,7 +26,7 @@ spec:
               value: "true"
             - name: LOG_LEVEL
               value: "debug"
-          image: fallenbagel/jellyseerr:2.7.0
+          image: fallenbagel/jellyseerr:2.7.3
           name: jellyseerr
           ports:
             - containerPort: 5055
