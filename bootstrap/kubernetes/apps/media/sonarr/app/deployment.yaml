@@ -28,7 +28,7 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Argentina/Cordoba"
-          image: lscr.io/linuxserver/sonarr:version-4.0.15.2941
+          image: lscr.io/linuxserver/sonarr:version-4.0.16.2944
           name: sonarr
           ports:
             - containerPort: 8989
