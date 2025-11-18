@@ -7,7 +7,7 @@ metadata:
 spec:
   chart:
     spec:
-      chart: linkerd
+      chart: linkerd2
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
