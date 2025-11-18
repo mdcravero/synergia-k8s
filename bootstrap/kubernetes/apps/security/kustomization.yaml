@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ./external-secrets/app
   - ./bitwarden/app
-  # - ./authentik/app
+  - ./linkerd/app
+  - ./authentik/app
   
   
