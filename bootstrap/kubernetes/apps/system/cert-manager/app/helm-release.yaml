@@ -2,19 +2,17 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
-  name: linkerd
-  namespace: linkerd
+  name: cert-manager
+  namespace: cert-manager
 spec:
   chart:
     spec:
-      chart: linkerd2
+      chart: cert-manager
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: linkerd
+        name: cert-manager
   interval: 1m0s
-  releaseName: linkerd
+  releaseName: cert-manager
   values:
-    identity:
-      issuer:
-        scheme: kubernetes.io/tls
+    installCRDs: true
