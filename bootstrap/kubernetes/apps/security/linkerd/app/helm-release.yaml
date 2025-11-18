@@ -7,11 +7,10 @@ metadata:
 spec:
   chart:
     spec:
-      chart: linkerd2
+      chart: linkerd
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
         name: linkerd
-      version: 2024.11.1
   interval: 1m0s
   releaseName: linkerd
