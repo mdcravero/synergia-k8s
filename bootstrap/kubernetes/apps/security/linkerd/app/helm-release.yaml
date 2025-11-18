@@ -7,7 +7,7 @@ metadata:
 spec:
   chart:
     spec:
-      chart: linkerd2
+      chart: linkerd-control-plane
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
@@ -16,5 +16,6 @@ spec:
   releaseName: linkerd
   values:
     identity:
+      externalCA: true
       issuer:
         scheme: kubernetes.io/tls

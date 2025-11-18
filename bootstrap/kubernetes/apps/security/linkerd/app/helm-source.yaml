@@ -6,4 +6,4 @@ metadata:
   namespace: linkerd
 spec:
   interval: 1m0s
-  url: https://helm.linkerd.io/stable
+  url: https://helm.linkerd.io/edge
