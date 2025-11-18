@@ -1,0 +1,16 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: linkerd-crds
+  namespace: linkerd
+spec:
+  chart:
+    spec:
+      chart: linkerd2-crds
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: linkerd
+  interval: 1m0s
+  releaseName: linkerd-crds
