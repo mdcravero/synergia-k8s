@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkerd-identity-trust-roots
+  namespace: linkerd
+  labels:
+    app.kubernetes.io/part-of: linkerd
+    app.kubernetes.io/version: edge-25.11.1
+data:
+  ca-bundle.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDKzCCAhOgAwIBAgIUTChSbf74X6/+XNLzajlx/zob7t4wDQYJKoZIhvcNAQEL
+    BQAwKTEnMCUGA1UEAxMeaWRlbnRpdHkubGlua2VyZC5jbHVzdGVyLmxvY2FsMB4X
+    DTI1MTExOTAxMDE1M1oXDTI2MDIxNzAxMDE1M1owKTEnMCUGA1UEAxMeaWRlbnRp
+    dHkubGlua2VyZC5jbHVzdGVyLmxvY2FsMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+    MIIBCgKCAQEAv8fTefQdB6CYz/g4WOs5fwJ0flVoGYBbG5m44OeCAvsPjq0tWkly
+    KcADqK+WpZzASPHSSnLWilnWLiRt2oV5JlxAIHU03RlCuTyiHr+neWnyHcCU+iIg
+    +XVYwHKNzprxZAfqich658PklOiLXmExEwzqV4xysTLmFql0UgBuQdpysfTSiaEG
+    OI3dml6XBeBCw3N7G5jxXIWr/FwPTF6jy6LsbLgDxRt3U4SqhGUJ1HoCiEAXFuT8
+    uJGu8jHtUu6AQBgJql3d6ZwvOSXqBC6lYmcSWAvdZ/pscD/AY61E3PgEoQcm6pMM
+    EU/B9uWzQtEIGksMHbvNuy7C8WTTVVsKoQIDAQABo0swSTAOBgNVHQ8BAf8EBAMC
+    BaAwDAYDVR0TAQH/BAIwADApBgNVHREEIjAggh5pZGVudGl0eS5saW5rZXJkLmNs
+    dXN0ZXIubG9jYWwwDQYJKoZIhvcNAQELBQADggEBAJzcjAcJauyq9Zn/9+r9wef9
+    Vse5M5eLFuX8J16Ws5/o1/XHCZyNK5JEZuStlONOemp9vUW+t/zP5odyXatMKurT
+    BnrJ2gOOXXEMrlxl7EEeeGW2ZuSxiGYvXgUqKJCMCTHEoBZ+0Zxfm+o+msk/5Hbi
+    MQ76YTiT87CEZXqC+dkGFUFLlC3Pj/Xyh9uQMCqhHbc2RVwqO5YQKwG/UMUGZdiR
+    LLhUL7QFJanumW57bb9vrQWND4CO0gsGEt1ButaWo9sUZBOJAfGUbjpv+WtgUkQQ
+    smeUBWESVDmCcbqSfQRvEFZEi15kNVoEZL/tx3A04h604MSPOCcPH8K419ZZ5Hs=
+    -----END CERTIFICATE-----
