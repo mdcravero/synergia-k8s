@@ -63,6 +63,9 @@ metadata:
   name: linkerd
   labels:
     name: linkerd
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
     config.linkerd.io/admission-webhooks: disabled
     linkerd.io/is-control-plane: "true"
 ---
