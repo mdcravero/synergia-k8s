@@ -33,3 +33,12 @@ spec:
     name: linkerd-trust-anchor
     kind: ClusterIssuer
   commonName: identity.linkerd.cluster.local
+  isCA: true
+  subject:
+    organizations:
+    - "linkerd.io"
+  usages:
+    - "digital signature"
+    - "key encipherment"
+    - "client auth"
+    - "server auth"
