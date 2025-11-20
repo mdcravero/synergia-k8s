@@ -7,9 +7,9 @@ metadata:
 data:
   values.yaml: |
     identity:
-      externalCA: true
       issuer:
         scheme: linkerd.io/tls
+        externalSecret: true
         secret:
           name: linkerd-identity-issuer
     destination:
