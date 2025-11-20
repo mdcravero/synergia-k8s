@@ -10,6 +10,8 @@ data:
       externalCA: true
       issuer:
         scheme: linkerd.io/tls
+        secret:
+          name: linkerd-identity-issuer
     destination:
       livenessProbe:
         timeoutSeconds: 10
