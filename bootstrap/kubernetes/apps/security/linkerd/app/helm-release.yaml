@@ -13,6 +13,7 @@ spec:
         kind: HelmRepository
         name: linkerd
   interval: 1m0s
+  timeout: 15m
   releaseName: linkerd
   valuesFrom:
     - kind: ConfigMap
