@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: linkerd-values
+  namespace: linkerd
+data:
+  values.yaml: |
+    identity:
+      externalCA: true
+      issuer:
+        scheme: kubernetes.io/tls
+    destination:
+      livenessProbe:
+        timeoutSeconds: 10
+        periodSeconds: 30
+        failureThreshold: 10
+      readinessProbe:
+        timeoutSeconds: 10
+        periodSeconds: 30
+        failureThreshold: 10
+    spValidator:
+      livenessProbe:
+        timeoutSeconds: 10
+        periodSeconds: 30
+        failureThreshold: 10
+      readinessProbe:
+        timeoutSeconds: 10
+        periodSeconds: 30
+        failureThreshold: 10
+    proxyInjector:
+      livenessProbe:
+        timeoutSeconds: 10
+        periodSeconds: 30
+        failureThreshold: 10
+      readinessProbe:
+        timeoutSeconds: 10
+        periodSeconds: 30
+        failureThreshold: 10

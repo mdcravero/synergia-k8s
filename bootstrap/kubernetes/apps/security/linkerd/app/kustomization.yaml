@@ -3,6 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - configmap-trust-roots.yaml
+  - configmap-linkerd-values.yaml
   - certificates.yaml
   - helm-source.yaml
   - helm-release.yaml

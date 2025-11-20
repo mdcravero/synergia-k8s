@@ -14,8 +14,7 @@ spec:
         name: linkerd
   interval: 1m0s
   releaseName: linkerd
-  values:
-    identity:
-      externalCA: true
-      issuer:
-        scheme: kubernetes.io/tls
+  valuesFrom:
+    - kind: ConfigMap
+      name: linkerd-values
+      valuesKey: values.yaml
