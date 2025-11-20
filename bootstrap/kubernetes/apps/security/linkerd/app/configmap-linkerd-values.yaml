@@ -7,7 +7,6 @@ metadata:
 data:
   values.yaml: |
     identity:
-      externalCA: true
       issuer:
         scheme: linkerd.io/tls
     destination:
