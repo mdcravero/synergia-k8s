@@ -9,7 +9,7 @@ data:
     identity:
       externalCA: true
       issuer:
-        scheme: kubernetes.io/tls
+        scheme: linkerd.io/tls
     destination:
       livenessProbe:
         timeoutSeconds: 10
