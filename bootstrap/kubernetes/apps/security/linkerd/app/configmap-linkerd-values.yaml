@@ -6,12 +6,10 @@ metadata:
   namespace: linkerd
 data:
   values.yaml: |
+    # Linkerd will use its built-in certificate generation
     identity:
       issuer:
         scheme: linkerd.io/tls
-        externalSecret: true
-        secret:
-          name: linkerd-identity-issuer
     destination:
       livenessProbe:
         timeoutSeconds: 10
