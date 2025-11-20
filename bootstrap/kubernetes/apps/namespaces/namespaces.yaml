@@ -43,8 +43,6 @@ metadata:
   name: media
   labels:
     name: media
-  annotations:
-    linkerd.io/inject: enabled
 ---
 apiVersion: v1
 kind: Namespace
@@ -56,18 +54,6 @@ metadata:
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: linkerd
-  labels:
-    name: linkerd
-    pod-security.kubernetes.io/enforce: privileged
-    pod-security.kubernetes.io/audit: privileged
-    pod-security.kubernetes.io/warn: privileged
-    config.linkerd.io/admission-webhooks: disabled
-    linkerd.io/is-control-plane: "true"
 ---
 apiVersion: v1
 kind: Namespace
