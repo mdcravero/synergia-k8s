@@ -6,31 +6,7 @@ metadata:
   namespace: linkerd
 data:
   values.yaml: |
-    # Using Linkerd defaults with built-in certificate generation
-    destination:
-      livenessProbe:
-        timeoutSeconds: 10
-        periodSeconds: 30
-        failureThreshold: 10
-      readinessProbe:
-        timeoutSeconds: 10
-        periodSeconds: 30
-        failureThreshold: 10
-    spValidator:
-      livenessProbe:
-        timeoutSeconds: 10
-        periodSeconds: 30
-        failureThreshold: 10
-      readinessProbe:
-        timeoutSeconds: 10
-        periodSeconds: 30
-        failureThreshold: 10
-    proxyInjector:
-      livenessProbe:
-        timeoutSeconds: 10
-        periodSeconds: 30
-        failureThreshold: 10
-      readinessProbe:
-        timeoutSeconds: 10
-        periodSeconds: 30
-        failureThreshold: 10
+    identity:
+      issuer:
+        scheme: linkerd.io/tls
+        externalSecret: false
