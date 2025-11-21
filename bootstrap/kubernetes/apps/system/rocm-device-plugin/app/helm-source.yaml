@@ -1,0 +1,11 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: rocm-device-plugin
+  namespace: kube-system
+spec:
+  interval: 5m0s
+  url: https://github.com/ROCm/k8s-device-plugin
+  ref:
+    tag: v0.14.0
