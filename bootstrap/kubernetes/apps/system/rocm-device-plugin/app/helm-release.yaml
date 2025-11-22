@@ -8,7 +8,7 @@ spec:
   interval: 1m0s
   chart:
     spec:
-      chart: deployment
+      chart: k8s-device-plugin
       reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository

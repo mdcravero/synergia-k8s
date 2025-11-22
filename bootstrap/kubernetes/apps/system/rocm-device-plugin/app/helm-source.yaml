@@ -1,4 +1,5 @@
 ---
+# Simplified approach - using the main k8s-device-plugin repository
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
@@ -6,6 +7,6 @@ metadata:
   namespace: kube-system
 spec:
   interval: 5m0s
-  url: https://github.com/ROCm/k8s-device-plugin
+  url: https://github.com/kubernetes-sigs/k8s-device-plugin
   ref:
     tag: v0.14.0
