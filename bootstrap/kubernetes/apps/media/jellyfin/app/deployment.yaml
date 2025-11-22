@@ -15,9 +15,6 @@ spec:
       labels:
         run: jellyfin
     spec:
-      securityContext:
-        supplementalGroups:
-          - 104
       nodeSelector:
         type: worker-amd
       containers:
@@ -34,8 +31,6 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
-            - name: render-device
-              mountPath: /dev/dri/renderD128
           resources:
             limits:
               amd.com/gpu: 1
@@ -46,7 +41,3 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
-        - name: render-device
-          hostPath:
-            path: /dev/dri/renderD128
-            type: CharDevice
