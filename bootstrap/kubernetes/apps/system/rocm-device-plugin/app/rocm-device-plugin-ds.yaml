@@ -44,7 +44,7 @@ spec:
         - name: rocm
           mountPath: /opt/rocm
       
-      # Init container to install ROCm
+      # Init container to install ROCm with dependency fixes
       initContainers:
       - name: rocm-setup
         image: ubuntu:22.04
@@ -52,10 +52,41 @@ spec:
         - /bin/bash
         - -c
         - |
-          apt-get update && apt-get install -y wget gnupg2 software-properties-common
+          # Install dependencies first
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages \
+            wget gnupg2 software-properties-common ca-certificates
+            
+          # Add ROCm repository with correct Ubuntu version detection
+          UBUNTU_VERSION=$(lsb_release -rs)
+          ROCM_REPO="ubuntu"
+          if [[ "$UBUNTU_VERSION" == "20.04" ]]; then
+            ROCM_REPO="focal"
+          elif [[ "$UBUNTU_VERSION" == "22.04" ]]; then
+            ROCM_REPO="jammy"
+          fi
+          
+          # Add ROCm GPG key and repository
           wget -qO - https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add -
-          echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/6.2 ubuntu main' | tee /etc/apt/sources.list.d/rocm.list
-          apt-get update && apt-get install -y rocm-dev rocm-libs
+          echo "deb [arch=amd64] https://repo.radeon.com/rocm/apt/6.2 $ROCM_REPO main" | tee /etc/apt/sources.list.d/rocm.list
+          
+          # Update and install ROCm with specific versions to avoid conflicts
+          apt-get update
+          apt-get install -y --allow-downgrades --allow-change-held-packages \
+            rocm-dev \
+            rocm-utils \
+            rocm-libs \
+            rocminfo \
+            rocm-smi
+            
+          # Verify installation
+          if command -v rocminfo >/dev/null 2>&1; then
+            echo "ROCm installed successfully"
+            rocminfo
+          else
+            echo "ROCm installation failed"
+            exit 1
+          fi
         volumeMounts:
         - name: rocm
           mountPath: /opt/rocm
