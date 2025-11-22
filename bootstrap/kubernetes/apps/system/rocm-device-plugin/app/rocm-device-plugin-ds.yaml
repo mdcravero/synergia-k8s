@@ -44,20 +44,8 @@ spec:
         - name: rocm
           mountPath: /opt/rocm
       
-      # Use pre-built ROCm container (more reliable)
-      initContainers:
-      - name: rocm-setup
-        image: rocm/dev-ubuntu-22.04:latest
-        command:
-        - /bin/bash
-        - -c
-        - |
-          echo "Using pre-built ROCm container"
-          echo "ROCm version:"
-          rocminfo
-          echo "ROCm devices:"
-          ls -la /sys/class/drm/
-          echo "Container setup complete"
+      # Minimal approach - just get device plugin working
+      # We'll add ROCm support step by step
         volumeMounts:
         - name: rocm
           mountPath: /opt/rocm
