@@ -27,7 +27,7 @@ spec:
       
       containers:
       - name: rocm-device-plugin
-        image: rocm/k8s-device-plugin:v0.14.0
+        image: registry.k8s.io/device-plugin-amd:latest
         args: ["--device-strategy", "all"]
         securityContext:
           privileged: true
