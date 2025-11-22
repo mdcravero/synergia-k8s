@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,6 +15,9 @@ spec:
       labels:
         run: jellyfin
     spec:
+      securityContext:
+        supplementalGroups:
+          - 104
       nodeSelector:
         type: worker-amd
       containers:
@@ -32,6 +34,8 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
+            - name: render-device
+              mountPath: /dev/dri/renderD128
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -39,3 +43,7 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
+        - name: render-device
+          hostPath:
+            path: /dev/dri/renderD128
+            type: CharDevice
