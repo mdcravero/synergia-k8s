@@ -36,6 +36,9 @@ spec:
               mountPath: /media
             - name: render-device
               mountPath: /dev/dri/renderD128
+          resources:
+            limits:
+              amd.com/gpu: 1
       volumes:
         - name: config
           persistentVolumeClaim:
