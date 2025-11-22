@@ -46,4 +46,3 @@ spec:
         - name: render-device
           hostPath:
             path: /dev/dri
-            type: Directory
