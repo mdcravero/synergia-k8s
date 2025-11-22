@@ -41,14 +41,6 @@ spec:
         - name: sys
           mountPath: /sys
           readOnly: true
-        - name: rocm
-          mountPath: /opt/rocm
-      
-      # Minimal approach - just get device plugin working
-      # We'll add ROCm support step by step
-        volumeMounts:
-        - name: rocm
-          mountPath: /opt/rocm
       
       volumes:
       - name: device-plugin
@@ -57,15 +49,3 @@ spec:
       - name: sys
         hostPath:
           path: /sys
-      - name: rocm
-        emptyDir: {}
-      
-      env:
-      - name: ROCM_VERSION
-        value: "6.2"
-      - name: HSA_OVERRIDE_GFX_VERSION
-        value: "10.3.0"
-      - name: PATH
-        value: "/opt/rocm/bin:/opt/rocm/rocprofiler/bin:/opt/rocm/opencl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-      - name: LD_LIBRARY_PATH
-        value: "/opt/rocm/lib:$LD_LIBRARY_PATH"
