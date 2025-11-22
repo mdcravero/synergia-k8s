@@ -43,6 +43,8 @@ metadata:
   name: media
   labels:
     name: media
+    # Added PodSecurity privileged labels to allow jellyfin host device access
+    pod-security.kubernetes.io/enforce: privileged
 ---
 apiVersion: v1
 kind: Namespace
