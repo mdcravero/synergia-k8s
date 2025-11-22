@@ -15,7 +15,6 @@ spec:
       labels:
         run: jellyfin
     spec:
-      # Permisos necesarios para acceder al dispositivo /dev/dri/renderD128
       securityContext:
         supplementalGroups:
           - 104
@@ -35,9 +34,8 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
-            # Monta el dispositivo de transcodificación dentro del contenedor
             - name: render-device
-              mountPath: /dev/dri/renderD128
+              mountPath: /dev/dri
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -45,8 +43,7 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
-        # Define el volumen HostPath al dispositivo físico
         - name: render-device
           hostPath:
-            path: /dev/dri/renderD128
-            type: CharDevice
+            path: /dev/dri
+            type: Directory
