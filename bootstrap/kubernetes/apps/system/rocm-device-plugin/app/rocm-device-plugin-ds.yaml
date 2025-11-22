@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: rocm-device-plugin-ds
+  namespace: kube-system
+  labels:
+    app: rocm-device-plugin
+spec:
+  selector:
+    matchLabels:
+      app: rocm-device-plugin
+  template:
+    metadata:
+      labels:
+        app: rocm-device-plugin
+    spec:
+      nodeSelector:
+        type: worker-amd
+      
+      hostNetwork: true
+      
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      
+      containers:
+      - name: rocm-device-plugin
+        image: rocm/k8s-device-plugin:v0.14.0
+        args: ["--device-strategy", "all"]
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+        volumeMounts:
+        - name: device-plugin
+          mountPath: /var/lib/kubelet/device-plugins
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: rocm
+          mountPath: /opt/rocm
+      
+      # Init container to install ROCm
+      initContainers:
+      - name: rocm-setup
+        image: ubuntu:22.04
+        command:
+        - /bin/bash
+        - -c
+        - |
+          apt-get update && apt-get install -y wget gnupg2 software-properties-common
+          wget -qO - https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add -
+          echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/6.2 ubuntu main' | tee /etc/apt/sources.list.d/rocm.list
+          apt-get update && apt-get install -y rocm-dev rocm-libs
+        volumeMounts:
+        - name: rocm
+          mountPath: /opt/rocm
+      
+      volumes:
+      - name: device-plugin
+        hostPath:
+          path: /var/lib/kubelet/device-plugins
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: rocm
+        emptyDir: {}
+      
+      env:
+      - name: ROCM_VERSION
+        value: "6.2"
+      - name: HSA_OVERRIDE_GFX_VERSION
+        value: "10.3.0"
+      - name: PATH
+        value: "/opt/rocm/bin:/opt/rocm/rocprofiler/bin:/opt/rocm/opencl/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      - name: LD_LIBRARY_PATH
+        value: "/opt/rocm/lib:$LD_LIBRARY_PATH"

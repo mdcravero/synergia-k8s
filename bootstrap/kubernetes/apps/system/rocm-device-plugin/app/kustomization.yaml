@@ -4,5 +4,4 @@ metadata:
   name: rocm-device-plugin
   namespace: kube-system
 resources:
-  - helm-source.yaml
-  - helm-release.yaml
+  - rocm-device-plugin-ds.yaml
