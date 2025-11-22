@@ -70,14 +70,11 @@ spec:
           wget -qO - https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add -
           echo "deb [arch=amd64] https://repo.radeon.com/rocm/apt/6.2 $ROCM_REPO main" | tee /etc/apt/sources.list.d/rocm.list
           
-          # Update and install ROCm with specific versions to avoid conflicts
+          # Update and install essential ROCm packages only
           apt-get update
           apt-get install -y --allow-downgrades --allow-change-held-packages \
             rocm-dev \
-            rocm-utils \
-            rocm-libs \
-            rocminfo \
-            rocm-smi
+            rocminfo
             
           # Verify installation
           if command -v rocminfo >/dev/null 2>&1; then
