@@ -1,0 +1,34 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apprise-api
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apprise-api
+  template:
+    metadata:
+      labels:
+        app: apprise-api
+    spec:
+      containers:
+        - name: apprise-api
+          image: ghcr.io/caronc/apprise-api:v1.9.5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+
+          env:
+            # Run without local state
+            - name: APPRISE_STATELESS
+              value: "1"
+
+            # Load Telegram URL via ExternalSecret
+            - name: APPRISE_URL_TGRAM
+              valueFrom:
+                secretKeyRef:
+                  name: apprise-tgram-secret
+                  key: TGRAM_URL
