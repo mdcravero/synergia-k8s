@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apprise-api
-          image: ghcr.io/caronc/apprise-api:v1.9.5
+          image: lscr.io/linuxserver/apprise-api:1.2.6
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
