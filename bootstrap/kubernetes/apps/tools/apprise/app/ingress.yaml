@@ -18,4 +18,4 @@ spec:
               service:
                 name: apprise
                 port:
-                  number: 8096
+                  number: 8000
