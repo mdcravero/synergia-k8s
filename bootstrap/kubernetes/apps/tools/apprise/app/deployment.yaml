@@ -34,6 +34,10 @@ spec:
             - name: APPRISE_LOG_LEVEL
               value: "WARNING"
 
+            # Load config from environment variables
+            - name: APPRISE_CONFIG
+              value: "env://"
+
             # First target = Telegram
             - name: APPRISE_URL_1
               valueFrom:
