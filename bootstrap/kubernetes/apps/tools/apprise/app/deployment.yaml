@@ -26,6 +26,9 @@ spec:
             - name: APPRISE_STATELESS
               value: "1"
 
+            - name: APPRISE_SERVICES
+              value: "1"
+
             # Load Telegram URL via ExternalSecret
             - name: APPRISE_URL_1
               valueFrom:
