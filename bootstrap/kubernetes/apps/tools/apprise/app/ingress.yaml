@@ -16,6 +16,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: apprise
+                name: apprise-api
                 port:
                   number: 8000
