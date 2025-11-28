@@ -31,8 +31,8 @@ spec:
               value: "1"
 
             # Enable debugging (optional)
-            - name: LOG_LEVEL
-              value: "DEBUG"
+            - name: APPRISE_LOG_LEVEL
+              value: "WARNING"
 
             # First target = Telegram
             - name: APPRISE_URL_1
