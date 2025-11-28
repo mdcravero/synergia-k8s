@@ -4,11 +4,11 @@ metadata:
   name: apprise-ingress
   namespace: tools
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
-    traefik.ingress.kubernetes.io/router.requestBodyBuffering: "true"
 spec:
+  ingressClassName: traefik
   rules:
     - host: apprise.synergia.net.ar
       http:
