@@ -22,16 +22,43 @@ spec:
             - containerPort: 8000
 
           env:
-            # Run without local state
+            # Run in stateless mode (required for Kubernetes)
             - name: APPRISE_STATELESS
               value: "1"
 
-            - name: APPRISE_SERVICES
+            # Enable URL scanning: auto-load all APPRISE_URL_X*
+            - name: APPRISE_ALLOW_SERVICES
               value: "1"
 
-            # Load Telegram URL via ExternalSecret
+            # Enable debugging (optional)
+            - name: LOG_LEVEL
+              value: "DEBUG"
+
+            # First target = Telegram
             - name: APPRISE_URL_1
               valueFrom:
                 secretKeyRef:
                   name: secret-apprise-tgram
                   key: apprise-tgram
+
+          readinessProbe:
+            httpGet:
+              path: /notify/
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /notify/
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 30
+
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "256Mi"
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
