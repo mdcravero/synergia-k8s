@@ -30,5 +30,5 @@ spec:
             - name: APPRISE_URL_TGRAM
               valueFrom:
                 secretKeyRef:
-                  name: apprise-tgram-secret
-                  key: TGRAM_URL
+                  name: secret-apprise-tgram
+                  key: apprise-tgram
