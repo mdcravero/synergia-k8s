@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apprise-api
-          image: lscr.io/linuxserver/apprise-api:1.2.6
+          image: caronc/apprise:1.2.6
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -34,12 +34,8 @@ spec:
             - name: APPRISE_LOG_LEVEL
               value: "WARNING"
 
-            # Load config from environment variables
-            - name: APPRISE_CONFIG
-              value: "env://"
-
             # First target = Telegram
-            - name: APPRISE_URL_1
+            - name: APPRISE_URL_TGRAM
               valueFrom:
                 secretKeyRef:
                   name: secret-apprise-tgram
