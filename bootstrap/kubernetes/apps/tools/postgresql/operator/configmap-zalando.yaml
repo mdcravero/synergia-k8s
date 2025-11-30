@@ -47,6 +47,8 @@ data:
       etcd_host: ""
       # Spilo docker image
       docker_image: ghcr.io/zalando/spilo-17:4.0-p3
+      # Logical backup docker image
+      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.0"
 
       # key name for annotation to ignore globally configured instance limits
       # ignore_instance_limits_annotation_key: ""
