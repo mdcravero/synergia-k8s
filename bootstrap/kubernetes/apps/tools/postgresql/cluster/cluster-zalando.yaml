@@ -179,7 +179,7 @@ spec:
 # run periodic backups with k8s cron jobs
   enableLogicalBackup: true
   logicalBackupRetention: "1 week"
-  logicalBackupSchedule: "0 2 * * *"
+  logicalBackupSchedule: "0 1 * * *"
 
 #  maintenanceWindows:
 #  - 01:00-06:00  #UTC
