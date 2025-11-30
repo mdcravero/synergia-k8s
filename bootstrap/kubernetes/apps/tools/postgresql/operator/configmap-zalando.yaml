@@ -47,9 +47,7 @@ data:
       etcd_host: ""
       # Spilo docker image
       docker_image: ghcr.io/zalando/spilo-17:4.0-p3
-      # Logical backup docker image
-      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.0"
-
+   
       # key name for annotation to ignore globally configured instance limits
       # ignore_instance_limits_annotation_key: ""
 
@@ -329,6 +327,12 @@ data:
       # number of lines in the ring buffer used to store cluster logs
       ring_log_lines: 100
 
+    
+    # configure K8s cron job managed by the operator
+    configLogicalBackup:
+      # image for pods of the logical backup job (example runs pg_dumpall)
+      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.0"
+    
     # automate creation of human users with teams API service
     configTeamsApi:
       # team_admin_role will have the rights to grant roles coming from PG manifests
