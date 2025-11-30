@@ -331,7 +331,7 @@ data:
     # configure K8s cron job managed by the operator
     configLogicalBackup:
       # image for pods of the logical backup job (example runs pg_dumpall)
-      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.0"
+      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.1"
     
     # automate creation of human users with teams API service
     configTeamsApi:

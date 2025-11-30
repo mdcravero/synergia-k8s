@@ -35,6 +35,8 @@ RUN apt-get update     \
 
 COPY dump.sh ./
 
+RUN chmod +x dump.sh
+
 ENV PG_DIR=/usr/lib/postgresql
 
 ENTRYPOINT ["/dump.sh"]
