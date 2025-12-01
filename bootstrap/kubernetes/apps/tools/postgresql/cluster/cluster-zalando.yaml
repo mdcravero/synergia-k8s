@@ -223,14 +223,15 @@ spec:
 
 # Add node affinity support by allowing postgres pods to schedule only on nodes that
 # have label: "postgres-operator:enabled" set.
-#  nodeAffinity:
-#    requiredDuringSchedulingIgnoredDuringExecution:
-#      nodeSelectorTerms:
-#        - matchExpressions:
-#            - key: postgres-operator
-#              operator: In
-#              values:
-#                - enabled
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values:
+                - arm64
+
 
 # Enables change data capture streams for defined database tables
 #  streams:
