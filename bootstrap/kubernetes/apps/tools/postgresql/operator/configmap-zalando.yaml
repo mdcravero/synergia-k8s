@@ -196,7 +196,7 @@ data:
       # namespaced name of the ConfigMap with environment variables to populate on every pod
       # pod_environment_configmap: "default/my-custom-config"
       # name of the Secret (in cluster namespace) with environment variables to populate on every pod
-      # pod_environment_secret: "my-custom-secret"
+      # pod_environment_secret: "secret-zalando-s3-bkp"
 
       # specify the pod management policy of stateful sets of Postgres clusters
       pod_management_policy: "ordered_ready"
@@ -332,10 +332,9 @@ data:
     configLogicalBackup:
       # image for pods of the logical backup job (example runs pg_dumpall)
       logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.1"
-
+      # use secret for backup job environment variables
       logical_backup_cronjob_environment_secret: "secret-zalando-s3-bkp"
-    
-    
+
     # automate creation of human users with teams API service
     configTeamsApi:
       # team_admin_role will have the rights to grant roles coming from PG manifests

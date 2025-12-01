@@ -58,21 +58,6 @@ spec:
     value: "true"
   - name: PATRONI_KUBERNETES_USE_ENDPOINTS
     value: "true"
-  - name: AWS_ACCESS_KEY_ID
-    valueFrom:
-      secretKeyRef:
-        name: secret-zalando-s3-bkp
-        key: access-key-id
-  - name: AWS_SECRET_ACCESS_KEY
-    valueFrom:
-      secretKeyRef:
-        name: secret-zalando-s3-bkp
-        key: secret-access-key
-  - name: WAL_S3_BUCKET
-    valueFrom:
-      secretKeyRef:
-        name: secret-zalando-s3-bkp
-        key: bucket-name
 
   volume:
     size: 10Gi
