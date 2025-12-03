@@ -13,23 +13,28 @@ data:
         - name: AUTHENTIK_SECRET_KEY
           valueFrom:
             secretKeyRef:
-              name: secret-authentik-key
-              key: password
+              name: secret-authentik
+              key: secret-key
         - name: AUTHENTIK_POSTGRESQL__PASSWORD
           valueFrom:
             secretKeyRef:
-              name: secret-authentik-postgres
-              key: password
+              name: secret-authentik
+              key: postgres-password
         - name: AUTHENTIK_REDIS__PASSWORD
           valueFrom:
             secretKeyRef:
-              name: secret-authentik-redis
-              key: password
+              name: secret-authentik
+              key: redis-password
         - name: AUTHENTIK_REDIS__USERNAME
           valueFrom:
             secretKeyRef:
-              name: secret-authentik-redis
-              key: username
+              name: secret-authentik
+              key: redis-username
+        - name: AUTHENTIK_ERROR_REPORTING__SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: secret-authentik
+              key: sentry-dsn
         
     authentik:
 
