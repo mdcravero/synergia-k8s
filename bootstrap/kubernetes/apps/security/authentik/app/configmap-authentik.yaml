@@ -44,6 +44,7 @@ data:
       postgresql:
         host: 10.42.20.70
         database: authentik
+        sslmode: require
 
       redis:
         host: 10.42.20.71
