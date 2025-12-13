@@ -23,11 +23,12 @@ spec:
     - login
     authentik:
     - login
-    # n8n:
-    # - login
+    homebox:
+    - login
 #    flyway: []
   usersIgnoringSecretRotation:
   - authentik
+  - homebox
 #  usersWithSecretRotation:
 #  - foo_user
 #  usersWithInPlaceSecretRotation:
@@ -43,7 +44,7 @@ spec:
   - 10.0.0.0/8
   databases:
     authentik: authentik
-    # n8n: n8n
+    homebox: homebox
 
   postgresql:
     version: "17"
