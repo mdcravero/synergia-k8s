@@ -43,6 +43,8 @@ spec:
               value: "5432"
             - name: HBOX_DATABASE_NAME
               value: homebox
+            - name: HBOX_DATABASE_SSL_MODE
+              value: prefer
             - name: HBOX_DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
