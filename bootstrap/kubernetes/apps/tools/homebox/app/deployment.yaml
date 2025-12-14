@@ -35,6 +35,22 @@ spec:
               value: text
             - name: HBOX_OPTIONS_ALLOW_ANALYTICS
               value: "false"
+            - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
+              value: "false"
+            - name: HBOX_OIDC_ENABLED
+              value: "true"
+            - name: HBOX_OIDC_ISSUER_URL
+              value: "https://authentik.synergia.net.ar/application/o/homebox/"
+            - name: HBOX_OIDC_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: oidc-client-id
+            - name: HBOX_OIDC_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: oidc-client-secret
             - name: HBOX_MODE
               value: production
             - name: HBOX_DATABASE_DRIVER
@@ -47,8 +63,6 @@ spec:
               value: require
             - name: HBOX_DATABASE_DATABASE
               value: homebox
-            - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
-              value: "false"
             - name: HBOX_DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
