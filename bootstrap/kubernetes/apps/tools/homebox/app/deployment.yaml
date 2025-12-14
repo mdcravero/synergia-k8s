@@ -47,7 +47,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: secret-homebox
-                  key: database-username
+                  key: database-user
             - name: HBOX_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
