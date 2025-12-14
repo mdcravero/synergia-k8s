@@ -44,7 +44,11 @@ spec:
             - name: HBOX_DATABASE_NAME
               value: homebox
             - name: HBOX_DATABASE_SSL_MODE
-              value: enable
+              value: require
+            - name: HBOX_DATABASE_DATABASE
+              value: homebox
+            - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
+              value: "false"
             - name: HBOX_DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
