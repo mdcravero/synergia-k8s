@@ -9,5 +9,4 @@ resources:
   # - ./n8n/app
   - ./transmission_movies/app
   - ./transmission_shows/app
-  # - ./apprise/app
   # - ./backup/app

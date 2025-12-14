@@ -1,0 +1,89 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: homebox
+  name: homebox
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homebox
+  template:
+    metadata:
+      labels:
+        app: homebox
+    spec:
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: homebox-data
+      containers:
+        - name: homebox-app
+          image: sysadminsmedia/homebox:0.22.0-rc.2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TZ
+              value: "America/Argentina/Córdoba"
+            - name: HBOX_LOG_LEVEL
+              value: info
+            - name: HBOX_LOG_FORMAT
+              value: text
+            - name: HBOX_OPTIONS_ALLOW_ANALYTICS
+              value: false
+            - name: HBOX_MODE
+              value: production
+            - name: HBOX_DATABASE_DRIVER
+              value: postgres
+            - name: HBOX_DATABASE_PORT
+              value: "5432"
+            - name: HBOX_DATABASE_NAME
+              value: homebox
+            - name: HBOX_DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: database-username
+            - name: HBOX_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: database-password
+            - name: HBOX_DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: database-host
+          volumeMounts:
+            - mountPath: /data
+              name: data
+          ports:
+            - containerPort: 7745
+              name: http
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: 7745
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 7745
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            timeoutSeconds: 1
+            periodSeconds: 10
+          startupProbe:
+            tcpSocket:
+              port: 7745
+            initialDelaySeconds: 0
+            failureThreshold: 30
+            timeoutSeconds: 1
+            periodSeconds: 10
+
