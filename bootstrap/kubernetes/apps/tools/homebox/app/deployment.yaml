@@ -19,7 +19,7 @@ spec:
       securityContext:
         fsGroup: 1000
       volumes:
-        - name: config
+        - name: data
           persistentVolumeClaim:
             claimName: homebox-data
       containers:
