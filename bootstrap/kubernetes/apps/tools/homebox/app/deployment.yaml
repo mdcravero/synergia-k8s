@@ -37,6 +37,8 @@ spec:
               value: "false"
             - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
               value: "false"
+            - name: HBOX_AUTH_METHOD
+              value: oidc
             - name: HBOX_BASE_URL
               value: https://homebox.synergia.net.ar
             - name: HBOX_TRUST_PROXY_HEADERS
