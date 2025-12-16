@@ -1,11 +1,10 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: homebox
   name: homebox
   namespace: tools
+  labels:
+    app: homebox
 spec:
   replicas: 1
   selector:
@@ -23,30 +22,40 @@ spec:
           persistentVolumeClaim:
             claimName: homebox-data
       containers:
-        - name: homebox-app
+        - name: homebox
           image: sysadminsmedia/homebox:0.22.0-rc.2
           imagePullPolicy: IfNotPresent
+
           env:
+            # ---- Core ----
             - name: TZ
-              value: "America/Argentina/Córdoba"
+              value: America/Argentina/Córdoba
+            - name: HBOX_MODE
+              value: production
             - name: HBOX_LOG_LEVEL
               value: debug
             - name: HBOX_LOG_FORMAT
               value: text
-            - name: HBOX_OPTIONS_ALLOW_ANALYTICS
-              value: "false"
-            - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
-              value: "false"
-            - name: HBOX_AUTH_METHOD
-              value: oidc
+
+            # ---- Proxy ----
             - name: HBOX_BASE_URL
               value: https://homebox.synergia.net.ar
             - name: HBOX_TRUST_PROXY_HEADERS
               value: "true"
+
+            # ---- Auth ----
+            - name: HBOX_OPTIONS_ALLOW_ANALYTICS
+              value: "false"
+            - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
+              value: "false"
+
+            # ---- OIDC ----
+            - name: HBOX_OIDC_ENABLED
+              value: "true"
             - name: HBOX_OIDC_ISSUER_URL
               value: https://authentik.synergia.net.ar/application/o/homebox/
             - name: HBOX_OIDC_BUTTON_TEXT
-              value: "Sign in with Authentik"
+              value: Sign in with Authentik
             - name: HBOX_OIDC_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -57,17 +66,18 @@ spec:
                 secretKeyRef:
                   name: secret-homebox
                   key: oidc-client-secret
-            - name: HBOX_MODE
-              value: production
+
+            # ---- Database ----
             - name: HBOX_DATABASE_DRIVER
               value: postgres
+            - name: HBOX_DATABASE_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: database-host
             - name: HBOX_DATABASE_PORT
               value: "5432"
             - name: HBOX_DATABASE_NAME
-              value: homebox
-            - name: HBOX_DATABASE_SSL_MODE
-              value: require
-            - name: HBOX_DATABASE_DATABASE
               value: homebox
             - name: HBOX_DATABASE_USERNAME
               valueFrom:
@@ -79,37 +89,35 @@ spec:
                 secretKeyRef:
                   name: secret-homebox
                   key: database-password
-            - name: HBOX_DATABASE_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: secret-homebox
-                  key: database-host
+            - name: HBOX_DATABASE_SSL_MODE
+              value: require
+
           volumeMounts:
-            - mountPath: /data
-              name: data
+            - name: data
+              mountPath: /data
+
           ports:
-            - containerPort: 7745
-              name: http
+            - name: http
+              containerPort: 7745
               protocol: TCP
+
           livenessProbe:
             tcpSocket:
               port: 7745
-            initialDelaySeconds: 0
-            failureThreshold: 3
-            timeoutSeconds: 1
             periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+
           readinessProbe:
             tcpSocket:
               port: 7745
-            initialDelaySeconds: 0
-            failureThreshold: 3
-            timeoutSeconds: 1
             periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+
           startupProbe:
             tcpSocket:
               port: 7745
-            initialDelaySeconds: 0
-            failureThreshold: 30
-            timeoutSeconds: 1
             periodSeconds: 10
-
+            timeoutSeconds: 1
+            failureThreshold: 30
