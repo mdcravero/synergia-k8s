@@ -30,17 +30,19 @@ spec:
             - name: TZ
               value: "America/Argentina/Córdoba"
             - name: HBOX_LOG_LEVEL
-              value: info
+              value: debug
             - name: HBOX_LOG_FORMAT
               value: text
             - name: HBOX_OPTIONS_ALLOW_ANALYTICS
               value: "false"
             - name: HBOX_OPTIONS_ALLOW_LOCAL_LOGIN
               value: "false"
-            - name: HBOX_OIDC_ENABLED
+            - name: HBOX_BASE_URL
+              value: https://homebox.synergia.net.ar
+            - name: HBOX_TRUST_PROXY_HEADERS
               value: "true"
             - name: HBOX_OIDC_ISSUER_URL
-              value: "https://authentik.synergia.net.ar/application/o/homebox/"
+              value: https://authentik.synergia.net.ar/application/o/homebox/
             - name: HBOX_OIDC_BUTTON_TEXT
               value: "Sign in with Authentik"
             - name: HBOX_OIDC_CLIENT_ID

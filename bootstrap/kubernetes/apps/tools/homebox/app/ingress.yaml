@@ -4,9 +4,10 @@ metadata:
   name: homebox-ingress
   namespace: tools
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
+    traefik.ingress.kubernetes.io/router.middlewares: tools-homebox-forwarded-headers@kubernetescrd
 spec:
   rules:
     - host: homebox.synergia.net.ar
@@ -19,4 +20,3 @@ spec:
                 name: homebox
                 port:
                   number: 7745
-
