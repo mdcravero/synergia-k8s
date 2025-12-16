@@ -90,7 +90,7 @@ spec:
                   name: secret-homebox
                   key: database-password
             - name: HBOX_DATABASE_SSL_MODE
-              value: require
+              value: homebox
 
           volumeMounts:
             - name: data
