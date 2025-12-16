@@ -33,7 +33,7 @@ spec:
             - name: HBOX_MODE
               value: production
             - name: HBOX_LOG_LEVEL
-              value: debug
+              value: info # Can be one of trace, debug, info, warn, error, fatal, panic
             - name: HBOX_LOG_FORMAT
               value: text
 
