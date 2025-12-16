@@ -70,6 +70,8 @@ spec:
             # ---- Database ----
             - name: HBOX_DATABASE_DRIVER
               value: postgres
+            - name: HBOX_DATABASE_DATABASE
+              value: homebox
             - name: HBOX_DATABASE_HOST
               valueFrom:
                 secretKeyRef:
@@ -90,7 +92,8 @@ spec:
                   name: secret-homebox
                   key: database-password
             - name: HBOX_DATABASE_SSL_MODE
-              value: homebox
+              value: require
+            
 
           volumeMounts:
             - name: data
