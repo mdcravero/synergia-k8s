@@ -19,7 +19,7 @@ spec:
         supplementalGroups:
           - 104
       nodeSelector:
-        type: worker-amd
+        type: wk-amd
       containers:
         - env:
             - name: TZ
@@ -34,8 +34,6 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
-            - name: render-device
-              mountPath: /dev/dri
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -43,6 +41,3 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
-        - name: render-device
-          hostPath:
-            path: /dev/dri
