@@ -45,6 +45,8 @@ data:
 
     prometheus-node-exporter:
       enabled: true
+      extraArgs:
+        - --collector.hwmon
 
       rbac:
         pspEnabled: false
@@ -66,7 +68,19 @@ data:
         runAsNonRoot: true
         runAsUser: 1000
      
-    ruleFiles: {}
+    ruleFiles:
+      recording_rules.yml: |
+        groups:
+        - name: temperature
+          rules:
+          - alert: HighTemperature
+            expr: node_hwmon_temp_celsius > 80
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High temperature detected"
+              description: "Node {{ $labels.instance }} temperature is {{ $value }}°C"
 
     serverFiles:
       prometheus.yml:
@@ -149,6 +163,11 @@ data:
                 regex: (.+)
                 target_label: __metrics_path__
                 replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+          - job_name: 'node-exporter-hwmon'
+            static_configs:
+              - targets: ['prometheus-prometheus-node-exporter.monitoring.svc.cluster.local:9100']
+            params:
+              collect[]: ['hwmon']
 
     alertmanager:
       enabled: false
