@@ -68,19 +68,19 @@ data:
         runAsNonRoot: true
         runAsUser: 1000
      
-    ruleFiles:
-      recording_rules.yml: |
-        groups:
-        - name: temperature
-          rules:
-          - alert: HighTemperature
-            expr: node_hwmon_temp_celsius > 80
-            for: 5m
-            labels:
-              severity: warning
-            annotations:
-              summary: "High temperature detected"
-              description: "Node {{ $labels.instance }} temperature is {{ $value }}°C"
+    ruleFiles: {}
+      # recording_rules.yml: |
+      #   groups:
+      #   - name: temperature
+      #     rules:
+      #     - alert: HighTemperature
+      #       expr: node_hwmon_temp_celsius > 80
+      #       for: 5m
+      #       labels:
+      #         severity: warning
+      #       annotations:
+      #         summary: "High temperature detected"
+      #         description: "Node {{ $labels.instance }} temperature is {{ $value }}°C"
 
     serverFiles:
       prometheus.yml:
