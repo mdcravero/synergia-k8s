@@ -39,18 +39,6 @@ data:
           bind_port: 7946
           join_members:
           - 'loki-stack-memberlist'
-          gossip_interval: 200ms
-          push_pull_interval: 30s
-          probe_interval: 5s
-          probe_timeout: 500ms
-          dead_node_reclaim_time: 30s
-          dns_lookup_period: 10s
-          leave_timeout: 5s
-          rejoin_cluster: true
-          min_join_backoff: 1s
-          max_join_backoff: 1m
-          max_join_retries: 10
-          abort_if_cluster_join_fails: false
         schema_config:
           configs:
           - from: "2020-10-24"
@@ -158,18 +146,6 @@ data:
         - -log.level=debug
         - -memberlist.bind-port=7946
         - -memberlist.join=loki-stack-memberlist
-        - -memberlist.gossip-interval=200ms
-        - -memberlist.push-pull-interval=30s
-        - -memberlist.probe-interval=5s
-        - -memberlist.probe-timeout=500ms
-        - -memberlist.dead-node-reclaim-time=30s
-        - -memberlist.dns-lookup-period=10s
-        - -memberlist.leave-timeout=5s
-        - -memberlist.rejoin-cluster=true
-        - -memberlist.min-join-backoff=1s
-        - -memberlist.max-join-backoff=1m
-        - -memberlist.max-join-retries=10
-        - -memberlist.abort-if-cluster-join-fails=false
       resources:
         limits:
           cpu: 1000m
