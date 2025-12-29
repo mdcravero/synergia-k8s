@@ -6,7 +6,15 @@ metadata:
 data:
   values.yaml: |
     loki:
-      affinity: {}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                - arm64
       alerting_groups: []
       annotations: {}
       client: {}
