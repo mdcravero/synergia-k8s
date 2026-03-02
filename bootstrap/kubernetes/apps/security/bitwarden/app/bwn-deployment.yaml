@@ -69,7 +69,7 @@ spec:
               mountPath: /home/.config/bitwarden-cli
 
       nodeSelector:
-        type: worker-amd
+        type: wk-amd
 
       securityContext:
         runAsUser: 0
