@@ -26,7 +26,7 @@ spec:
               value: "true"
             - name: LOG_LEVEL
               value: "debug"
-          image: ghcr.io/seerr-team/seerr:3.1.0
+          image: ghcr.io/seerr-team/seerr:v3.1.0
           name: jellyseerr
           ports:
             - containerPort: 5055
