@@ -48,7 +48,7 @@ spec:
   databases:
     authentik: authentik
     homebox: homebox
-    ha-db: ha-user
+    homeassistant: ha-user
 
   postgresql:
     version: "17"
