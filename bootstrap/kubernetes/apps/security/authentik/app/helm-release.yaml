@@ -14,7 +14,7 @@ spec:
         name: authentik
       version: 2026.2.1
   interval: 1m0s
-  timeout: 10m
+  timeout: 20m
   releaseName: authentik
   valuesFrom:
     - kind: ConfigMap
