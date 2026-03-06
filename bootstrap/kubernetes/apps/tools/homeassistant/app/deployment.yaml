@@ -33,6 +33,11 @@ spec:
               value: ignore:Unverified HTTPS request
             - name: HASS_HTTP_USE_X_FORWARDED_FOR
               value: "1"
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: homeassistant-postgres-secret
+                  key: POSTGRES_URL
           volumeMounts:
             - mountPath: /config
               name: config
