@@ -33,6 +33,8 @@ spec:
               value: ignore:Unverified HTTPS request
             - name: HASS_HTTP_USE_X_FORWARDED_FOR
               value: "1"
+            - name: LOG_LEVEL
+              value: "debug"
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:
