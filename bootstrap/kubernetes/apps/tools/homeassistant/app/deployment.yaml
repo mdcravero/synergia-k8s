@@ -36,7 +36,7 @@ spec:
             - name: POSTGRES_URL
               valueFrom:
                 secretKeyRef:
-                  name: homeassistant-postgres-secret
+                  name: secret-homeassistant-postgres
                   key: POSTGRES_URL
           volumeMounts:
             - mountPath: /config
