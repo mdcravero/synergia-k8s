@@ -24,7 +24,7 @@ spec:
             claimName: home-assistant-data
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:2025.11
+          image: homeassistant/home-assistant:2025.11.3
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
@@ -33,6 +33,11 @@ spec:
               value: ignore:Unverified HTTPS request
             - name: HASS_HTTP_USE_X_FORWARDED_FOR
               value: "1"
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homeassistant-postgres
+                  key: POSTGRES_URL
           volumeMounts:
             - mountPath: /config
               name: config
@@ -61,25 +66,3 @@ spec:
             failureThreshold: 30
             timeoutSeconds: 1
             periodSeconds: 10
-
-        - name: codeserver
-          securityContext: {}
-          args:
-            - --auth
-            - none
-            - --user-data-dir
-            - "/config/.vscode"
-            - --extensions-dir
-            - "/config/.vscode"
-            - --port
-            - "12321"
-            - "/config"
-          image: "ghcr.io/coder/code-server:4.105.1"
-          imagePullPolicy: "IfNotPresent"
-          ports:
-            - containerPort: 12321
-              name: codeserver
-              protocol: TCP
-          volumeMounts:
-            - mountPath: /config
-              name: config

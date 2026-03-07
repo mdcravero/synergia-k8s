@@ -1,7 +1,7 @@
 apiVersion: "acid.zalan.do/v1"
 kind: postgresql
 metadata:
-  name: postgres-authentik
+  name: postgres-cluster
   namespace: tools
 #  labels:
 #    application: test-app
@@ -25,10 +25,13 @@ spec:
     - login
     homebox:
     - login
+    ha-user:
+    - login
 #    flyway: []
   usersIgnoringSecretRotation:
   - authentik
   - homebox
+  - ha-user
 #  usersWithSecretRotation:
 #  - foo_user
 #  usersWithInPlaceSecretRotation:
@@ -45,6 +48,7 @@ spec:
   databases:
     authentik: authentik
     homebox: homebox
+    homeassistant: ha-user
 
   postgresql:
     version: "17"
@@ -61,7 +65,7 @@ spec:
     value: "true"
 
   volume:
-    size: 10Gi
+    size: 50Gi
     storageClass: "nfs-client"
 #    iops: 1000  # for EBS gp3
 #    throughput: 250  # in MB/s for EBS gp3

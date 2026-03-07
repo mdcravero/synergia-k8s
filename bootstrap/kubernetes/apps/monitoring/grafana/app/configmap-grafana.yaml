@@ -79,7 +79,7 @@ data:
     affinity: {}
 
     nodeSelector:
-      type: worker-amd
+      type: wk-amd
 
     datasources:
       datasources.yaml:

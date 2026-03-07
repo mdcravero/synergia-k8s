@@ -15,6 +15,7 @@ spec:
         kind: HelmRepository
         name: homarr
         namespace: tools
+      version: 8.13.0
   interval: 1m0s
   releaseName: homarr
   valuesFrom:
