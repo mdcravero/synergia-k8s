@@ -8,8 +8,8 @@ data:
   values.yaml: |-
     global:
       env:
-        - name: AUTHENTIK_RBAC__SYNCHRONIZE
-          value: "true"
+        # - name: AUTHENTIK_RBAC__SYNCHRONIZE
+        #   value: "true"
         - name: AUTHENTIK_SECRET_KEY
           valueFrom:
             secretKeyRef:
