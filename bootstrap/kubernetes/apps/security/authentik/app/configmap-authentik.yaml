@@ -6,10 +6,8 @@ metadata:
   namespace: security
 data:
   values.yaml: |-
-    # Default values for authentik.
-
     global:
-       env:
+      env:
         - name: AUTHENTIK_SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -37,42 +35,39 @@ data:
               key: sentry-dsn
         
     authentik:
-
-      error_reporting:
-          enabled: true
-
       postgresql:
         host: 10.42.20.70
         database: authentik
         sslmode: require
-
       redis:
         host: 10.42.20.71
-        architecture: standalone
 
     server:
       replicas: 1
-
-      volumes:
-        - name: media
-          persistentVolumeClaim:
-              claimName: authentik-media
-      volumeMounts:
-        - name: media
-          mountPath: /media
+      resources:
+        requests:
+          cpu: 400m    
+          memory: 700Mi
+        limits:
+          cpu: 1000m  
+          memory: 1Gi
+      
+      livenessProbe:
+        initialDelaySeconds: 80 
+        timeoutSeconds: 15
+        failureThreshold: 6
+      readinessProbe:
+        initialDelaySeconds: 40
+        timeoutSeconds: 15
 
       nodeSelector:
         kubernetes.io/arch: arm64
-
-      podLabels:
-        app: authentik
 
       service:
         type: LoadBalancer
         LoadBalancerIP: 10.42.20.72
 
       ingress:
-        # Specify kubernetes ingress controller class name
         ingressClassName: traefik
         enabled: true
         hosts:
@@ -80,22 +75,22 @@ data:
         paths:
           - /
         pathType: Prefix
-
         
     worker:
-      # Set worker values if you want to use it
-      name: worker
       replicas: 1
-      # Solo en nodos ARM64
+      resources:
+        requests:
+          cpu: 500m
+          memory: 800Mi
+        limits:
+          cpu: 1500m  
+          memory: 1.8Gi
+      
       nodeSelector:
         kubernetes.io/arch: arm64
+
       livenessProbe:
-        initialDelaySeconds: 5
-        periodSeconds: 10
-        timeoutSeconds: 5
-        failureThreshold: 3
-      readinessProbe:
-        initialDelaySeconds: 5
-        periodSeconds: 10
-        timeoutSeconds: 5
-        failureThreshold: 3
+        initialDelaySeconds: 80
+        periodSeconds: 30
+        timeoutSeconds: 20
+        failureThreshold: 6
