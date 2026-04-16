@@ -27,11 +27,14 @@ spec:
     - login
     ha-user:
     - login
-#    flyway: []
+    n8n:
+    - login
+
   usersIgnoringSecretRotation:
   - authentik
   - homebox
   - ha-user
+  - n8n
 #  usersWithSecretRotation:
 #  - foo_user
 #  usersWithInPlaceSecretRotation:
@@ -49,6 +52,7 @@ spec:
     authentik: authentik
     homebox: homebox
     homeassistant: ha-user
+    n8n: n8n
 
   postgresql:
     version: "17"
