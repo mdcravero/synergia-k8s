@@ -4,4 +4,4 @@ resources:
   - helm-source.yaml
   - helm-release.yaml
   - configmap-n8n.yaml
-  - secret-n8n.yaml
+  - network-policy-n8n.yaml

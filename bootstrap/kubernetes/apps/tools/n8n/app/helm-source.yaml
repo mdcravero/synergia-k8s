@@ -5,5 +5,5 @@ metadata:
   name: n8n
   namespace: tools
 spec:
-  interval: 1m0s
-  url: https://8gears.container-registry.com/chartrepo/library
+  interval: 5m0s
+  url: https://community-charts.github.io/helm-charts
