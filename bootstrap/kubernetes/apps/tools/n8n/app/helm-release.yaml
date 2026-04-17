@@ -15,7 +15,7 @@ spec:
         kind: HelmRepository
         name: n8n
         namespace: tools
-    version: 1.16.32
+  version: 1.16.32
   interval: 1m0s
   releaseName: n8n
   valuesFrom:
