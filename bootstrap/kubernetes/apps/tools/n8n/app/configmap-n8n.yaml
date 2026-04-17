@@ -115,6 +115,10 @@ data:
         GENERIC_TIMEZONE: "America/Buenos_Aires"
         WEBHOOK_URL: "https://n8n.synergia.net.ar"
         N8N_AWS_SYSTEM_CREDENTIALS_ACCESS_ENABLED: "true"
+        # Chart 1.16.x injects DB_POSTGRESDB_SSL_ENABLED=false in env before envFrom; explicit
+        # env wins over the database ConfigMap, so Postgres sees no SSL and pg_hba rejects it.
+        DB_POSTGRESDB_SSL_ENABLED: "true"
+        DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"
 
     # n8n encryption key - use existing secret
     existingEncryptionKeySecret: "n8n-secrets"
