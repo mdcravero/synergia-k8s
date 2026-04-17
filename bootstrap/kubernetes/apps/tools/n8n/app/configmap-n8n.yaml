@@ -52,8 +52,7 @@ data:
         idleConnectionTimeout: 30000
         schema: public
         ssl:
-          enabled: true
-          rejectUnauthorized: false
+          enabled: false
 
     # External PostgreSQL configuration
     externalPostgresql:
