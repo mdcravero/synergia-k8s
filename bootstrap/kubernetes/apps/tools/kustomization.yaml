@@ -6,7 +6,7 @@ resources:
   - ./redis/app
   - ./homarr/app
   - ./homeassistant/app
-  # - ./n8n/app
+  - ./n8n/app
   - ./transmission_movies/app
   - ./transmission_shows/app
   - ./homebox/app
