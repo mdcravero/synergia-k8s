@@ -36,7 +36,7 @@ data:
     # Service configuration
     service:
       enabled: true
-      type: ClusterIP
+      type: LoadBalancer
       port: 5678
       name: http
       annotations: {}
