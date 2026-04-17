@@ -53,7 +53,7 @@ data:
         schema: public
         ssl:
           enabled: true
-          rejectUnauthorized: true
+          rejectUnauthorized: false
 
     # External PostgreSQL configuration
     externalPostgresql:
