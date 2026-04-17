@@ -6,7 +6,7 @@ metadata:
   namespace: tools
 spec:
   dependsOn:
-    - name: postgres-cluster
+    - name: zalando-operator
       namespace: tools
   chart:
     spec:
