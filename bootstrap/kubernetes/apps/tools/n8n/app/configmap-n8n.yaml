@@ -154,7 +154,8 @@ data:
       pruneTime: 336
 
     # Node selector
-    nodeSelector: {}
+    nodeSelector:
+      kubernetes.io/arch: arm64
 
     # Tolerations
     tolerations: []
