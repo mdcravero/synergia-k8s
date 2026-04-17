@@ -48,7 +48,8 @@ data:
       tablePrefix: ""
       postgresdb:
         poolSize: 2
-        connectionTimeout: 20000
+        # Allow slow TLS / migrations; avoid pool timeouts during heavy startup.
+        connectionTimeout: 60000
         idleConnectionTimeout: 30000
         schema: public
         ssl:
@@ -84,19 +85,21 @@ data:
         httpGet:
           path: /healthz
           port: http
-        initialDelaySeconds: 30
-        periodSeconds: 10
-        timeoutSeconds: 5
-        failureThreshold: 3
+        # Cold start (image pull, migrations) can exceed defaults; liveness must not
+        # SIGTERM the container while DB work is still in flight (causes pool timeouts).
+        initialDelaySeconds: 120
+        periodSeconds: 15
+        timeoutSeconds: 10
+        failureThreshold: 6
 
       readinessProbe:
         httpGet:
           path: /healthz/readiness
           port: http
-        initialDelaySeconds: 10
-        periodSeconds: 5
-        timeoutSeconds: 3
-        failureThreshold: 3
+        initialDelaySeconds: 20
+        periodSeconds: 10
+        timeoutSeconds: 15
+        failureThreshold: 12
 
       forceToUseStatefulset: false
 
