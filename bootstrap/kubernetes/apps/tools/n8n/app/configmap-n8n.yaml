@@ -106,7 +106,6 @@ data:
       persistence:
         enabled: false
       
-    main:
       extraEnv:
         - name: N8N_BASIC_ACTIVE
           value: "true"
@@ -118,7 +117,7 @@ data:
           valueFrom:
             secretKeyRef:
               name: n8n-secrets
-              key: auth-password
+              key: N8N_BASIC_AUTH_PASSWORD
         - name: N8N_EDITOR_BASE_URL
           value: "https://n8n.synergia.net.ar"
         - name: N8N_PERSONALIZATION_ENABLED
