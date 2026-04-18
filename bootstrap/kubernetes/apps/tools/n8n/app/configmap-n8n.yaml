@@ -110,6 +110,7 @@ data:
         N8N_BASIC_ACTIVE: "true"
         N8N_BASIC_AUTH_ACTIVE: "true"
         N8N_BASIC_AUTH_USER: "admin"
+        N8N_BASIC_AUTH_PASSWORD: "" 
         N8N_EDITOR_BASE_URL: "https://n8n.synergia.net.ar"
         N8N_PERSONALIZATION_ENABLED: "false"
         N8N_DIAGNOSTICS_ENABLED: "false"
@@ -117,9 +118,9 @@ data:
         EXECUTIONS_DATA_SAVE_ON_SUCCESS: "all"
         GENERIC_TIMEZONE: "America/Buenos_Aires"
         WEBHOOK_URL: "https://n8n.synergia.net.ar"
-        N8N_AWS_SYSTEM_CREDENTIALS_ACCESS_ENABLED: "true"
         DB_POSTGRESDB_SSL_ENABLED: "true"
         DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"
+        
 
     # n8n encryption key - use existing secret
     existingEncryptionKeySecret: "n8n-secrets"
