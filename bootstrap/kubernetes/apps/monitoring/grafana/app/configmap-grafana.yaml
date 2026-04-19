@@ -111,10 +111,3 @@ data:
           name: loki-home
           type: loki
           url: http://loki-stack:3100
-
-    dashboards:
-      default:
-        postgres-overview:
-          gnetId: 18870
-          revision: 1
-          datasource: Prometheus
