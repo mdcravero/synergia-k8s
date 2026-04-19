@@ -29,12 +29,15 @@ spec:
     - login
     n8n:
     - login
+    bot_user:
+    - login
 
   usersIgnoringSecretRotation:
   - authentik
   - homebox
   - ha-user
   - n8n
+  - bot_user
 #  usersWithSecretRotation:
 #  - foo_user
 #  usersWithInPlaceSecretRotation:
@@ -53,6 +56,7 @@ spec:
     homebox: homebox
     homeassistant: ha-user
     n8n: n8n
+    bot_memory: bot_user
 
   postgresql:
     version: "17"
