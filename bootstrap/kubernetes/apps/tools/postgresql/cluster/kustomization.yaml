@@ -5,3 +5,4 @@ metadata:
 
 resources:
   - cluster-zalando.yaml
+  - configmap-exporter-queries.yaml
