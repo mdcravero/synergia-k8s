@@ -118,6 +118,9 @@ spec:
   enableShmVolume: false
   podAnnotations:
     annotation.key: value
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9187"
+    prometheus.io/path: "/metrics"
   serviceAnnotations:
     metallb.universe.tf/address-pool: main-pool
     metallb.universe.tf/loadBalancerIPs: 10.42.20.70
@@ -198,23 +201,23 @@ spec:
   - name: date
     image: busybox
     command: [ "/bin/date" ]
-#  sidecars:
-#   - name: "telegraf-sidecar"
-#     image: "telegraf:latest"
-#     ports:
-#     - name: metrics
-#       containerPort: 8094
-#       protocol: TCP
-#     resources:
-#       limits:
-#         cpu: 500m
-#         memory: 500Mi
-#       requests:
-#         cpu: 100m
-#         memory: 100Mi
-#     env:
-#       - name: "USEFUL_VAR"
-#         value: "perhaps-true"
+  sidecars:
+    - name: postgres-exporter
+      image: prometheuscommunity/postgres-exporter:v0.15.0
+      ports:
+        - name: exporter
+          containerPort: 9187
+          protocol: TCP
+      env:
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://postgres:$(POSTGRES_PASSWORD)@localhost:5432/?sslmode=disable"
+      resources:
+        limits:
+          cpu: 500m
+          memory: 256Mi
+        requests:
+          cpu: 100m
+          memory: 128Mi
 
 # Custom TLS certificate. Disabled unless tls.secretName has a value.
   tls:
