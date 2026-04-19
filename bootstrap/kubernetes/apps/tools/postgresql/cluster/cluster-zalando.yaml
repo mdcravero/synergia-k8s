@@ -219,8 +219,8 @@ spec:
         - name: DATA_SOURCE_PASS
           valueFrom:
             secretKeyRef:
-              name: postgres-cluster.credentials
-              key: postgres
+              name: postgres.postgres-cluster.credentials.postgresql.acid.zalan.do
+              key: password
         - name: DATA_SOURCE_URI
           value: "localhost:5432/?sslmode=disable"
       resources:
