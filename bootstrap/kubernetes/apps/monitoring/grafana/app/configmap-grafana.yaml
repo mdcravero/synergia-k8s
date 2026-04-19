@@ -87,6 +87,19 @@ data:
         datasources:
         - access: proxy
           basicAuth: false
+          isDefault: false
+          jsonData:
+            maxLines: 1000
+            timeout: 60
+            alerting: false
+            queryType: "range"
+            metrics: true
+            logs: true
+          name: Prometheus
+          type: prometheus
+          url: http://prometheus-server:80
+        - access: proxy
+          basicAuth: false
           isDefault: true
           jsonData:
             maxLines: 1000
@@ -98,3 +111,10 @@ data:
           name: loki-home
           type: loki
           url: http://loki-stack:3100
+
+    dashboards:
+      default:
+        postgres-overview:
+          gnetId: 18870
+          revision: 1
+          datasource: Prometheus
