@@ -145,6 +145,7 @@ spec:
 #      hugepages-2Mi: 128Mi
 #      hugepages-1Gi: 1Gi
   patroni:
+    enableMetricsExporter: true
     failsafe_mode: false
     initdb:
       encoding: "UTF8"
