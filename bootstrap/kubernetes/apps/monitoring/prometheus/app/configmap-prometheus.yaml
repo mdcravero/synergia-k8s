@@ -92,10 +92,6 @@ data:
             static_configs:
               - targets: ['prometheus-prometheus-node-exporter.monitoring.svc.cluster.local:9100']
               
-          - job_name: prometheus
-            static_configs:
-              - targets: ['localhost:9090']
-
           - job_name: kube-state-metrics
             static_configs:
               - targets: ['prometheus-kube-state-metrics.monitoring.svc.cluster.local:8080']
