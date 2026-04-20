@@ -89,14 +89,14 @@ data:
       alerting_rules.yml: {}
 
     alertmanager:
-      enabled: true
-      storageClass: "nfs-client"
-      accessModes:
-        - ReadWriteOnce
-      size: 500Mi
+      enabled: false
+      # storageClass: "nfs-client"
+      # accessModes:
+      #   - ReadWriteOnce
+      # size: 500Mi
 
-      podSecurityContext:
-        runAsUser: 1000
-        runAsNonRoot: true
-        runAsGroup: 1000
-        fsGroup: 1000
+      # podSecurityContext:
+      #   runAsUser: 1000
+      #   runAsNonRoot: true
+      #   runAsGroup: 1000
+      #   fsGroup: 1000
