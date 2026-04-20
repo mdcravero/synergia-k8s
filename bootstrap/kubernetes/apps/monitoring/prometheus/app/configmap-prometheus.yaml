@@ -5,6 +5,12 @@ metadata:
   namespace: monitoring
 data:
   values.yaml: |-
+    # Chart 28+: disable default scrapeConfigs map so scrape jobs are only those in serverFiles.prometheus.yml
+    scrapeConfigs: null
+
+    prometheus-pushgateway:
+      enabled: false
+
     server:
       name: server
 
@@ -28,7 +34,7 @@ data:
         annotations: {}
         type: LoadBalancer
         servicePort: 80
-      
+
       ingress:
         enabled: true
         pathType: Prefix
@@ -37,7 +43,7 @@ data:
         path: /
         annotations:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.tls: "true"    
+          traefik.ingress.kubernetes.io/router.tls: "true"
           traefik.ingress.kubernetes.io/router.tls.certresolver: le
 
     kube-state-metrics:
@@ -85,18 +91,105 @@ data:
               - targets: ['prometheus-prometheus-node-exporter.monitoring.svc.cluster.local:9100']
             params:
               collect[]: ['hwmon']
+          - job_name: kubernetes-pods-tools
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - tools
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                action: keep
+                regex: true
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape_slow]
+                action: drop
+                regex: true
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+                action: replace
+                target_label: __scheme__
+                regex: (https?)
+              - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+                action: replace
+                target_label: __metrics_path__
+                regex: (.+)
+              - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+                action: replace
+                regex: ([^:]+)(?::\d+)?;(\d+)
+                replacement: $1:$2
+                target_label: __address__
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
+              - source_labels: [__meta_kubernetes_namespace]
+                action: replace
+                target_label: kubernetes_namespace
+              - source_labels: [__meta_kubernetes_pod_name]
+                action: replace
+                target_label: kubernetes_pod_name
 
-      alerting_rules.yml: {}
+      recording_rules.yml:
+        groups: []
+
+      alerting_rules.yml:
+        groups:
+          - name: postgresql
+            rules:
+              - alert: PostgresqlExporterUnreachable
+                expr: up{job="kubernetes-pods-tools"} == 0
+                for: 3m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "PostgreSQL exporter target is down"
+                  description: "Prometheus cannot scrape postgres metrics in namespace tools (job kubernetes-pods-tools)."
+              - alert: PostgresqlNotResponding
+                expr: pg_up{job="kubernetes-pods-tools"} == 0
+                for: 2m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "PostgreSQL not responding"
+                  description: "postgres_exporter reports pg_up=0 for {{ $labels.instance }}."
+              - alert: PostgresqlHighConnectionCount
+                expr: |
+                  sum by (instance, job) (
+                    pg_stat_database_numbackends{job="kubernetes-pods-tools",datname!~"template.*"}
+                  ) >= 8
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "PostgreSQL connection count high"
+                  description: "Total backends across databases is at least 8 (cluster max_connections is 10) on {{ $labels.instance }}."
 
     alertmanager:
-      enabled: false
-      # storageClass: "nfs-client"
-      # accessModes:
-      #   - ReadWriteOnce
-      # size: 500Mi
-
-      # podSecurityContext:
-      #   runAsUser: 1000
-      #   runAsNonRoot: true
-      #   runAsGroup: 1000
-      #   fsGroup: 1000
+      enabled: true
+      persistence:
+        enabled: true
+        storageClass: "nfs-client"
+        accessModes:
+          - ReadWriteOnce
+        size: 1Gi
+      podSecurityContext:
+        runAsUser: 65534
+        runAsNonRoot: true
+        runAsGroup: 65534
+        fsGroup: 65534
+      extraSecretMounts:
+        - name: telegram-secret
+          secretName: telegram-secret
+          mountPath: /etc/alertmanager/secrets
+          readOnly: true
+      config:
+        global:
+          resolve_timeout: 5m
+        route:
+          receiver: telegram
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 12h
+        receivers:
+          - name: telegram
+            telegram_configs:
+              - bot_token_file: /etc/alertmanager/secrets/TELEGRAM_BOT_TOKEN
+                chat_id_file: /etc/alertmanager/secrets/TELEGRAM_CHAT_ID
+                send_resolved: true
