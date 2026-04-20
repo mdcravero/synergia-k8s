@@ -67,20 +67,6 @@ data:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-     
-    ruleFiles: {}
-      # recording_rules.yml: |
-      #   groups:
-      #   - name: temperature
-      #     rules:
-      #     - alert: HighTemperature
-      #       expr: node_hwmon_temp_celsius > 80
-      #       for: 5m
-      #       labels:
-      #         severity: warning
-      #       annotations:
-      #         summary: "High temperature detected"
-      #         description: "Node {{ $labels.instance }} temperature is {{ $value }}°C"
 
     serverFiles:
       prometheus.yml:
@@ -100,43 +86,7 @@ data:
             params:
               collect[]: ['hwmon']
 
-      alerting_rules.yml: |
-        groups:
-          - name: postgresql
-            interval: 30s
-            rules:
-              - alert: PostgreSQLDown
-                expr: up{job="kubernetes-pods", namespace="tools"} == 0
-                for: 1m
-                labels:
-                  severity: critical
-                annotations:
-                  summary: "PostgreSQL is down"
-                  description: "PostgreSQL cluster in namespace {{ $labels.namespace }} is down"
-              - alert: PostgreSQLHighConnections
-                expr: pg_stat_activity_count > 8
-                for: 5m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: "PostgreSQL high connections"
-                  description: "Database {{ $labels.datname }} has high connections"
-              - alert: PostgreSQLDeadlocks
-                expr: rate(pg_stat_database_deadlocks[5m]) > 0
-                for: 1m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: "PostgreSQL deadlocks"
-                  description: "Deadlocks detected in {{ $labels.datname }}"
-              - alert: PostgreSQLExporterDown
-                expr: up{namespace="tools"} == 0
-                for: 2m
-                labels:
-                  severity: warning
-                annotations:
-                  summary: "PostgreSQL exporter is down"
-                  description: "Exporter for {{ $labels.pod }} is down"
+      alerting_rules.yml: {}
 
     alertmanager:
       enabled: true
