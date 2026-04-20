@@ -139,4 +139,14 @@ data:
                   description: "Exporter for {{ $labels.pod }} is down"
 
     alertmanager:
-      enabled: false
+      enabled: true
+      storageClass: "nfs-client"
+      accessModes:
+        - ReadWriteOnce
+      size: 500Mi
+
+      podSecurityContext:
+        runAsUser: 1000
+        runAsNonRoot: true
+        runAsGroup: 1000
+        fsGroup: 1000
