@@ -14,6 +14,7 @@ spec:
         name: prometheus
       version: 29.2.1
   interval: 1m0s
+  timeout: 10m
   releaseName: prometheus
   valuesFrom:
     - kind: ConfigMap
