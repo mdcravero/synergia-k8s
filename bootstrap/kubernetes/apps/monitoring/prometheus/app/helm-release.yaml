@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus
-      version: 29.2.1
+      version: 28.0.0
   interval: 1m0s
   timeout: 10m
   releaseName: prometheus
