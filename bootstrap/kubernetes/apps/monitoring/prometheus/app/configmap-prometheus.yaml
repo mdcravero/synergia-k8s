@@ -112,6 +112,9 @@ data:
                 action: replace
                 target_label: __metrics_path__
                 regex: (.+)
+              - source_labels: [__meta_kubernetes_pod_label_application]
+                action: drop
+                regex: spilo-logical-backup
               - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
                 action: replace
                 regex: ([^:]+)(?::\d+)?;(\d+)
@@ -134,7 +137,7 @@ data:
           - name: postgresql
             rules:
               - alert: PostgresqlExporterUnreachable
-                expr: up{job="kubernetes-pods-tools"} == 0
+                expr: up{job="kubernetes-pods-tools",kubernetes_pod_name!~"logical-backup-.*"} == 0
                 for: 3m
                 labels:
                   severity: critical
@@ -192,4 +195,5 @@ data:
             telegram_configs:
               - bot_token_file: /etc/alertmanager/secrets/TELEGRAM_BOT_TOKEN
                 chat_id_file: /etc/alertmanager/secrets/TELEGRAM_CHAT_ID
+                message: '{{ .Status | toUpper }}: {{ .CommonLabels.alertname }} | {{ .CommonAnnotations.summary }}{{ if .CommonLabels.instance }} | instance={{ .CommonLabels.instance }}{{ end }}'
                 send_resolved: true
