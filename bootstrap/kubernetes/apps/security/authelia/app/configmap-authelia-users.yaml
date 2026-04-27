@@ -15,3 +15,10 @@ data:
         email: admin@synergia.net.ar
         groups:
           - admins
+      matute:
+        disabled: false
+        displayname: Matías Cravero
+        password: "$argon2id$v=19$m=65536,t=3,p=4$Sm7TeCjcWi6oldUMQaP5iA$mBZNO/UacV1C6/uYaDSQz/EEmLpQrhJWSGtHpSRr3og"
+        email: matute@synergia.net.ar
+        groups:
+          - admins
