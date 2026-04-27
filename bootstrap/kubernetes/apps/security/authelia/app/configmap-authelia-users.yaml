@@ -11,7 +11,7 @@ data:
       admin:
         disabled: false
         displayname: Administrator
-        password: "$argon2id$v=19$m=65536,t=3,p=4$2mQDIygHI/pDld4ZJKSVxw$dUEFVOQYgJ3AXXByfX6AdZgqu5F34wk6SKXCyvSHibw"
+        password: "$argon2id$v=19$m=65536,t=3,p=4$1iw3x+HREvg/TIUbJtmRtg$jT0khjkguHFG5r84UTWEu6EXH2rr1oO1/aVB+qCHyY8"
         email: admin@synergia.net.ar
         groups:
           - admins
