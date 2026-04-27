@@ -2,8 +2,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: authentik
+  name: authelia
   namespace: security
 spec:
-  interval: 1m0s
-  url: https://charts.goauthentik.io
+  interval: 1h
+  url: https://charts.authelia.com/stable

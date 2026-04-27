@@ -200,13 +200,13 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: apps-authentik
+  name: apps-authelia
   namespace: flux-system
 spec:
   dependsOn:
     - name: apps-secrets-config
   interval: 5m0s
-  path: ./bootstrap/kubernetes/apps/security/authentik
+  path: ./bootstrap/kubernetes/apps/security/authelia
   prune: true
   sourceRef:
     kind: GitRepository
@@ -219,7 +219,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: apps-authentik
+    - name: apps-authelia
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/declarations
   prune: true

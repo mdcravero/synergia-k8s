@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: middlewares-authelia
+  namespace: traefik
+spec:
+  forwardAuth:
+    address: "http://authelia.security.svc.cluster.local/api/verify"
+    trustForwardHeader: true
+    authResponseHeaders:
+      - "Remote-User"
+      - "Remote-Groups"
+      - "Remote-Email"
+      - "Remote-Name"
+      - "Remote-Given-Name"
+      - "Remote-Family-Name"

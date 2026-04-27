@@ -6,7 +6,7 @@ metadata:
   namespace: tools
 spec:
   dependsOn:
-    - name: authentik
+    - name: authelia
       namespace: security
   chart:
     spec:

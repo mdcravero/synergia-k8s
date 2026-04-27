@@ -58,5 +58,5 @@ data:
           - name: api@internal
             kind: TraefikService
         middlewares: 
-          - name: "middlewares-authentik"
+          - name: "middlewares-authelia"
             namespace: traefik

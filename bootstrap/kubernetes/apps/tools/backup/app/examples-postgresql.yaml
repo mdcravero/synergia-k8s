@@ -3,11 +3,11 @@
 # Copy and customize this for your specific PostgreSQL instances
 
 ---
-# Example for Authentik PostgreSQL backup
+# Example for Authelia PostgreSQL backup (Zalando user authelia_user, database authelia)
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: authentik-postgresql-backup
+  name: authelia-postgresql-backup
   namespace: backup-system
 spec:
   schedule: "0 1 * * *"  # Daily at 1 AM
@@ -16,7 +16,7 @@ spec:
       template:
         spec:
           containers:
-          - name: authentik-postgres-backup
+          - name: authelia-postgres-backup
             image: postgres:16
             command:
             - /bin/bash
@@ -28,16 +28,16 @@ spec:
                 sleep 5
               done
 
-              BACKUP_PATH="mega:/backups/databases/authentik/$(date +%Y-%m-%d)"
+              BACKUP_PATH="mega:/backups/databases/authelia/$(date +%Y-%m-%d)"
 
               # Create backup directory
               rclone mkdir $BACKUP_PATH
 
-              # Backup Authentik database
-              BACKUP_FILE="authentik-backup-$(date +%Y%m%d-%H%M%S).sql"
+              # Backup Authelia database
+              BACKUP_FILE="authelia-backup-$(date +%Y%m%d-%H%M%S).sql"
 
-              echo "Creating Authentik PostgreSQL backup..."
-              pg_dump -h $POSTGRES_HOST -U $POSTGRES_USER -d authentik -f /tmp/$BACKUP_FILE
+              echo "Creating Authelia PostgreSQL backup..."
+              pg_dump -h $POSTGRES_HOST -U $POSTGRES_USER -d authelia -f /tmp/$BACKUP_FILE
 
               # Upload to Mega.nz
               rclone copy /tmp/$BACKUP_FILE $BACKUP_PATH/
@@ -45,7 +45,7 @@ spec:
               # Cleanup
               rm /tmp/$BACKUP_FILE
 
-              echo "Authentik backup completed"
+              echo "Authelia backup completed"
             env:
             - name: POSTGRES_HOST
               value: "postgresql.tools.svc.cluster.local"

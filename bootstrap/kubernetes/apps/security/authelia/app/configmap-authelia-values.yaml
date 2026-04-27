@@ -1,0 +1,107 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authelia-values
+  namespace: security
+data:
+  values.yaml: |-
+    enabled: true
+
+    secret:
+      existingSecret: secret-authelia
+
+    rbac:
+      enabled: true
+
+    pod:
+      kind: Deployment
+      replicas: 1
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      extraVolumes:
+        - name: users-database
+          configMap:
+            name: authelia-users
+      extraVolumeMounts:
+        - name: users-database
+          mountPath: /config/users_database.yml
+          subPath: users_database.yml
+
+    ingress:
+      enabled: true
+      className: traefik
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: le
+      tls:
+        enabled: true
+
+    configMap:
+      server:
+        endpoints:
+          authz:
+            forward-auth:
+              implementation: ForwardAuth
+      session:
+        cookies:
+          - domain: synergia.net.ar
+            subdomain: auth
+            authelia_url: https://auth.synergia.net.ar
+        same_site: lax
+      authentication_backend:
+        file:
+          enabled: true
+          path: /config/users_database.yml
+      access_control:
+        default_policy: deny
+        rules:
+          - domain: auth.synergia.net.ar
+            policy: one_factor
+          - domain: traefik-dash.synergia.net.ar
+            policy: one_factor
+      storage:
+        postgres:
+          enabled: true
+          address: tcp://postgres-cluster.tools.svc.cluster.local:5432
+          database: authelia
+          username: authelia_user
+          tls:
+            enabled: true
+            skip_verify: true
+      notifier:
+        disable_startup_check: true
+        filesystem:
+          enabled: true
+      identity_providers:
+        oidc:
+          enabled: true
+          cors:
+            allowed_origins_from_client_redirect_uris: true
+          jwks:
+            - key_id: default
+              algorithm: RS256
+              use: sig
+              key:
+                path: /secrets/issuer_private.pem
+          clients:
+            - client_id: homebox
+              client_name: Homebox
+              client_secret: '$pbkdf2-sha512$310000$G0x0JEzoQ8oyoDyUi5sQcQ$Wu2u6b9Fdvsf8Is/tjbM8rj2jeyI4POddgGCEOqUyuSW.zDSpEJGVpXnT32T6p7uRgGNw2XRYDN0iTmApBaxUQ'
+              public: false
+              authorization_policy: one_factor
+              require_pkce: true
+              pkce_challenge_method: S256
+              redirect_uris:
+                - https://homebox.synergia.net.ar/api/v1/users/login/oidc/callback
+              scopes:
+                - openid
+                - profile
+                - email
+                - groups
+              response_types:
+                - code
+              grant_types:
+                - authorization_code
+              token_endpoint_auth_method: client_secret_basic

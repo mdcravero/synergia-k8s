@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authelia-users
+  namespace: security
+data:
+  users_database.yml: |
+    ---
+    users:
+      admin:
+        disabled: false
+        displayname: Administrator
+        password: "$argon2id$v=19$m=65536,t=3,p=4$2mQDIygHI/pDld4ZJKSVxw$dUEFVOQYgJ3AXXByfX6AdZgqu5F34wk6SKXCyvSHibw"
+        email: admin@synergia.net.ar
+        groups:
+          - admins

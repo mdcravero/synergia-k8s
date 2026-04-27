@@ -165,8 +165,8 @@ exclude_patterns: ["**/.git/**", "**/tmp/**"]
 ```yaml
 # Hourly database backup
 schedule: "0 * * * *"
-backup_path: "mega:/backups/databases/authentik"
-database_name: "authentik"
+backup_path: "mega:/backups/databases/authelia"
+database_name: "authelia"
 retention_days: 30
 ```
 

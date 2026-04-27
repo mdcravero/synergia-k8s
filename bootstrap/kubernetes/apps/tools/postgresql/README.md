@@ -53,7 +53,7 @@ kubectl get pods -n tools -l app=postgres
 kubectl get secret -n tools postgres-cluster.credentials -o yaml
 
 # Decode a specific password
-kubectl get secret -n tools postgres-cluster.credentials -o jsonpath='{.data.authentik}' | base64 -d
+kubectl get secret -n tools postgres-cluster.credentials -o jsonpath='{.data.authelia_user}' | base64 -d
 ```
 
 ### Connect to PostgreSQL:
@@ -65,7 +65,7 @@ POD=$(kubectl get pods -n tools -l app=postgres -o jsonpath='{.items[0].metadata
 kubectl exec -n tools $POD -- psql -U postgres
 
 # Connect to a specific database
-kubectl exec -n tools $POD -- psql -U postgres -d authentik
+kubectl exec -n tools $POD -- psql -U postgres -d authelia
 ```
 
 ### List all databases:
@@ -75,7 +75,7 @@ kubectl exec -n tools postgres-cluster -- psql -U postgres -l
 
 ### List tables in a database:
 ```bash
-kubectl exec -n tools postgres-cluster -- psql -U postgres -d authentik -c "\dt"
+kubectl exec -n tools postgres-cluster -- psql -U postgres -d authelia -c "\dt"
 ```
 
 ## Restoring a Backup
@@ -95,13 +95,13 @@ kubectl exec -n tools postgres-cluster -- gunzip /tmp/backup.sql.gz
 ### Drop and recreate the database (recommended to avoid duplicate table errors):
 ```bash
 # Drop the existing database
-kubectl exec -n tools postgres-cluster -- psql -U postgres -c "DROP DATABASE IF EXISTS authentik;"
+kubectl exec -n tools postgres-cluster -- psql -U postgres -c "DROP DATABASE IF EXISTS authelia;"
 
 # Recreate the database
-kubectl exec -n tools postgres-cluster -- psql -U postgres -c "CREATE DATABASE authentik;"
+kubectl exec -n tools postgres-cluster -- psql -U postgres -c "CREATE DATABASE authelia;"
 
 # Restore the backup
-kubectl exec -n tools postgres-cluster -- psql -U postgres -d authentik -f /tmp/backup.sql
+kubectl exec -n tools postgres-cluster -- psql -U postgres -d authelia -f /tmp/backup.sql
 ```
 
 ### Alternative: Restore both databases at once:
@@ -109,7 +109,7 @@ kubectl exec -n tools postgres-cluster -- psql -U postgres -d authentik -f /tmp/
 kubectl exec -n tools postgres-cluster -- psql -U postgres -f /tmp/backup.sql
 ```
 
-This will create both `authentik` and `homebox` databases.
+This will create both `authelia` and `homebox` databases when your dump includes both.
 
 ### Restart the application after restore:
 ```bash
@@ -134,21 +134,21 @@ kubectl get pods -n tools -l app=postgres-operator
 
 This happens because the database was already initialized with default tables before the restore. Drop and recreate the database before restoring:
 ```bash
-kubectl exec -n tools postgres-cluster-0 -- psql -U postgres -c "DROP DATABASE IF EXISTS authentik;"
-kubectl exec -n tools postgres-cluster-0 -- psql -U postgres -c "CREATE DATABASE authentik;"
-kubectl exec -n tools postgres-cluster-0 -- psql -U postgres -d authentik -f /tmp/backup.sql
+kubectl exec -n tools postgres-cluster-0 -- psql -U postgres -c "DROP DATABASE IF EXISTS authelia;"
+kubectl exec -n tools postgres-cluster-0 -- psql -U postgres -c "CREATE DATABASE authelia;"
+kubectl exec -n tools postgres-cluster-0 -- psql -U postgres -d authelia -f /tmp/backup.sql
 ```
 
 ### Password issues after restore
 
 If the application can't connect due to password mismatch, update the password:
 ```bash
-kubectl exec -n tools postgres-cluster -- psql -U postgres -c "ALTER USER authentik WITH PASSWORD 'your_new_password';"
+kubectl exec -n tools postgres-cluster -- psql -U postgres -c "ALTER USER authelia_user WITH PASSWORD 'your_new_password';"
 ```
 
 Or get the password from the Kubernetes secret:
 ```bash
-kubectl get secret -n tools postgres-cluster.credentials -o jsonpath='{.data.authentik}' | base64 -d
+kubectl get secret -n tools postgres-cluster.credentials -o jsonpath='{.data.authelia_user}' | base64 -d
 ```
 
 ## Backup Configuration

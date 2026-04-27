@@ -51,7 +51,7 @@ bootstrap/kubernetes/apps/
 ├── security/             # External Secrets + Bitwarden + Authentik
 │   ├── external-secrets/ # Gestión de secretos
 │   ├── bitwarden/        # Backend de secretos
-│   └── authentik/        # Sistema de autenticación
+│   └── authelia/         # SSO / forward auth (Authelia)
 ├── monitoring/           # Grafana + Loki + Prometheus
 ├── secrets/              # Secretos específicos (SOPS)
 ├── tools/                # PostgreSQL + Redis
