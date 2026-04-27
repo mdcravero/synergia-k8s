@@ -23,7 +23,7 @@ spec:
             claimName: homebox-data
       containers:
         - name: homebox
-          image: sysadminsmedia/homebox:0.22.0-rc.2
+          image: sysadminsmedia/homebox:0.25.0
           imagePullPolicy: IfNotPresent
 
           env:
