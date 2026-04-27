@@ -17,42 +17,42 @@ spec:
   spiloRunAsUser: 1000
   spiloRunAsGroup: 1000
   spiloFSGroup: 1000
-  users:  # Application/Robot users
+  users: # Application/Robot users
     zalando:
-    - superuser
-    - login
-    authentik:
-    - login
+      - superuser
+      - login
+    authelia_user:
+      - login
     homebox:
-    - login
+      - login
     ha-user:
-    - login
+      - login
     n8n:
-    - login
+      - login
     bot_user:
-    - login
+      - login
 
   usersIgnoringSecretRotation:
-  - authentik
-  - homebox
-  - ha-user
-  - n8n
-  - bot_user
-#  usersWithSecretRotation:
-#  - foo_user
-#  usersWithInPlaceSecretRotation:
-#  - flyway
-#  - bar_owner_user
+    - authelia_user
+    - homebox
+    - ha-user
+    - n8n
+    - bot_user
+  #  usersWithSecretRotation:
+  #  - foo_user
+  #  usersWithInPlaceSecretRotation:
+  #  - flyway
+  #  - bar_owner_user
   enableMasterLoadBalancer: true
   enableReplicaLoadBalancer: false
   enableConnectionPooler: false # enable/disable connection pooler deployment
   enableReplicaConnectionPooler: false # set to enable connectionPooler for replica service
   enableMasterPoolerLoadBalancer: false
   enableReplicaPoolerLoadBalancer: false
-  allowedSourceRanges:  # load balancers' source ranges for both master and replica services
-  - 10.0.0.0/8
+  allowedSourceRanges: # load balancers' source ranges for both master and replica services
+    - 10.0.0.0/8
   databases:
-    authentik: authentik
+    authelia: authelia_user
     homebox: homebox
     homeassistant: ha-user
     n8n: n8n
@@ -60,31 +60,31 @@ spec:
 
   postgresql:
     version: "17"
-    parameters:  # Expert section
+    parameters: # Expert section
       shared_buffers: "32MB"
-      max_connections: "10"
+      max_connections: "20"
       log_statement: "all"
   env:
-  - name: PATRONI_BOOTSTRAP_METHOD
-    value: "initdb"
-  - name: PATRONI_BOOTSTRAP_INITDB_DATA_CHECKSUMS
-    value: "true"
-  - name: PATRONI_KUBERNETES_USE_ENDPOINTS
-    value: "true"
+    - name: PATRONI_BOOTSTRAP_METHOD
+      value: "initdb"
+    - name: PATRONI_BOOTSTRAP_INITDB_DATA_CHECKSUMS
+      value: "true"
+    - name: PATRONI_KUBERNETES_USE_ENDPOINTS
+      value: "true"
 
   volume:
     size: 50Gi
     storageClass: "nfs-client"
-#    iops: 1000  # for EBS gp3
-#    throughput: 250  # in MB/s for EBS gp3
-#    selector:
-#      matchExpressions:
-#        - { key: flavour, operator: In, values: [ "banana", "chocolate" ] }
-#      matchLabels:
-#        environment: dev
-#        service: postgres
-#     subPath: $(NODE_NAME)/$(POD_NAME)
-#     isSubPathExpr: true
+  #    iops: 1000  # for EBS gp3
+  #    throughput: 250  # in MB/s for EBS gp3
+  #    selector:
+  #      matchExpressions:
+  #        - { key: flavour, operator: In, values: [ "banana", "chocolate" ] }
+  #      matchLabels:
+  #        environment: dev
+  #        service: postgres
+  #     subPath: $(NODE_NAME)/$(POD_NAME)
+  #     isSubPathExpr: true
   additionalVolumes:
     - name: run-volume
       mountPath: /run
@@ -92,32 +92,32 @@ spec:
         - postgres
       volumeSource:
         emptyDir: {}
-#    - name: data
-#      mountPath: /home/postgres/pgdata/partitions
-#      targetContainers:
-#        - postgres
-#      volumeSource:
-#        PersistentVolumeClaim:
-#          claimName: pvc-postgresql-data-partitions
-#          readyOnly: false
-#    - name: data
-#      mountPath: /home/postgres/pgdata/partitions
-#      subPath: $(NODE_NAME)/$(POD_NAME)
-#      isSubPathExpr: true
-#      targetContainers:
-#        - postgres
-#      volumeSource:
-#        PersistentVolumeClaim:
-#          claimName: pvc-postgresql-data-partitions
-#          readyOnly: false
-#    - name: conf
-#      mountPath: /etc/telegraf
-#      subPath: telegraf.conf
-#      targetContainers:
-#        - telegraf-sidecar
-#      volumeSource:
-#        configMap:
-#          name: my-config-map
+  #    - name: data
+  #      mountPath: /home/postgres/pgdata/partitions
+  #      targetContainers:
+  #        - postgres
+  #      volumeSource:
+  #        PersistentVolumeClaim:
+  #          claimName: pvc-postgresql-data-partitions
+  #          readyOnly: false
+  #    - name: data
+  #      mountPath: /home/postgres/pgdata/partitions
+  #      subPath: $(NODE_NAME)/$(POD_NAME)
+  #      isSubPathExpr: true
+  #      targetContainers:
+  #        - postgres
+  #      volumeSource:
+  #        PersistentVolumeClaim:
+  #          claimName: pvc-postgresql-data-partitions
+  #          readyOnly: false
+  #    - name: conf
+  #      mountPath: /etc/telegraf
+  #      subPath: telegraf.conf
+  #      targetContainers:
+  #        - telegraf-sidecar
+  #      volumeSource:
+  #        configMap:
+  #          name: my-config-map
 
   enableShmVolume: false
   podAnnotations:
@@ -128,38 +128,38 @@ spec:
   serviceAnnotations:
     metallb.universe.tf/address-pool: main-pool
     metallb.universe.tf/loadBalancerIPs: 10.42.20.70
-#  podPriorityClassName: "spilo-pod-priority"
-#  tolerations:
-#  - key: postgres
-#    operator: Exists
-#    effect: NoSchedule
+  #  podPriorityClassName: "spilo-pod-priority"
+  #  tolerations:
+  #  - key: postgres
+  #    operator: Exists
+  #    effect: NoSchedule
   resources:
     requests:
       cpu: 10m
       memory: 100Mi
-#      hugepages-2Mi: 128Mi
-#      hugepages-1Gi: 1Gi
+    #      hugepages-2Mi: 128Mi
+    #      hugepages-1Gi: 1Gi
     limits:
       cpu: 500m
       memory: 500Mi
-#      hugepages-2Mi: 128Mi
-#      hugepages-1Gi: 1Gi
+  #      hugepages-2Mi: 128Mi
+  #      hugepages-1Gi: 1Gi
   patroni:
     failsafe_mode: false
     initdb:
       encoding: "UTF8"
       locale: "en_US.UTF-8"
       data-checksums: "true"
-#    pg_hba:
-#      - hostssl all all 0.0.0.0/0 md5
-#      - host    all all 0.0.0.0/0 md5
-#    slots:
-#      permanent_physical_1:
-#        type: physical
-#      permanent_logical_1:
-#        type: logical
-#        database: foo
-#        plugin: pgoutput
+    #    pg_hba:
+    #      - hostssl all all 0.0.0.0/0 md5
+    #      - host    all all 0.0.0.0/0 md5
+    #    slots:
+    #      permanent_physical_1:
+    #        type: physical
+    #      permanent_logical_1:
+    #        type: logical
+    #        database: foo
+    #        plugin: pgoutput
     ttl: 30
     loop_wait: 30
     retry_timeout: 14
@@ -168,43 +168,43 @@ spec:
     synchronous_node_count: 1
     maximum_lag_on_failover: 33554432
 
-# restore a Postgres DB with point-in-time-recovery
-# with a non-empty timestamp, clone from an S3 bucket using the latest backup before the timestamp
-# with an empty/absent timestamp, clone from an existing alive cluster using pg_basebackup
-#  clone:
-#    uid: "efd12e58-5786-11e8-b5a7-06148230260c"
-#    cluster: "acid-minimal-cluster"
-#    timestamp: "2017-12-19T12:40:33+01:00"  # timezone required (offset relative to UTC, see RFC 3339 section 5.6)
-#    s3_wal_path: "s3://custom/path/to/bucket"
+  # restore a Postgres DB with point-in-time-recovery
+  # with a non-empty timestamp, clone from an S3 bucket using the latest backup before the timestamp
+  # with an empty/absent timestamp, clone from an existing alive cluster using pg_basebackup
+  #  clone:
+  #    uid: "efd12e58-5786-11e8-b5a7-06148230260c"
+  #    cluster: "acid-minimal-cluster"
+  #    timestamp: "2017-12-19T12:40:33+01:00"  # timezone required (offset relative to UTC, see RFC 3339 section 5.6)
+  #    s3_wal_path: "s3://custom/path/to/bucket"
 
-# run periodic backups with k8s cron jobs
+  # run periodic backups with k8s cron jobs
   enableLogicalBackup: true
   logicalBackupRetention: "1 week"
   logicalBackupSchedule: "0 2 * * *"
 
-#  maintenanceWindows:
-#  - 01:00-06:00  #UTC
-#  - Sat:00:00-04:00
+  #  maintenanceWindows:
+  #  - 01:00-06:00  #UTC
+  #  - Sat:00:00-04:00
 
-# overwrite custom properties for connection pooler deployments
-#  connectionPooler:
-#    numberOfInstances: 2
-#    mode: "transaction"
-#    schema: "pooler"
-#    user: "pooler"
-#    maxDBConnections: 60
-#    resources:
-#      requests:
-#        cpu: 300m
-#        memory: 100Mi
-#      limits:
-#        cpu: "1"
-#        memory: 100Mi
+  # overwrite custom properties for connection pooler deployments
+  #  connectionPooler:
+  #    numberOfInstances: 2
+  #    mode: "transaction"
+  #    schema: "pooler"
+  #    user: "pooler"
+  #    maxDBConnections: 60
+  #    resources:
+  #      requests:
+  #        cpu: 300m
+  #        memory: 100Mi
+  #      limits:
+  #        cpu: "1"
+  #        memory: 100Mi
 
   initContainers:
-  - name: date
-    image: busybox
-    command: [ "/bin/date" ]
+    - name: date
+      image: busybox
+      command: ["/bin/date"]
 
   sidecars:
     - name: postgres-exporter
@@ -233,20 +233,20 @@ spec:
 
   # Custom TLS certificate. Disabled unless tls.secretName has a value.
   tls:
-    secretName: ""  # should correspond to a Kubernetes Secret resource to load
+    secretName: "" # should correspond to a Kubernetes Secret resource to load
     certificateFile: "tls.crt"
     privateKeyFile: "tls.key"
-    caFile: ""  # optionally configure Postgres with a CA certificate
+    caFile: "" # optionally configure Postgres with a CA certificate
     caSecretName: "" # optionally the ca.crt can come from this secret instead.
-# file names can be also defined with absolute path, and will no longer be relative
-# to the "/tls/" path where the secret is being mounted by default, and "/tlsca/"
-# where the caSecret is mounted by default.
-# When TLS is enabled, also set spiloFSGroup parameter above to the relevant value.
-# if unknown, set it to 103 which is the usual value in the default spilo images.
-# In Openshift, there is no need to set spiloFSGroup/spilo_fsgroup.
+  # file names can be also defined with absolute path, and will no longer be relative
+  # to the "/tls/" path where the secret is being mounted by default, and "/tlsca/"
+  # where the caSecret is mounted by default.
+  # When TLS is enabled, also set spiloFSGroup parameter above to the relevant value.
+  # if unknown, set it to 103 which is the usual value in the default spilo images.
+  # In Openshift, there is no need to set spiloFSGroup/spilo_fsgroup.
 
-# Add node affinity support by allowing postgres pods to schedule only on nodes that
-# have label: "postgres-operator:enabled" set.
+  # Add node affinity support by allowing postgres pods to schedule only on nodes that
+  # have label: "postgres-operator:enabled" set.
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
@@ -255,7 +255,6 @@ spec:
               operator: In
               values:
                 - arm64
-
 
 # Enables change data capture streams for defined database tables
 #  streams:
