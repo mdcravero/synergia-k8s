@@ -40,7 +40,8 @@ spec:
             # ---- Proxy ----
             - name: HBOX_BASE_URL
               value: https://homebox.synergia.net.ar
-            - name: HBOX_TRUST_PROXY_HEADERS
+            # Required behind Traefik so OIDC redirect_uri uses https + public Host (see getBaseURL in oidc.go).
+            - name: HBOX_OPTIONS_TRUST_PROXY
               value: "true"
 
             # ---- Auth ----
