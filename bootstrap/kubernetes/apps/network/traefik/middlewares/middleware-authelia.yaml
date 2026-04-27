@@ -6,7 +6,8 @@ metadata:
   namespace: traefik
 spec:
   forwardAuth:
-    address: "http://authelia.security.svc.cluster.local/api/verify"
+    # Authelia v4.38+: /api/verify is not served; use /api/authz/forward-auth with Traefik ForwardAuth.
+    address: "http://authelia.security.svc.cluster.local/api/authz/forward-auth"
     trustForwardHeader: true
     authResponseHeaders:
       - "Remote-User"
