@@ -6,4 +6,4 @@ metadata:
   namespace: security
 spec:
   interval: 1h
-  url: https://charts.authelia.com/stable
+  url: https://charts.authelia.com
