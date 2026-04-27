@@ -10,6 +10,11 @@ data:
 
     secret:
       existingSecret: secret-authelia
+      additionalSecrets:
+        issuer:
+          items:
+            - key: issuer_private.pem
+              path: issuer_private.pem
 
     rbac:
       enabled: true
@@ -82,7 +87,7 @@ data:
               algorithm: RS256
               use: sig
               key:
-                path: /secrets/issuer_private.pem
+                path: /secrets/issuer/issuer_private.pem
           clients:
             - client_id: homebox
               client_name: Homebox
