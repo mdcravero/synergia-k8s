@@ -45,7 +45,7 @@ spec:
               secretKeyRef:
                 name: diun-secret 
                 key: telegram-chat-id
-            - name: DIUN_NOTIF_TELEGRAM_BOTTOKEN
+            - name: DIUN_NOTIF_TELEGRAM_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: diun-secret 
