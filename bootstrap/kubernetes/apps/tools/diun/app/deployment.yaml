@@ -40,9 +40,9 @@ spec:
               value: "true"
             - name: DIUN_NOTIF_TELEGRAM_CHATIDS
               valueFrom:
-              secretKeyRef:
-                name: diun-secret 
-                key: telegram-chat-id
+                secretKeyRef:
+                  name: diun-secret 
+                  key: telegram-chat-id
             - name: DIUN_NOTIF_TELEGRAM_TOKEN
               valueFrom:
                 secretKeyRef:
