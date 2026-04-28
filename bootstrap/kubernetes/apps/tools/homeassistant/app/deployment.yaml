@@ -24,7 +24,7 @@ spec:
             claimName: home-assistant-data
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:2026.4.2
+          image: homeassistant/home-assistant:2026.4.4
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
