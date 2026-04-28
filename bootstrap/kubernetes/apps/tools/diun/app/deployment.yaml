@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: tools
+  name: diun
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diun
+  template:
+    metadata:
+      labels:
+        app: diun
+      annotations:
+        diun.enable: "true"
+        diun.notify: "telegram"
+        diun.watch_repo: "true"
+    spec:
+      serviceAccountName: diun
+      containers:
+        - name: diun
+          image: crazymax/diun:4.31.0
+          imagePullPolicy: Always
+          args: ["serve"]
+          env:
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_JSON
+              value: "false"
+            - name: DIUN_WATCH_WORKERS
+              value: "20"
+            - name: DIUN_WATCH_SCHEDULE
+              value: "0 */6 * * *"
+            - name: DIUN_WATCH_JITTER
+              value: "30s"
+            - name: DIUN_PROVIDERS_KUBERNETES
+              value: "true"
+            - name: DIUN_WATCH_BYDEFAULT
+              value: "true"
+            - name: DIUN_NOTIF_TELEGRAM_CHATID
+              valueFrom:
+              secretKeyRef:
+                name: diun-secret 
+                key: telegram-chat-id
+            - name: DIUN_NOTIF_TELEGRAM_BOTTOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: diun-secret 
+                  key: telegram-bot-token
+          volumeMounts:
+            - mountPath: "/data"
+              name: "data"
+      restartPolicy: Always
+      volumes:
+        - name: "data"
+          persistentVolumeClaim:
+            claimName: diun-data
+
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8080
+        initialDelaySeconds: 30
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 5
+
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "100m"
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
