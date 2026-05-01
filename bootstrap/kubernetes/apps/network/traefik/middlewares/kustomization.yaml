@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - middleware-authelia.yaml
   - middleware-homebox.yaml
-  - middleware-authelia-monitoring.yam
+  - middleware-authelia-monitoring.yaml
