@@ -45,7 +45,7 @@ data:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.tls: "true"
           traefik.ingress.kubernetes.io/router.tls.certresolver: le
-          traefik.ingress.kubernetes.io/router.middlewares: traefik/middlewares-authelia@kubernetescrd
+          traefik.ingress.kubernetes.io/router.middlewares: middlewares-authelia@kubernetescrd
 
     kube-state-metrics:
       enabled: true
