@@ -64,6 +64,8 @@ data:
             policy: one_factor
           - domain: traefik-dash.synergia.net.ar
             policy: one_factor
+          - domain: prometheus.synergia.net.ar
+            policy: one_factor
       storage:
         postgres:
           enabled: true
