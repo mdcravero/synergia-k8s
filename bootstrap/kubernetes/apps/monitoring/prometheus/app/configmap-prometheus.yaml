@@ -45,7 +45,7 @@ data:
           traefik.ingress.kubernetes.io/router.entrypoints: websecure
           traefik.ingress.kubernetes.io/router.tls: "true"
           traefik.ingress.kubernetes.io/router.tls.certresolver: le
-          traefik.ingress.kubernetes.io/router.middlewares: middlewares-auth-prometheus@kubernetescrd
+           traefik.ingress.kubernetes.io/router.middlewares: monitoring-middlewares-auth-prometheus@kubernetescrd
 
     kube-state-metrics:
       enabled: true
