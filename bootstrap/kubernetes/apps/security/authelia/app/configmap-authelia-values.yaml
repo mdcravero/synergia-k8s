@@ -41,18 +41,17 @@ data:
       tls:
         enabled: true
 
-    configMap:
-      server:
-        endpoints:
-          authz:
-            forward-auth:
-              implementation: ForwardAuth
-      session:
-        cookies:
-          - domain: synergia.net.ar
-            subdomain: auth
-            authelia_url: https://auth.synergia.net.ar
-        same_site: lax
+     configMap:
+       server:
+         endpoints:
+           authz:
+             forward-auth:
+               implementation: ForwardAuth
+        session:
+          cookies:
+            - domain: synergia.net.ar
+              subdomain: auth
+          same_site: lax
       authentication_backend:
         file:
           enabled: true
