@@ -157,7 +157,7 @@ data:
                 expr: |
                   sum by (instance, job) (
                     pg_stat_database_numbackends{job="kubernetes-pods-tools",datname!~"template.*"}
-                  ) >= 8
+                  ) >= 15
                 for: 5m
                 labels:
                   severity: warning
