@@ -1,43 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trans-shows
-  namespace: media
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: trans-shows
-  template:
-    metadata:
-      labels:
-        app: trans-shows
-    spec:
-      containers:
-        - name: trans-shows
-          image: "lscr.io/linuxserver/transmission:latest"
-          ports:
-            - containerPort: 9091
-          env:
-            - name: PUID
-              value: "1000"
-            - name: PGID
-              value: "1000"
-            - name: TZ
-              value: "America/Argentina/Cordoba"
-            - name: USER
-              valueFrom:
-                secretKeyRef:
-                  name: secret-transmission-shows
-                  key: username
-            - name: PASS
-              valueFrom:
-                secretKeyRef:
-                  name: secret-transmission-shows
-                  key: password
-            apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: trans-movies
   namespace: media
 spec:
@@ -97,10 +60,3 @@ spec:
               mountPath: /config
             - name: downloads
               mountPath: /downloads
-      volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: trans-shows-config
-        - name: downloads
-          persistentVolumeClaim:
-            claimName: trans-shows-down
