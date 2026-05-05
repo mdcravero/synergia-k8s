@@ -14,7 +14,7 @@ spec:
         app: trans-shows
     spec:
       containers:
-         - name: trans-shows
+        - name: trans-shows
           image: "lscr.io/linuxserver/transmission:4.1.1"
           ports:
             - containerPort: 9091
@@ -47,10 +47,10 @@ spec:
               mountPath: /config
             - name: downloads
               mountPath: /downloads
-       volumes:
-          - name: config
-            persistentVolumeClaim:
-              claimName: trans-shows-config
-          - name: downloads
-            persistentVolumeClaim:
-              claimName: trans-shows-down
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: trans-shows-config
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: trans-shows-down
