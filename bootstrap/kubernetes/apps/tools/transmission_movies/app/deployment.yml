@@ -35,6 +35,12 @@ spec:
                 secretKeyRef:
                   name: secret-transmission-movies
                   key: password
+            - name: TRANSMISSION_BLOCKLIST_ENABLED
+              value: "true"
+            - name: TRANSMISSION_BLOCKLIST_URL
+              value: "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
+            - name: TRANSMISSION_BLOCKLIST_DAYS
+              value: "7" 
           volumeMounts:
             - name: config
               mountPath: /config

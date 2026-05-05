@@ -35,6 +35,62 @@ spec:
                 secretKeyRef:
                   name: secret-transmission-shows
                   key: password
+            apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trans-movies
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trans-movies
+  template:
+    metadata:
+      labels:
+        app: trans-movies
+    spec:
+      containers:
+        - name: trans-movies
+          image: "lscr.io/linuxserver/transmission:latest"
+          ports:
+            - containerPort: 9091
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-transmission-movies
+                  key: username
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-transmission-movies
+                  key: password
+            # Blocklist with URL
+            - name: TRANSMISSION_BLOCKLIST_ENABLED
+              value: "true"
+            - name: TRANSMISSION_BLOCKLIST_URL
+              value: "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz"
+            - name: TRANSMISSION_BLOCKLIST_DAYS
+              value: "7"  # Auto-update weekly
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: downloads
+              mountPath: /downloads
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: trans-movies-config
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: trans-movies-down
           #Sonarr depens on to downloads folder to move shows
           volumeMounts:
             - name: config
