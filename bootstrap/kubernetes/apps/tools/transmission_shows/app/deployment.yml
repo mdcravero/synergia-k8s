@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: trans-movies
+  name: trans-shows
   namespace: media
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: trans-movies
+      app: trans-shows
   template:
     metadata:
       labels:
-        app: trans-movies
+        app: trans-shows
     spec:
       containers:
-        - name: trans-movies
+         - name: trans-shows
           image: "lscr.io/linuxserver/transmission:4.1.1"
           ports:
             - containerPort: 9091
@@ -47,16 +47,10 @@ spec:
               mountPath: /config
             - name: downloads
               mountPath: /downloads
-      volumes:
-        - name: config
-          persistentVolumeClaim:
-            claimName: trans-movies-config
-        - name: downloads
-          persistentVolumeClaim:
-            claimName: trans-movies-down
-          #Sonarr depens on to downloads folder to move shows
-          volumeMounts:
-            - name: config
-              mountPath: /config
-            - name: downloads
-              mountPath: /downloads
+       volumes:
+          - name: config
+            persistentVolumeClaim:
+              claimName: trans-shows-config
+          - name: downloads
+            persistentVolumeClaim:
+              claimName: trans-shows-down
