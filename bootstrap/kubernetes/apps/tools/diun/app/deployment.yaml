@@ -31,11 +31,11 @@ spec:
             - name: LOG_JSON
               value: "false"
             - name: DIUN_WATCH_WORKERS
-              value: "20"
+              value: "5"
             - name: DIUN_WATCH_SCHEDULE
               value: "0 */6 * * *"
             - name: DIUN_WATCH_JITTER
-              value: "30s"
+              value: "60s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
             - name: DIUN_NOTIF_TELEGRAM_CHATIDS
@@ -72,8 +72,8 @@ spec:
 
       resources:
         requests:
-          memory: "64Mi"
+          memory: "128Mi"
           cpu: "100m"
         limits:
-          memory: "128Mi"
+          memory: "256Mi"
           cpu: "500m"
