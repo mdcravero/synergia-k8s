@@ -334,6 +334,8 @@ data:
       logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.1"
       # use secret for backup job environment variables
       logical_backup_cronjob_environment_secret: "secret-zalando-s3-bkp"
+      logical_backup_node_selector:
+        kubernetes.io/arch: arm64
 
     # automate creation of human users with teams API service
     configTeamsApi:
