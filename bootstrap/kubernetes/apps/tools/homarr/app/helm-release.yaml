@@ -5,9 +5,9 @@ metadata:
   name: homarr
   namespace: tools
 spec:
-  dependsOn:
-    - name: authelia
-      namespace: security
+  # dependsOn:
+  #   - name: authelia
+  #     namespace: security
   chart:
     spec:
       chart: homarr
