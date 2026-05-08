@@ -51,18 +51,6 @@ spec:
           volumeMounts:
             - mountPath: "/data"
               name: "data"
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 5
           resources:
             requests:
               memory: "128Mi"
