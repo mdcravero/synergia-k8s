@@ -13,8 +13,8 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: traefik
-      version: 38.0.0
-  interval: 1m0s
+      version: 39.0.0
+  interval: 1h
   releaseName: traefik
   valuesFrom:
     - kind: ConfigMap
