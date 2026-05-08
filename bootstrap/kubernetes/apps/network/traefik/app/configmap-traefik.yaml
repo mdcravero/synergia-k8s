@@ -13,6 +13,17 @@ data:
        access:
          enabled: true
          format: json
+    
+    metris:
+      prometheus:
+        service:
+          enabled: true
+          labels: {}
+          annotations: {}
+        serviceMonitor:
+          enabled: true
+          apiVersion: "monitoring.coreos.com/v1"
+
 
     additionalArguments:
       - "--certificatesresolvers.le-staging.acme.tlschallenge=true"
