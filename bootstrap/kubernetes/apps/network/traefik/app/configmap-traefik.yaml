@@ -14,7 +14,7 @@ data:
          enabled: true
          format: json
     
-    metris:
+    metrics:
       prometheus:
         service:
           enabled: true
