@@ -21,8 +21,7 @@ data:
           labels: {}
           annotations: {}
         serviceMonitor:
-          enabled: true
-          apiVersion: "monitoring.coreos.com/v1"
+          enabled: false
 
 
     additionalArguments:
