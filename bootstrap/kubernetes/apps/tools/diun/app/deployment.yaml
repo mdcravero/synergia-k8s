@@ -38,6 +38,10 @@ spec:
               value: "60s"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
+            - name: DIUN_PROVIDERS_KUBERNETES_WATCHBYDEFAULT
+              value: "true"
+            - name: DIUN_PROVIDERS_KUBERNETES_NAMESPACES
+              value: "tools,media,monitoring,security,metallb-system,cert-manager,traefik,nfs-storage,backup-system"
             - name: DIUN_NOTIF_TELEGRAM_CHATIDS
               valueFrom:
                 secretKeyRef:
