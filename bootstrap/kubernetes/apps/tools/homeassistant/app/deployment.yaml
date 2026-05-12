@@ -8,6 +8,8 @@ metadata:
   namespace: tools
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: home-assistant
@@ -24,7 +26,7 @@ spec:
             claimName: home-assistant-data
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:2026.4.4
+          image: homeassistant/home-assistant:2026.5.1
           imagePullPolicy: IfNotPresent
           env:
             - name: TZ
@@ -46,21 +48,24 @@ spec:
               name: http
               protocol: TCP
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: 8123
             initialDelaySeconds: 0
             failureThreshold: 3
             timeoutSeconds: 1
             periodSeconds: 10
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: 8123
             initialDelaySeconds: 0
             failureThreshold: 3
             timeoutSeconds: 1
             periodSeconds: 10
           startupProbe:
-            tcpSocket:
+            httpGet:
+              path: /
               port: 8123
             initialDelaySeconds: 0
             failureThreshold: 30
