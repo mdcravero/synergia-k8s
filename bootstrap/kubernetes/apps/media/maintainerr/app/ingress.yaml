@@ -7,7 +7,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     traefik.ingress.kubernetes.io/router.tls.certresolver: le
-    traefik.ingress.kubernetes.io/router.middlewares: traefik-middlewares-authelia@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: media-middlewares-auth-maintainerr@kubernetescrd
 spec:
   rules:
     - host: maintainerr.synergia.net.ar

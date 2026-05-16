@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: middlewares-auth-maintainerr
+  namespace: media
+spec:
+  forwardAuth:
+    address: "http://authelia.security.svc.cluster.local/api/authz/forward-auth"
+    trustForwardHeader: true
+    authResponseHeaders:
+      - "Remote-User"
+      - "Remote-Groups"
+      - "Remote-Email"
+      - "Remote-Name"
+      - "Remote-Given-Name"
+      - "Remote-Family-Name"
