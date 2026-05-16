@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: maintainerr
+  name: maintainerr
+  namespace: media
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: maintainerr
+  template:
+    metadata:
+      labels:
+        run: maintainerr
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - env:
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+          image: ghcr.io/jorenn92/maintainerr:2
+          name: maintainerr
+          ports:
+            - containerPort: 6246
+              name: webui
+          volumeMounts:
+            - name: data
+              mountPath: /opt/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: maintainerr-data
