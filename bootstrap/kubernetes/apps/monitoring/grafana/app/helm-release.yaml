@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: grafana
       version: 12.3.3
-  interval: 5m
+  interval: 1h
   timeout: 15m
   releaseName: grafana
   valuesFrom:
