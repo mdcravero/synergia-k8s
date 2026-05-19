@@ -15,8 +15,8 @@ spec:
         kind: HelmRepository
         name: n8n
         namespace: tools
-      version: 1.16.39
-  interval: 1m0s
+      version: 1.16.40
+  interval: 1h
   releaseName: n8n
   valuesFrom:
     - kind: ConfigMap
