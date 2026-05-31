@@ -17,6 +17,8 @@ spec:
     metadata:
       labels:
         run: sonarr
+      annotations:
+        diun.watch_repo: "true"
     spec:
       securityContext:
         fsGroup: 1000

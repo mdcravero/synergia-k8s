@@ -17,6 +17,8 @@ spec:
     metadata:
       labels:
         run: jellyseerr
+      annotations:
+        diun.watch_repo: "true"
     spec:
       containers:
         - env:

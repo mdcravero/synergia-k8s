@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: homebox
+      annotations:
+        diun.watch_repo: "true"
     spec:
       securityContext:
         fsGroup: 1000

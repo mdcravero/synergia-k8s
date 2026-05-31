@@ -6,6 +6,9 @@ metadata:
   namespace: tools
 data:
   values.yaml: |
+    podAnnotations:
+      diun.watch_repo: "true"
+
     image:
       repository: n8nio/n8n
       pullPolicy: IfNotPresent
