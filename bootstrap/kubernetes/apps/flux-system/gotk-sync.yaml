@@ -124,6 +124,8 @@ metadata:
   name: apps-secrets-config
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: apps-namespaces
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/secrets
   prune: true
@@ -143,6 +145,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-secrets-config
+    - name: apps-traefik-middlewares
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/tools
   prune: true
@@ -158,6 +161,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-secrets-config
+    - name: apps-traefik-middlewares
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/monitoring
   prune: true
@@ -173,6 +177,7 @@ metadata:
 spec:
   dependsOn:
     - name: apps-secrets-config
+    - name: apps-traefik-middlewares
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/security/authelia
   prune: true
@@ -188,6 +193,8 @@ metadata:
 spec:
   dependsOn:
     - name: apps-authelia
+    - name: apps-storage
+    - name: apps-traefik-middlewares
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/declarations
   prune: true
