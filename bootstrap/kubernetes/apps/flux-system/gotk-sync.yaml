@@ -124,8 +124,6 @@ metadata:
   name: apps-secrets-config
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: apps-bitwarden
   interval: 5m0s
   path: ./bootstrap/kubernetes/apps/secrets
   prune: true
