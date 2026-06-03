@@ -14,8 +14,7 @@ spec:
     metadata:
       labels:
         run: jellyfin
-      annotations:
-        diun.watch_repo: "true"
+      annotations: {}
     spec:
       securityContext:
         supplementalGroups:

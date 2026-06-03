@@ -15,7 +15,6 @@ spec:
       annotations:
         diun.enable: "true"
         diun.notify: "telegram"
-        diun.watch_repo: "true"
     spec:
       serviceAccountName: diun
       containers:
