@@ -15,8 +15,7 @@ spec:
     metadata:
       labels:
         run: bazarr
-      annotations:
-        diun.watch_repo: "true"
+      annotations: {}
     spec:
       securityContext:
         # runAsUser: 1000
