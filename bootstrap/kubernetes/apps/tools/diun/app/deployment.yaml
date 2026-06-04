@@ -35,6 +35,8 @@ spec:
               value: "0 */6 * * *"
             - name: DIUN_WATCH_JITTER
               value: "60s"
+            - name: DIUN_DEFAULTS_EXCLUDETAGS
+              value: ".*(unstable|nightly|development|beta|alpha|rc).*"
             - name: DIUN_PROVIDERS_KUBERNETES
               value: "true"
             - name: DIUN_PROVIDERS_KUBERNETES_WATCHBYDEFAULT
