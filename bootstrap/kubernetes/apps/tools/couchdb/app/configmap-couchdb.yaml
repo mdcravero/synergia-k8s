@@ -46,10 +46,8 @@ data:
         traefik.ingress.kubernetes.io/router.tls: "true"
         traefik.ingress.kubernetes.io/router.tls.certresolver: le
       hosts:
-        - host: couchdb.synergia.net.ar
-          paths:
-            - path: /
-              pathType: Prefix
+        - couchdb.synergia.net.ar
+      path: /
       tls:
         - hosts:
             - couchdb.synergia.net.ar
