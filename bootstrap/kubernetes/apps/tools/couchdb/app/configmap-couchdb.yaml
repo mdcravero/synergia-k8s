@@ -14,8 +14,6 @@ data:
 
     # CouchDB configuration for Obsidian LiveSync CORS requirements
     couchdbConfig:
-      couchdb:
-        uuid: "REPLACE_WITH_UUID"  # generate with: uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '-'
       httpd:
         enable_cors: "true"
         bind_address: "0.0.0.0"
@@ -68,15 +66,6 @@ data:
       limits:
         cpu: 500m
         memory: 512Mi
-
-    # Security context
-    podSecurityContext:
-      fsGroup: 5984
-
-    securityContext:
-      runAsNonRoot: true
-      runAsUser: 5984
-      runAsGroup: 5984
 
     # ARM64 node selection
     nodeSelector:
