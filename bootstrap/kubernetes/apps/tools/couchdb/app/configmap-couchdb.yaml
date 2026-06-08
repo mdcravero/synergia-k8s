@@ -14,6 +14,8 @@ data:
 
     # CouchDB configuration for Obsidian LiveSync CORS requirements
     couchdbConfig:
+      couchdb:
+        uuid: "c31d19dd02594378b84ddcf1b045b820"
       httpd:
         enable_cors: "true"
         bind_address: "0.0.0.0"
