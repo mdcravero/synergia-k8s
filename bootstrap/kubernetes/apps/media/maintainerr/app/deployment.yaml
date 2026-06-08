@@ -24,7 +24,7 @@ spec:
         - env:
             - name: TZ
               value: "America/Argentina/Cordoba"
-          image: maintainerr/maintainerr:3.11.2
+          image: maintainerr/maintainerr:3.14.0
           name: maintainerr
           ports:
             - containerPort: 6246
