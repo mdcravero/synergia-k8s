@@ -9,9 +9,8 @@ data:
     # Single-node cluster suitable for Obsidian Self-hosted LiveSync
     clusterSize: 1
 
-    # Use existing secret instead of creating one
+    # Disable auto-creation — secret couchdb-couchdb is managed via SOPS
     createAdminSecret: false
-    existingSecret: "secret-couchdb"
 
     # CouchDB configuration for Obsidian LiveSync CORS requirements
     couchdbConfig:
