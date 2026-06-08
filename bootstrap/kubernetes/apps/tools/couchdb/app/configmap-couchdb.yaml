@@ -1,0 +1,104 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: couchdb-values
+  namespace: tools
+data:
+  values.yaml: |
+    # Single-node cluster suitable for Obsidian Self-hosted LiveSync
+    clusterSize: 1
+
+    # Use existing secret instead of creating one
+    createAdminSecret: false
+    existingSecret: "secret-couchdb"
+
+    # CouchDB configuration for Obsidian LiveSync CORS requirements
+    couchdbConfig:
+      couchdb:
+        uuid: "REPLACE_WITH_UUID"  # generate with: uuidgen | tr '[:upper:]' '[:lower:]' | tr -d '-'
+      httpd:
+        enable_cors: "true"
+        bind_address: "0.0.0.0"
+        WWW-Authenticate: 'Basic realm="administrator"'
+      cors:
+        origins: "*"
+        credentials: "true"
+        methods: "GET, PUT, POST, HEAD, DELETE"
+        headers: "accept, authorization, content-type, origin, referer"
+      chttpd:
+        require_valid_user: "true"
+        max_http_request_size: "4294967296"
+      chttpd_auth:
+        require_valid_user: "true"
+        authentication_redirect: "/_utils/session.html"
+
+    # Service
+    service:
+      type: ClusterIP
+      externalPort: 5984
+
+    # Ingress with Traefik
+    ingress:
+      enabled: true
+      className: "traefik"
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+        traefik.ingress.kubernetes.io/router.tls.certresolver: le
+      hosts:
+        - host: couchdb.synergia.net.ar
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - couchdb.synergia.net.ar
+
+    # Persistence
+    persistentVolume:
+      enabled: true
+      storageClass: "nfs-client"
+      accessModes:
+        - ReadWriteOnce
+      size: "10Gi"
+
+    # Resources
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+    # Security context
+    podSecurityContext:
+      fsGroup: 5984
+
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 5984
+      runAsGroup: 5984
+
+    # ARM64 node selection
+    nodeSelector:
+      kubernetes.io/arch: arm64
+
+    tolerations: []
+    affinity: {}
+
+    # Liveness / readiness
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 3
+
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      timeoutSeconds: 10
+      failureThreshold: 6
