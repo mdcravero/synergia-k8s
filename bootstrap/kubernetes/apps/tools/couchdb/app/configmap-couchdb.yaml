@@ -69,6 +69,12 @@ data:
         cpu: 500m
         memory: 512Mi
 
+    # Run as couchdb user directly — skips the root chown step that NFS root_squash rejects
+    containerSecurityContext:
+      runAsUser: 5984
+      runAsGroup: 5984
+      runAsNonRoot: true
+
     # ARM64 node selection
     nodeSelector:
       kubernetes.io/arch: arm64
