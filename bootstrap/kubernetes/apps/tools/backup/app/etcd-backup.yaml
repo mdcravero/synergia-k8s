@@ -1,0 +1,108 @@
+---
+# Prerequisito: crear el Secret con el talosconfig antes de activar este CronJob.
+#
+#   kubectl create secret generic talosconfig \
+#     --from-file=config=/path/to/synergia-k8s-talos/talosconfig \
+#     -n backup-system
+#
+# O via External Secrets si usás Bitwarden/Vault (recomendado para GitOps).
+# El Secret debe tener una key "config" con el contenido del talosconfig.
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-backup
+  namespace: backup-system
+  labels:
+    app.kubernetes.io/name: etcd-backup
+    app.kubernetes.io/component: backup
+    app.kubernetes.io/part-of: synergia-k8s
+spec:
+  schedule: "0 3 * * *"          # Diario a las 3 AM
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14
+  concurrencyPolicy: Forbid       # Evita solapamiento si el job tarda más de 24hs
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: etcd-backup
+            image: rclone/rclone:latest
+            command:
+            - sh
+            - -c
+            - |
+              set -e
+              TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+              SNAPSHOT_FILE="/tmp/etcd-${TIMESTAMP}.db"
+
+              echo "[$(date)] Descargando talosctl ${TALOS_VERSION} (arm64)..."
+              wget -q -O /tmp/talosctl \
+                "https://github.com/siderolabs/talos/releases/download/${TALOS_VERSION}/talosctl-linux-arm64"
+              chmod +x /tmp/talosctl
+
+              echo "[$(date)] Tomando snapshot de etcd..."
+              /tmp/talosctl etcd snapshot "${SNAPSHOT_FILE}" \
+                --talosconfig /talosconfig/config \
+                -e "${TALOS_ENDPOINT}" \
+                -n "${TALOS_NODE}"
+
+              echo "[$(date)] Snapshot generado: $(du -sh ${SNAPSHOT_FILE} | cut -f1)"
+
+              echo "[$(date)] Subiendo a Mega.nz en ${MEGA_PATH}..."
+              rclone copy "${SNAPSHOT_FILE}" "mega:${MEGA_PATH}/" --progress
+
+              echo "[$(date)] Rotando snapshots antiguos (reteniendo últimos ${RETENTION_COUNT})..."
+              rclone ls "mega:${MEGA_PATH}/" \
+                | sort -k2 \
+                | head -n "-${RETENTION_COUNT}" \
+                | awk '{print $2}' \
+                | while read f; do
+                    echo "Eliminando snapshot viejo: $f"
+                    rclone deletefile "mega:${MEGA_PATH}/${f}"
+                  done
+
+              rm -f "${SNAPSHOT_FILE}"
+              echo "[$(date)] Backup completo: etcd-${TIMESTAMP}.db"
+            env:
+            - name: TALOS_VERSION
+              value: "v1.10.6"
+            - name: TALOS_ENDPOINT
+              value: "10.42.20.4"          # VIP del cluster
+            - name: TALOS_NODE
+              value: "10.42.20.5"          # Nodo sobre el que se toma el snapshot
+            - name: MEGA_PATH
+              value: "backups/etcd/synergia-k8s"
+            - name: RETENTION_COUNT
+              value: "7"                   # Snapshots a conservar
+            - name: RCLONE_CONFIG_MEGA_TYPE
+              value: "mega"
+            - name: RCLONE_CONFIG_MEGA_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: username
+            - name: RCLONE_CONFIG_MEGA_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mega-credentials
+                  key: password
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+            volumeMounts:
+            - name: talosconfig
+              mountPath: /talosconfig
+              readOnly: true
+          volumes:
+          - name: talosconfig
+            secret:
+              secretName: talosconfig

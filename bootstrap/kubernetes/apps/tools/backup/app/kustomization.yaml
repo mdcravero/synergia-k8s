@@ -12,6 +12,9 @@ resources:
   - backup-jobs.yaml
   - scheduled-backups.yaml
 
+  # etcd backup (requiere Secret "talosconfig" creado previamente)
+  # - etcd-backup.yaml
+
   # Examples (commented out by default)
   # - examples-postgresql.yaml
   # - examples-filesystem.yaml
