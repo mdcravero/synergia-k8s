@@ -99,7 +99,14 @@ spec:
                   key: database-password
             - name: HBOX_DATABASE_SSL_MODE
               value: require
-            
+
+            # ---- Security ----
+            - name: HBOX_AUTH_API_KEY_PEPPER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-homebox
+                  key: api-key-pepper
+
 
           volumeMounts:
             - name: data
