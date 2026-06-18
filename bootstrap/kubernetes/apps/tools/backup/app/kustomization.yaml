@@ -5,41 +5,15 @@ metadata:
   name: backup-system
 
 resources:
-  # Core infrastructure
-  - deployment-rclone.yaml
+  - etcd-backup.yaml
 
-  # Backup jobs and templates
-  - backup-jobs.yaml
-  - scheduled-backups.yaml
-
-  # etcd backup (requiere Secret "talosconfig" creado previamente)
-  # - etcd-backup.yaml
-
-  # Examples (commented out by default)
-  # - examples-postgresql.yaml
-  # - examples-filesystem.yaml
-
-# Common labels for all resources
-commonLabels:
-  app.kubernetes.io/name: backup-system
-  app.kubernetes.io/component: mega-backup
-  app.kubernetes.io/part-of: synergia-k8s
-
-# Namespace for all resources
 namespace: backup-system
 
-# Images configuration
+commonLabels:
+  app.kubernetes.io/name: backup-system
+  app.kubernetes.io/component: etcd-backup
+  app.kubernetes.io/part-of: synergia-k8s
+
 images:
   - name: rclone/rclone
     newTag: latest
-  - name: postgres
-    newTag: "16"
-
-# Resource configurations
-patchesStrategicMerge: []
-
-# JSON patches for specific configurations
-patches: []
-
-# Namespace override
-namespace: backup-system
