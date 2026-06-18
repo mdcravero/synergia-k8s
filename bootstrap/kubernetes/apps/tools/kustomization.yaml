@@ -12,4 +12,4 @@ resources:
   - ./homebox/app
   - ./diun/app
   - ./couchdb/app
-  # - ./backup/app
+  - ./backup/app
