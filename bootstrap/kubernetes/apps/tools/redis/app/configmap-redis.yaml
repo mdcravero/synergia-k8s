@@ -103,12 +103,11 @@ data:
         size: 8Gi
 
       service:
-        type: LoadBalancer
+        type: ClusterIP
         portNames:
           redis: "tcp-redis"
         ports:
           redis: 6379
-        loadBalancerIP: "10.42.20.71"
         
       serviceAccount:
         create: true

@@ -44,7 +44,7 @@ data:
     service:
       port: 7575
       targetPort: 7575
-      type: LoadBalancer
+      type: ClusterIP
 
     persistence:
       homarrDatabase:
