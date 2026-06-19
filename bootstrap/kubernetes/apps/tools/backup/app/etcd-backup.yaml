@@ -70,7 +70,7 @@ spec:
               echo "[$(date)] Backup completo: etcd-${TIMESTAMP}.db"
             env:
             - name: TALOS_VERSION
-              value: "v1.10.6"
+              value: "v1.11.6"
             - name: TALOS_ENDPOINT
               value: "10.42.20.4"          # VIP del cluster
             - name: TALOS_NODE
@@ -84,13 +84,13 @@ spec:
             - name: RCLONE_CONFIG_MEGA_USER
               valueFrom:
                 secretKeyRef:
-                  name: mega-credentials
-                  key: username
+                  name: secret-mega
+                  key: mega-username
             - name: RCLONE_CONFIG_MEGA_PASS
               valueFrom:
                 secretKeyRef:
-                  name: mega-credentials
-                  key: password
+                  name: secret-mega
+                  key: mega-password
             resources:
               requests:
                 memory: "128Mi"
