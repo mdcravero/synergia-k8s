@@ -109,14 +109,11 @@ data:
         enabled: false
 
       extraEnvVars:
-        N8N_EDITOR_BASE_URL: "https://n8n.synergia.net.ar"
-        N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
         N8N_PROTOCOL: "https"
         N8N_PERSONALIZATION_ENABLED: "false"
         N8N_DIAGNOSTICS_ENABLED: "false"
         EXECUTIONS_DATA_SAVE_ON_ERROR: "all"
         EXECUTIONS_DATA_SAVE_ON_SUCCESS: "all"
-        GENERIC_TIMEZONE: "America/Buenos_Aires"
         WEBHOOK_URL: "https://n8n.synergia.net.ar"
         DB_POSTGRESDB_SSL_ENABLED: "true"
         DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"

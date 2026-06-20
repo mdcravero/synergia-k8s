@@ -224,9 +224,6 @@ data:
       # group ID with write-access to volumes (required to run Spilo as non-root process)
       spilo_fsgroup: 103
 
-      # UID of the postgres user in the container
-      spilo_uid: 1000
-
       # whether the Spilo container should run in privileged mode
       spilo_privileged: false
       # whether the Spilo container should run with additional permissions other than parent.
@@ -334,8 +331,6 @@ data:
       logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.1"
       # use secret for backup job environment variables
       logical_backup_cronjob_environment_secret: "secret-zalando-s3-bkp"
-      logical_backup_node_selector:
-        kubernetes.io/arch: arm64
 
     # automate creation of human users with teams API service
     configTeamsApi:
