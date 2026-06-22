@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prowlarr
-      version: 1.53.0
+      version: 1.54.0
   interval: 1h
   releaseName: prowlarr
   valuesFrom:
