@@ -27,6 +27,13 @@ spec:
               value: "Argentina/Cordoba/Arroyito"
           image: jellyfin/jellyfin:10.11.8
           name: jellyfin
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "4"
+              memory: 2Gi
           ports:
             - containerPort: 8096
               name: webui

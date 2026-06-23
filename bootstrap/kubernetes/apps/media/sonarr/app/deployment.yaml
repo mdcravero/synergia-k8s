@@ -31,6 +31,13 @@ spec:
               value: "America/Argentina/Cordoba"
           image: lscr.io/linuxserver/sonarr:version-4.0.17.2952
           name: sonarr
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           ports:
             - containerPort: 8989
               name: webui

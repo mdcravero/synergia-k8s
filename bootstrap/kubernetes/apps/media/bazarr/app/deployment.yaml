@@ -34,6 +34,13 @@ spec:
               value: "1000"
           image: linuxserver/bazarr:1.5.7-development
           name: bazarr
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
           ports:
             - containerPort: 6767
               name: webui

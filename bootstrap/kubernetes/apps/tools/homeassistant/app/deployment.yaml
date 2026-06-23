@@ -40,6 +40,13 @@ spec:
                 secretKeyRef:
                   name: secret-homeassistant-postgres
                   key: POSTGRES_URL
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
           volumeMounts:
             - mountPath: /config
               name: config
