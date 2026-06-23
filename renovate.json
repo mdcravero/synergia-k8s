@@ -1,0 +1,59 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "America/Argentina/Cordoba",
+  "schedule": ["before 9am on monday"],
+  "labels": ["renovate"],
+  "prConcurrentLimit": 10,
+  "flux": {
+    "fileMatch": ["(^|/)bootstrap/kubernetes/.+\\.ya?ml$"]
+  },
+  "kubernetes": {
+    "fileMatch": ["(^|/)bootstrap/kubernetes/.+\\.ya?ml$"]
+  },
+  "ignorePaths": [
+    "**/secret-*.yaml"
+  ],
+  "packageRules": [
+    {
+      "description": "Patch y digest: merge automático",
+      "matchUpdateTypes": ["patch", "digest"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Media stack: agrupar en un solo PR",
+      "matchPackageNames": [
+        "jellyfin/jellyfin",
+        "lscr.io/linuxserver/sonarr",
+        "lscr.io/linuxserver/radarr",
+        "linuxserver/bazarr",
+        "ghcr.io/seerr-team/seerr",
+        "maintainerr/maintainerr",
+        "lscr.io/linuxserver/transmission",
+        "crazymax/diun"
+      ],
+      "groupName": "media stack",
+      "automerge": false
+    },
+    {
+      "description": "Seguridad: siempre revisión manual",
+      "matchPackageNames": ["authelia"],
+      "automerge": false,
+      "labels": ["security", "renovate"]
+    },
+    {
+      "description": "Infraestructura: revisión manual",
+      "matchPackageNames": ["traefik", "cert-manager", "metallb"],
+      "automerge": false,
+      "labels": ["infrastructure", "renovate"]
+    },
+    {
+      "description": "Major versions: requiere aprobación manual desde el Dashboard",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "dependencyDashboardApproval": true,
+      "labels": ["breaking-change", "renovate"]
+    }
+  ]
+}
