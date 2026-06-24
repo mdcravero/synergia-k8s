@@ -16,13 +16,13 @@
   ],
   "packageRules": [
     {
-      "description": "Patch y digest: merge automático",
+      "description": "Patch and digest updates: auto-merge",
       "matchUpdateTypes": ["patch", "digest"],
       "automerge": true,
       "automergeType": "pr"
     },
     {
-      "description": "Media stack: agrupar en un solo PR",
+      "description": "Media stack: group all updates into a single PR",
       "matchPackageNames": [
         "jellyfin/jellyfin",
         "lscr.io/linuxserver/sonarr",
@@ -37,19 +37,19 @@
       "automerge": false
     },
     {
-      "description": "Seguridad: siempre revisión manual",
+      "description": "Security components: always require manual review",
       "matchPackageNames": ["authelia"],
       "automerge": false,
       "labels": ["security", "renovate"]
     },
     {
-      "description": "Infraestructura: revisión manual",
+      "description": "Infrastructure components: require manual review",
       "matchPackageNames": ["traefik", "cert-manager", "metallb"],
       "automerge": false,
       "labels": ["infrastructure", "renovate"]
     },
     {
-      "description": "Major versions: requiere aprobación manual desde el Dashboard",
+      "description": "Major versions: require manual approval from Dependency Dashboard",
       "matchUpdateTypes": ["major"],
       "automerge": false,
       "dependencyDashboardApproval": true,
