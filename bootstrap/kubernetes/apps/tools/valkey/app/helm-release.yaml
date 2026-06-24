@@ -1,0 +1,21 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: valkey
+  namespace: tools
+spec:
+  chart:
+    spec:
+      chart: valkey
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: valkey
+      version: 2.1.3
+  interval: 1h
+  releaseName: valkey
+  valuesFrom:
+    - kind: ConfigMap
+      name: valkey-values
+      valuesKey: values.yaml
