@@ -20,11 +20,11 @@ spec:
               imagePullPolicy: IfNotPresent
               resources:
                 requests:
-                  cpu: 100m
-                  memory: 256Mi
-                limits:
-                  cpu: 500m
+                  cpu: 200m
                   memory: 512Mi
+                limits:
+                  cpu: "1"
+                  memory: 1.5Gi
               env:
                 - name: RENOVATE_TOKEN
                   valueFrom:
@@ -41,3 +41,5 @@ spec:
                   value: info
                 - name: RENOVATE_GIT_AUTHOR
                   value: "Renovate Bot <bot@renovateapp.com>"
+                - name: NODE_OPTIONS
+                  value: "--max-old-space-size=1024"
