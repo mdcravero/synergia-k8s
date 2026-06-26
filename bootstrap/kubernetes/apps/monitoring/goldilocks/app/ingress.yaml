@@ -5,7 +5,7 @@ metadata:
   name: goldilocks
   namespace: monitoring
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: monitoring-middlewares-auth-goldilocks@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
