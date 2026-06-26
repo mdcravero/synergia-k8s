@@ -11,6 +11,5 @@ resources:
   - ./transmission_movies/app
   - ./transmission_shows/app
   - ./homebox/app
-  - ./diun/app
   - ./couchdb/app
   - ./backup/app

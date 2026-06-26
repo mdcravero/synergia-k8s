@@ -1,0 +1,17 @@
+name: Notify Telegram on Renovate PR
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  notify:
+    if: startsWith(github.head_ref, 'renovate/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram notification
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "parse_mode=HTML" \
+            -d "text=<b>Renovate PR #${{ github.event.pull_request.number }}</b>%0A${{ github.event.pull_request.title }}%0A%0A${{ github.event.pull_request.html_url }}"
