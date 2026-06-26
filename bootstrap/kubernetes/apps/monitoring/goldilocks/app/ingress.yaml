@@ -5,6 +5,9 @@ metadata:
   name: goldilocks
   namespace: monitoring
   annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: le
     traefik.ingress.kubernetes.io/router.middlewares: monitoring-middlewares-auth-goldilocks@kubernetescrd
 spec:
   ingressClassName: traefik
