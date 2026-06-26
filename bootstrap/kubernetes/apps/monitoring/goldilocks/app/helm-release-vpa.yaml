@@ -1,0 +1,24 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vpa
+  namespace: monitoring
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: vpa
+      version: "4.4.6"
+      sourceRef:
+        kind: HelmRepository
+        name: fairwinds-stable
+        namespace: monitoring
+  values:
+    # Only the recommender is needed — no automatic resource changes
+    recommender:
+      enabled: true
+    updater:
+      enabled: false
+    admissionController:
+      enabled: false

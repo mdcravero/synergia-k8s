@@ -4,3 +4,4 @@ resources:
   - ./grafana/app
   - ./loki-stack/app
   - ./prometheus/app
+  - ./goldilocks/app

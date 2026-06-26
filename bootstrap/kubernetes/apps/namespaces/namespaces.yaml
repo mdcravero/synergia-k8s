@@ -29,6 +29,7 @@ metadata:
   name: tools
   labels:
     name: tools
+    goldilocks.fairwinds.com/enabled: "true"
 ---
 apiVersion: v1
 kind: Namespace
@@ -43,6 +44,7 @@ metadata:
   name: media
   labels:
     name: media
+    goldilocks.fairwinds.com/enabled: "true"
     # Added PodSecurity privileged labels to allow jellyfin host device access
     pod-security.kubernetes.io/enforce: privileged
 ---
