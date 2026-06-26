@@ -31,7 +31,7 @@ spec:
           restartPolicy: OnFailure
           containers:
           - name: etcd-backup
-            image: rclone/rclone:latest
+            image: rclone/rclone:1.68.2
             command:
             - sh
             - -c
