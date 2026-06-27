@@ -5,3 +5,4 @@ resources:
   - middleware-homebox.yaml
   - middleware-authelia-monitoring.yaml
   - middleware-authelia-maintainerr.yaml
+  - middleware-authelia-goldilocks.yaml
