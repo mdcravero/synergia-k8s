@@ -49,6 +49,11 @@ data:
         - ReadWriteOnce
       size: 128Mi
 
+    ports:
+      web:
+        redirectTo:
+          port: websecure
+
     service:
       enabled: true
       single: true
