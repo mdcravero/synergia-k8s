@@ -5,5 +5,5 @@ metadata:
   name: homarr
   namespace: tools
 spec:
-  interval: 1m0s
-  url: https://homarr-labs.github.io/charts/
+  interval: 1h
+  url: https://raw.githubusercontent.com/homarr-labs/charts/helm-index
