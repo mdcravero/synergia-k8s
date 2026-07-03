@@ -25,14 +25,7 @@ data:
 
 
     additionalArguments:
-      - "--certificatesresolvers.le-staging.acme.tlschallenge=true"
-      - "--certificatesresolvers.le-staging.acme.email=synergia.soporte@gmail.com"
-      - "--certificatesresolvers.le-staging.acme.storage=/data/acme.json"
-      - "--certificatesresolvers.le-staging.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.le.acme.tlschallenge=true"
-      - "--certificatesresolvers.le.acme.email=synergia.soporte@gmail.com"
-      - "--certificatesresolvers.le.acme.storage=/data/acme.json"
-      - "--api.insecure=false" # No usar insecure en producción
+      - "--api.insecure=false"
       - "--api.dashboard=true"
 
     providers:

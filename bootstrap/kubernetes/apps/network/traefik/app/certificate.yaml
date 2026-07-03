@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: synergia-wildcard
+  namespace: traefik
+spec:
+  secretName: synergia-wildcard-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: "*.synergia.net.ar"
+  dnsNames:
+    - "*.synergia.net.ar"
+    - "synergia.net.ar"
