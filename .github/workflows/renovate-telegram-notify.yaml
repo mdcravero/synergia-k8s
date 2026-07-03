@@ -8,6 +8,8 @@ jobs:
   notify:
     if: startsWith(github.head_ref, 'renovate/')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Send Telegram notification
         run: |
