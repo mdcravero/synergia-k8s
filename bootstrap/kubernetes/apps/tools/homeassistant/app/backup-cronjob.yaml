@@ -1,0 +1,83 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: homeassistant-backup
+  namespace: tools
+spec:
+  schedule: "0 4 * * *"
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 14
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: homeassistant-backup
+              image: rclone/rclone:1.68.2
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+                  echo "[$(date)] Archiving config directory..."
+                  tar -czf "/tmp/ha-config-${TIMESTAMP}.tar.gz" -C /config \
+                    --exclude="home-assistant.log*" \
+                    --exclude="__pycache__" \
+                    --exclude="*.pyc" \
+                    .
+                  echo "[$(date)] Archive size: $(du -sh /tmp/ha-config-${TIMESTAMP}.tar.gz | cut -f1)"
+
+                  echo "[$(date)] Uploading to Mega..."
+                  rclone copy "/tmp/ha-config-${TIMESTAMP}.tar.gz" "mega:${MEGA_PATH}/"
+
+                  echo "[$(date)] Rotating old backups (keeping last ${RETENTION_COUNT})..."
+                  rclone ls "mega:${MEGA_PATH}/" \
+                    | sort -k2 \
+                    | head -n "-${RETENTION_COUNT}" \
+                    | awk '{print $2}' \
+                    | while read f; do
+                        echo "Removing: $f"
+                        rclone deletefile "mega:${MEGA_PATH}/${f}"
+                      done
+
+                  rm -f "/tmp/ha-config-${TIMESTAMP}.tar.gz"
+                  echo "[$(date)] Backup complete: ha-config-${TIMESTAMP}.tar.gz"
+              env:
+                - name: MEGA_PATH
+                  value: "backups/homeassistant/synergia-k8s"
+                - name: RETENTION_COUNT
+                  value: "7"
+                - name: RCLONE_CONFIG_MEGA_TYPE
+                  value: "mega"
+                - name: RCLONE_CONFIG_MEGA_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: secret-homeassistant
+                      key: mega-username
+                - name: RCLONE_CONFIG_MEGA_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: secret-homeassistant
+                      key: mega-password
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              volumeMounts:
+                - name: ha-config
+                  mountPath: /config
+                  readOnly: true
+          volumes:
+            - name: ha-config
+              persistentVolumeClaim:
+                claimName: home-assistant-data
