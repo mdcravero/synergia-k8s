@@ -328,7 +328,7 @@ data:
     # configure K8s cron job managed by the operator
     configLogicalBackup:
       # image for pods of the logical backup job (example runs pg_dumpall)
-      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.1"
+      logical_backup_docker_image: "mdcravero/zalando-logical-bkp:v1.2"
       # use secret for backup job environment variables
       logical_backup_cronjob_environment_secret: "secret-zalando-s3-bkp"
 
