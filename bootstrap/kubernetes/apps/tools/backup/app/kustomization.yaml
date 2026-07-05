@@ -14,6 +14,3 @@ commonLabels:
   app.kubernetes.io/component: etcd-backup
   app.kubernetes.io/part-of: synergia-k8s
 
-images:
-  - name: rclone/rclone
-    newTag: latest

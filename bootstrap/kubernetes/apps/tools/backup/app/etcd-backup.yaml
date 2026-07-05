@@ -1,12 +1,12 @@
 ---
-# Prerequisito: crear el Secret con el talosconfig antes de activar este CronJob.
+# Prerequisite: create the Secret with the talosconfig before enabling this CronJob.
 #
 #   kubectl create secret generic talosconfig \
 #     --from-file=config=/path/to/synergia-k8s-talos/talosconfig \
 #     -n backup-system
 #
-# O via External Secrets si usás Bitwarden/Vault (recomendado para GitOps).
-# El Secret debe tener una key "config" con el contenido del talosconfig.
+# Or via External Secrets (recommended for GitOps).
+# The Secret must have a "config" key with the talosconfig content.
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -18,10 +18,10 @@ metadata:
     app.kubernetes.io/component: backup
     app.kubernetes.io/part-of: synergia-k8s
 spec:
-  schedule: "0 3 * * *"          # Diario a las 3 AM
+  schedule: "0 3 * * *"          # Daily at 3 AM UTC
   successfulJobsHistoryLimit: 7
   failedJobsHistoryLimit: 14
-  concurrencyPolicy: Forbid       # Evita solapamiento si el job tarda más de 24hs
+  concurrencyPolicy: Forbid       # Prevent overlap if job takes longer than 24h
   jobTemplate:
     spec:
       backoffLimit: 2
@@ -40,45 +40,52 @@ spec:
               TIMESTAMP=$(date +%Y%m%d_%H%M%S)
               SNAPSHOT_FILE="/tmp/etcd-${TIMESTAMP}.db"
 
-              echo "[$(date)] Descargando talosctl ${TALOS_VERSION} (arm64)..."
+              ARCH=$(uname -m)
+              case "${ARCH}" in
+                x86_64)  TALOS_ARCH="amd64" ;;
+                aarch64) TALOS_ARCH="arm64" ;;
+                *) echo "Unsupported architecture: ${ARCH}"; exit 1 ;;
+              esac
+
+              echo "[$(date)] Downloading talosctl ${TALOS_VERSION} (${TALOS_ARCH})..."
               wget -q -O /tmp/talosctl \
-                "https://github.com/siderolabs/talos/releases/download/${TALOS_VERSION}/talosctl-linux-arm64"
+                "https://github.com/siderolabs/talos/releases/download/${TALOS_VERSION}/talosctl-linux-${TALOS_ARCH}"
               chmod +x /tmp/talosctl
 
-              echo "[$(date)] Tomando snapshot de etcd..."
+              echo "[$(date)] Taking etcd snapshot..."
               /tmp/talosctl etcd snapshot "${SNAPSHOT_FILE}" \
                 --talosconfig /talosconfig/config \
                 -e "${TALOS_ENDPOINT}" \
                 -n "${TALOS_NODE}"
 
-              echo "[$(date)] Snapshot generado: $(du -sh ${SNAPSHOT_FILE} | cut -f1)"
+              echo "[$(date)] Snapshot size: $(du -sh ${SNAPSHOT_FILE} | cut -f1)"
 
-              echo "[$(date)] Subiendo a Mega.nz en ${MEGA_PATH}..."
+              echo "[$(date)] Uploading to Mega.nz at ${MEGA_PATH}..."
               rclone copy "${SNAPSHOT_FILE}" "mega:${MEGA_PATH}/" --progress
 
-              echo "[$(date)] Rotando snapshots antiguos (reteniendo últimos ${RETENTION_COUNT})..."
+              echo "[$(date)] Rotating old snapshots (keeping last ${RETENTION_COUNT})..."
               rclone ls "mega:${MEGA_PATH}/" \
                 | sort -k2 \
                 | head -n "-${RETENTION_COUNT}" \
                 | awk '{print $2}' \
                 | while read f; do
-                    echo "Eliminando snapshot viejo: $f"
+                    echo "Deleting old snapshot: $f"
                     rclone deletefile "mega:${MEGA_PATH}/${f}"
                   done
 
               rm -f "${SNAPSHOT_FILE}"
-              echo "[$(date)] Backup completo: etcd-${TIMESTAMP}.db"
+              echo "[$(date)] Backup complete: etcd-${TIMESTAMP}.db"
             env:
             - name: TALOS_VERSION
               value: "v1.11.6"
             - name: TALOS_ENDPOINT
-              value: "10.42.20.4"          # VIP del cluster
+              value: "10.42.20.4"          # Cluster VIP
             - name: TALOS_NODE
-              value: "10.42.20.5"          # Nodo sobre el que se toma el snapshot
+              value: "10.42.20.5"          # Node used to take the snapshot
             - name: MEGA_PATH
               value: "backups/etcd/synergia-k8s"
             - name: RETENTION_COUNT
-              value: "7"                   # Snapshots a conservar
+              value: "7"                   # Snapshots to retain
             - name: RCLONE_CONFIG_MEGA_TYPE
               value: "mega"
             - name: RCLONE_CONFIG_MEGA_USER
