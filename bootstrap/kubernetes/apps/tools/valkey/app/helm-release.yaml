@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: valkey
-      version: 6.1.9
+      version: 6.1.14
   interval: 1h
   releaseName: valkey
   valuesFrom:
