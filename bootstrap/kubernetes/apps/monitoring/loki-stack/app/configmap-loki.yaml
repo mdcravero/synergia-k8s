@@ -83,7 +83,7 @@ data:
         port: 3100
         type: ClusterIP
 
-      terminationGracePeriodSeconds: 4800
+      terminationGracePeriodSeconds: 60
 
       url: http://loki-stack:3100
 
@@ -135,16 +135,17 @@ data:
           max_entries_limit_per_query: 5000
           max_query_parallelism: 2
           split_queries_by_interval: 30m
+          retention_period: 720h
         compactor:
           shared_store: filesystem
           working_directory: /data/loki/boltdb-shipper-compactor
           compaction_interval: 10m
-          retention_enabled: false
+          retention_enabled: true
         chunk_store_config:
-          max_look_back_period: 0s
+          max_look_back_period: 720h
         table_manager:
-          retention_deletes_enabled: false
-          retention_period: 0s
+          retention_deletes_enabled: true
+          retention_period: 720h
         query_range:
           align_queries_with_step: true
           max_retries: 2
@@ -160,7 +161,7 @@ data:
             local:
               directory: /data/loki/rules
           rule_path: /data/loki/rules
-          alertmanager_url: http://alertmanager:9093
+          alertmanager_url: http://prometheus-alertmanager:9093
           ring:
             kvstore:
               store: inmemory
