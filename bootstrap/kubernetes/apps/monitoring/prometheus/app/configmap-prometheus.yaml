@@ -138,6 +138,26 @@ data:
 
       alerting_rules.yml:
         groups:
+          - name: backups
+            rules:
+              - alert: BackupCronJobFailed
+                expr: |
+                  kube_job_failed{condition="true", job_name=~"(etcd-backup|homeassistant-backup)-.*"} == 1
+                for: 0m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "Backup job {{ $labels.job_name }} failed"
+                  description: "Job {{ $labels.job_name }} in namespace {{ $labels.namespace }} reached backoffLimit and is marked as failed."
+              - alert: BackupCronJobNotScheduled
+                expr: |
+                  time() - kube_cronjob_status_last_schedule_time{cronjob=~"etcd-backup|homeassistant-backup"} > 90000
+                for: 0m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "CronJob {{ $labels.cronjob }} has not run in 25h"
+                  description: "CronJob {{ $labels.cronjob }} in namespace {{ $labels.namespace }} has not been scheduled in the last 25 hours. Check if it is suspended or if the cluster had an issue."
           - name: postgresql
             rules:
               - alert: PostgresqlExporterUnreachable
