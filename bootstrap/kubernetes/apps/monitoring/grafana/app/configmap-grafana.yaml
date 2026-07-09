@@ -100,17 +100,13 @@ data:
           revision: 37
           datasource: Prometheus
         kubernetes-cluster:
-          gnetId: 15661
-          revision: 1
+          gnetId: 315
+          revision: 3
           datasource: Prometheus
         postgresql:
-          gnetId: 9628
-          revision: 7
+          gnetId: 12485
+          revision: 1
           datasource: Prometheus
-        loki-logs:
-          gnetId: 13639
-          revision: 2
-          datasource: loki-home
 
     datasources:
       datasources.yaml:
