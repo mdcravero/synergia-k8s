@@ -29,11 +29,11 @@ spec:
           name: jellyfin
           resources:
             requests:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 50m
+              memory: 750Mi
             limits:
-              cpu: "4"
-              memory: 2Gi
+              cpu: "2"
+              memory: 900Mi
           ports:
             - containerPort: 8096
               name: webui

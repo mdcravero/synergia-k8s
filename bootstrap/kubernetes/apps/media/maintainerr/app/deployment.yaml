@@ -28,11 +28,11 @@ spec:
           name: maintainerr
           resources:
             requests:
-              cpu: 50m
-              memory: 128Mi
+              cpu: 15m
+              memory: 192Mi
             limits:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 50m
+              memory: 210Mi
           ports:
             - containerPort: 6246
               name: webui

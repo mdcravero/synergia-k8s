@@ -31,11 +31,11 @@ spec:
           name: jellyseerr
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 20m
+              memory: 300Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 100m
+              memory: 380Mi
           ports:
             - containerPort: 5055
               name: webui

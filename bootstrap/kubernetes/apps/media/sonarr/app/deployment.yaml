@@ -33,11 +33,11 @@ spec:
           name: sonarr
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 35m
+              memory: 300Mi
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 150m
+              memory: 340Mi
           ports:
             - containerPort: 8989
               name: webui

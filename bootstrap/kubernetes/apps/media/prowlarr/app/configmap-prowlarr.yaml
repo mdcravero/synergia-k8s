@@ -52,6 +52,14 @@ data:
                     port:
                       number: 9696
 
+    resources:
+      requests:
+        cpu: 25m
+        memory: 210Mi
+      limits:
+        cpu: 50m
+        memory: 240Mi
+
     # -- Configures the probes for the main Pod.
     # @default -- See values.yaml
     probes:
