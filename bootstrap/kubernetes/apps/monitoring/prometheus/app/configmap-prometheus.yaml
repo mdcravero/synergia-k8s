@@ -82,17 +82,26 @@ data:
           - job_name: traefik
             static_configs:
               - targets: ['traefik-metrics.traefik.svc.cluster.local:9100']
-          - job_name: node
-            static_configs:
-              - targets: ['prometheus-prometheus-node-exporter.monitoring.svc.cluster.local:9100']
+          - job_name: node-exporter
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - monitoring
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+                action: keep
+                regex: prometheus-node-exporter
+              - source_labels: [__meta_kubernetes_pod_ip]
+                replacement: $1:9100
+                target_label: __address__
+              - source_labels: [__meta_kubernetes_pod_node_name]
+                target_label: instance
+              - source_labels: [__meta_kubernetes_pod_node_name]
+                target_label: node
           - job_name: kube-state-metrics
             static_configs:
               - targets: ['prometheus-kube-state-metrics.monitoring.svc.cluster.local:8080']
-          - job_name: node-exporter-hwmon
-            static_configs:
-              - targets: ['prometheus-prometheus-node-exporter.monitoring.svc.cluster.local:9100']
-            params:
-              collect[]: ['hwmon']
           - job_name: kubernetes-pods-tools
             scrape_interval: 2m
             scrape_timeout: 90s
@@ -161,7 +170,7 @@ data:
           - name: postgresql
             rules:
               - alert: PostgresqlExporterUnreachable
-                expr: up{job="kubernetes-pods-tools",kubernetes_pod_name!~"logical-backup-.*"} == 0
+                expr: up{job="kubernetes-pods-tools",kubernetes_pod_name!~"logical-backup-.*|postgres-cluster-.*"} == 0
                 for: 3m
                 labels:
                   severity: critical
