@@ -45,8 +45,9 @@ metadata:
   labels:
     name: media
     goldilocks.fairwinds.com/enabled: "true"
-    # Added PodSecurity privileged labels to allow jellyfin host device access
     pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
 ---
 apiVersion: v1
 kind: Namespace
