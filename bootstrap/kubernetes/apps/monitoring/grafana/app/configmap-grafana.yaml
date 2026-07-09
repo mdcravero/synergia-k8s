@@ -107,6 +107,10 @@ data:
           gnetId: 12485
           revision: 1
           datasource: Prometheus
+        flux-cluster-stats:
+          gnetId: 18376
+          revision: 3
+          datasource: Prometheus
 
     datasources:
       datasources.yaml:

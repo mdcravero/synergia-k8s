@@ -102,6 +102,21 @@ data:
           - job_name: kube-state-metrics
             static_configs:
               - targets: ['prometheus-kube-state-metrics.monitoring.svc.cluster.local:8080']
+          - job_name: flux-system
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - flux-system
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_app]
+                action: keep
+                regex: (source-controller|kustomize-controller|helm-controller|notification-controller|image-automation-controller|image-reflector-controller)
+              - source_labels: [__meta_kubernetes_pod_ip]
+                replacement: $1:8080
+                target_label: __address__
+              - source_labels: [__meta_kubernetes_pod_label_app]
+                target_label: instance
           - job_name: kubernetes-pods-tools
             scrape_interval: 2m
             scrape_timeout: 90s
@@ -167,6 +182,26 @@ data:
                 annotations:
                   summary: "CronJob {{ $labels.cronjob }} has not run in 25h"
                   description: "CronJob {{ $labels.cronjob }} in namespace {{ $labels.namespace }} has not been scheduled in the last 25 hours. Check if it is suspended or if the cluster had an issue."
+          - name: flux
+            rules:
+              - alert: FluxHelmReleaseFailed
+                expr: |
+                  gotk_reconcile_condition{type="Ready",status="False",kind="HelmRelease"} == 1
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "HelmRelease {{ $labels.name }} failed"
+                  description: "HelmRelease {{ $labels.name }} in namespace {{ $labels.namespace }} is not Ready. Run: flux get hr -n {{ $labels.namespace }}"
+              - alert: FluxKustomizationFailed
+                expr: |
+                  gotk_reconcile_condition{type="Ready",status="False",kind="Kustomization"} == 1
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Kustomization {{ $labels.name }} failed"
+                  description: "Kustomization {{ $labels.name }} in namespace {{ $labels.namespace }} is not Ready. Run: flux get ks"
           - name: postgresql
             rules:
               - alert: PostgresqlExporterUnreachable
