@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: loki-stack
-      version: 2.9.11
+      version: 2.10.3
   interval: 5m
   timeout: 15m
   releaseName: loki-stack
