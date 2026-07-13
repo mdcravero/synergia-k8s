@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana
-      version: 12.4.2
+      version: 12.7.2
   interval: 1h
   timeout: 15m
   releaseName: grafana
