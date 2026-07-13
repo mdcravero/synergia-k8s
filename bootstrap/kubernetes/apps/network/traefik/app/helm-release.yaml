@@ -13,7 +13,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: traefik
-      version: 41.0.1
+      version: 41.0.2
   interval: 1h
   releaseName: traefik
   valuesFrom:
