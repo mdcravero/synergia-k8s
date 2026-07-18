@@ -80,7 +80,7 @@ data:
           cpu: 250m
           memory: 512Mi
         limits:
-          cpu: 500m
+          cpu: "2"
           memory: 1Gi
 
       livenessProbe:

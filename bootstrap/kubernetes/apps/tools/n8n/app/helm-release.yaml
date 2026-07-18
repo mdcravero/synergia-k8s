@@ -17,6 +17,7 @@ spec:
         namespace: tools
       version: 1.24.10
   interval: 1h
+  timeout: 15m
   releaseName: n8n
   valuesFrom:
     - kind: ConfigMap
