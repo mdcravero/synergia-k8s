@@ -38,7 +38,7 @@
     },
     {
       "description": "Frequent releases: check as soon as detected, patches auto-merge",
-      "matchPackageNames": ["n8n"],
+      "matchPackageNames": ["n8n", "homeassistant/home-assistant", "traefik"],
       "schedule": ["at any time"]
     },
     {
