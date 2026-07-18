@@ -24,7 +24,7 @@ spec:
         - env:
             - name: TZ
               value: "America/Argentina/Cordoba"
-          image: maintainerr/maintainerr:3.16.0
+          image: maintainerr/maintainerr:3.18.0
           name: maintainerr
           resources:
             requests:
