@@ -37,8 +37,14 @@
       "automerge": false
     },
     {
+      "description": "Frequent releases: check as soon as detected, patches auto-merge",
+      "matchPackageNames": ["n8n"],
+      "schedule": ["at any time"]
+    },
+    {
       "description": "Security components: always require manual review",
       "matchPackageNames": ["authelia"],
+      "schedule": ["at any time"],
       "automerge": false,
       "labels": ["security", "renovate"]
     },
