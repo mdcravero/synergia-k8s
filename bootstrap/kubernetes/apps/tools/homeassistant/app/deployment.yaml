@@ -27,7 +27,7 @@ spec:
             claimName: home-assistant-data
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:2026.6.4
+          image: homeassistant/home-assistant:2026.7.2
           env:
             - name: TZ
               value: "America/Argentina/Córdoba"
