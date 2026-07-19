@@ -32,7 +32,7 @@ spec:
               value: "1000"
             - name: PGID
               value: "1000"
-          image: linuxserver/bazarr:1.5.7-development
+          image: linuxserver/bazarr:1.6.1-development
           name: bazarr
           resources:
             requests:
