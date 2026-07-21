@@ -13,3 +13,5 @@ resources:
   - ./homebox/app
   - ./couchdb/app
   - ./backup/app
+  - ./mosquitto/app
+  - ./zigbee2mqtt/app

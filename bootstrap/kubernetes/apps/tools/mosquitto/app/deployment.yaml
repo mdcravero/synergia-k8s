@@ -1,0 +1,87 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      securityContext:
+        fsGroup: 1883
+        runAsUser: 1883
+        runAsGroup: 1883
+        runAsNonRoot: true
+      initContainers:
+        - name: init-config
+          image: eclipse-mosquitto:2.0.21
+          securityContext:
+            runAsUser: 1883
+            runAsGroup: 1883
+          command:
+            - sh
+            - -c
+            - |
+              cp /mosquitto/conf/mosquitto.conf /mosquitto/config/mosquitto.conf
+              mosquitto_passwd -c -b /mosquitto/config/passwd "$MQTT_USERNAME" "$MQTT_PASSWORD"
+          env:
+            - name: MQTT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mosquitto
+                  key: username
+            - name: MQTT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mosquitto
+                  key: password
+          volumeMounts:
+            - name: conf-cm
+              mountPath: /mosquitto/conf
+              readOnly: true
+            - name: config
+              mountPath: /mosquitto/config
+      containers:
+        - name: mosquitto
+          image: eclipse-mosquitto:2.0.21
+          ports:
+            - containerPort: 1883
+              name: mqtt
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          readinessProbe:
+            tcpSocket:
+              port: 1883
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 1883
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: config
+              mountPath: /mosquitto/config
+            - name: data
+              mountPath: /mosquitto/data
+      volumes:
+        - name: conf-cm
+          configMap:
+            name: mosquitto-conf
+        - name: config
+          emptyDir: {}
+        - name: data
+          persistentVolumeClaim:
+            claimName: mosquitto-data

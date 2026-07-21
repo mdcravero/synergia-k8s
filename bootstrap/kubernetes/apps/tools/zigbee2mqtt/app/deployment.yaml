@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zigbee2mqtt
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zigbee2mqtt
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqtt
+    spec:
+      initContainers:
+        - name: init-config
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -f /app/data/configuration.yaml ]; then
+                cp /app/config/configuration.yaml /app/data/configuration.yaml
+              fi
+          volumeMounts:
+            - name: conf-cm
+              mountPath: /app/config
+              readOnly: true
+            - name: data
+              mountPath: /app/data
+      containers:
+        - name: zigbee2mqtt
+          image: ghcr.io/koenkk/zigbee2mqtt:2.3.0
+          ports:
+            - containerPort: 8080
+              name: frontend
+          env:
+            - name: ZIGBEE2MQTT_CONFIG_MQTT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mosquitto
+                  key: username
+            - name: ZIGBEE2MQTT_CONFIG_MQTT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mosquitto
+                  key: password
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+      volumes:
+        - name: conf-cm
+          configMap:
+            name: zigbee2mqtt-conf
+        - name: data
+          persistentVolumeClaim:
+            claimName: zigbee2mqtt-data
