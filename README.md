@@ -1,140 +1,185 @@
-# Synergia K8s - Home Lab con Flux CD
+# Synergia K8s — Home Lab
 
-Este repositorio contiene la configuración de un cluster Kubernetes usando Talos Linux en Raspberry Pi, gestionado con Flux CD.
+Kubernetes home lab running on Talos Linux, managed with Flux CD (GitOps). All configuration is declarative and version-controlled; secrets are encrypted at rest with SOPS + age.
 
-## Arquitectura
+## Hardware
 
-### Orden de Despliegue
+| Node | Role | SoC | Arch |
+|---|---|---|---|
+| synergia-01 | Control plane | Raspberry Pi 4 (8GB) | ARM64 |
+| synergia-02 | Control plane | Raspberry Pi 4 (8GB) | ARM64 |
+| synergia-03 | Control plane | Raspberry Pi 4 (8GB) | ARM64 |
+| synergia-05 | Worker | Radxa X4 (8GB) | AMD64 |
 
-Flux CD despliega las aplicaciones en el siguiente orden usando dependencias:
+**NFS storage server:** `10.42.20.10`
+**Zigbee coordinator:** SMLIGHT SLZB-06U (CC2652P via TCP at `10.42.30.30:6638`)
 
-1. **Namespaces** - Crea todos los namespaces necesarios
-2. **Cert-manager** - Gestión automática de certificados TLS
-3. **Metrics Server** - Servidor de métricas para HPA y kubectl top
-4. **MetalLB Install** - Instala MetalLB y sus CRDs
-5. **Network** - Configuración de MetalLB + Traefik (instala CRDs)
-6. **Traefik Middlewares** - Middlewares de Traefik (espera a CRDs)
-7. **Storage** - NFS Provisioner
-8. **External Secrets** - Sistema de gestión de secretos
-9. **Bitwarden** - Backend de secretos
-10. **Secrets Config** - Secretos específicos (PostgreSQL, Redis, etc.)
-11. **Monitoring** - Grafana + Loki + Prometheus (requiere secrets)
-12. **Authentik** - Sistema de autenticación (requiere secrets)
-13. **Tools** - PostgreSQL + Redis + Homarr (Homarr espera a Authentik)
-14. **Media** - Jellyfin, Radarr, Sonarr, etc. (usa Authentik para autenticación)
+## Core Stack
 
-### Componentes Principales
+| Component | Purpose |
+|---|---|
+| [Talos Linux](https://www.talos.dev/) | Immutable, API-managed OS |
+| [Flux CD](https://fluxcd.io/) | GitOps controller |
+| [SOPS + age](https://github.com/getsops/sops) | Secret encryption |
+| [MetalLB](https://metallb.universe.tf/) | Bare-metal load balancer (L2, pool `10.42.20.40–10.42.20.90`) |
+| [Traefik](https://traefik.io/) | Ingress controller + reverse proxy |
+| [cert-manager](https://cert-manager.io/) | Automatic TLS via Cloudflare DNS-01 (wildcard `*.synergia.net.ar`) |
+| [NFS Provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner) | Dynamic persistent storage |
+| [Authelia](https://www.authelia.com/) | SSO / forward auth for internal services |
+| [Renovate](https://docs.renovatebot.com/) | Automated dependency updates (self-hosted) |
+| [Goldilocks](https://goldilocks.docs.fairwinds.com/) | VPA-based resource recommendations |
 
-- **Cert-manager**: Gestión automática de certificados TLS para servicios
-- **Metrics Server**: Servidor de métricas para HPA y monitoreo de recursos
-- **MetalLB**: Load balancer para bare metal (rango IP: 10.42.20.50-10.42.20.90)
-- **Traefik**: Ingress controller y reverse proxy con middlewares de Authentik
-- **NFS Provisioner**: Storage dinámico usando NFS (servidor: 10.42.20.10)
-- **Monitoring**: Grafana + Loki + Prometheus para observabilidad
-- **Authentik**: Sistema de autenticación y autorización
-- **External Secrets**: Gestión de secretos desde Bitwarden
+## Applications
 
-## Estructura del Proyecto
+### Monitoring (`monitoring` namespace)
+
+| App | Purpose | URL |
+|---|---|---|
+| Prometheus | Metrics collection + AlertManager (Telegram alerts) | `prometheus.synergia.net.ar` |
+| Grafana | Dashboards (Node Exporter, K8s, PostgreSQL, Flux, Alertmanager) | `grafana.synergia.net.ar` |
+| Loki + Promtail | Log aggregation (30-day retention) | — |
+| Goldilocks | Resource usage recommendations | `goldilocks.synergia.net.ar` |
+
+### Tools (`tools` namespace)
+
+| App | Purpose | URL / IP |
+|---|---|---|
+| PostgreSQL | Database cluster via Zalando operator (multi-arch ARM64+AMD64) | `10.42.20.70` |
+| Valkey | Redis-compatible in-memory cache | ClusterIP |
+| Home Assistant | Home automation | `ha.synergia.net.ar` |
+| n8n | Workflow automation | `n8n.synergia.net.ar` |
+| Mosquitto | MQTT broker for Zigbee integration | ClusterIP `1883` |
+| Zigbee2MQTT | Zigbee coordinator bridge (SLZB-06U via TCP) | `zigbee2mqtt.synergia.net.ar` |
+| Homarr | Homelab dashboard | `homarr.synergia.net.ar` |
+| Homebox | Home inventory management | `homebox.synergia.net.ar` |
+| CouchDB | Document database | ClusterIP |
+| Transmission Movies | BitTorrent client | `10.42.20.69` |
+| Transmission Shows | BitTorrent client | `10.42.20.68` |
+
+### Media (`media` namespace)
+
+| App | Purpose | URL / IP |
+|---|---|---|
+| Jellyfin | Media server | `jellyfin.synergia.net.ar` — `10.42.20.60` |
+| Jellyseerr | Media request management | `jellyseerr.synergia.net.ar` — `10.42.20.61` |
+| Sonarr | TV series automation | `sonarr.synergia.net.ar` — `10.42.20.64` |
+| Radarr | Movie automation | `radarr.synergia.net.ar` — `10.42.20.63` |
+| Prowlarr | Indexer aggregator | `prowlarr.synergia.net.ar` — `10.42.20.62` |
+| Bazarr | Subtitle management | `bazarr.synergia.net.ar` — `10.42.20.67` |
+| Maintainerr | Media library cleanup | `maintainerr.synergia.net.ar` |
+
+## Zigbee Stack
+
+```
+SMLIGHT SLZB-06U (CC2652P)
+  TCP 10.42.30.30:6638
+          │
+          ▼
+    Zigbee2MQTT ──── MQTT ──── Mosquitto ──── Home Assistant
+    (bridge)                   (broker)       (MQTT integration)
+```
+
+- Coordinator connects over LAN — no USB device passthrough required
+- Zigbee2MQTT publishes device discovery to Home Assistant automatically via MQTT
+- Devices paired in Zigbee2MQTT appear as entities in Home Assistant immediately
+
+## Backup Strategy
+
+| Target | Method | Schedule | Destination |
+|---|---|---|---|
+| etcd snapshots | `talosctl etcd snapshot` via CronJob | Daily 3 AM UTC | Mega.nz via rclone |
+| Home Assistant | Tar + rclone via CronJob | Daily | Mega.nz via rclone |
+| PostgreSQL | Zalando logical backup (multi-arch image) | Daily | S3-compatible |
+
+## Secrets Management
+
+All secrets are encrypted with **SOPS + age** and stored in `bootstrap/kubernetes/apps/secrets/`. The age recipient key is stored securely offline.
+
+```bash
+# Encrypt a new secret in-place
+sops -e -i bootstrap/kubernetes/apps/secrets/secret-myapp.yaml
+
+# Edit an existing encrypted secret
+sops bootstrap/kubernetes/apps/secrets/secret-myapp.yaml
+```
+
+## Project Structure
 
 ```
 bootstrap/kubernetes/apps/
-├── flux-system/          # Configuración de Flux CD
-├── namespaces/           # Todos los namespaces centralizados
-├── system/               # Componentes del sistema
-│   ├── cert-manager/     # Gestión automática de certificados
-│   └── metrics-server/   # Servidor de métricas
-├── network/              # MetalLB + Traefik
-│   ├── metallb/
-│   │   ├── install/      # Instalación de MetalLB
-│   │   └── app/          # Configuración de MetalLB
-│   └── traefik/          # Traefik ingress controller + middlewares
-├── security/             # External Secrets + Bitwarden + Authentik
-│   ├── external-secrets/ # Gestión de secretos
-│   ├── bitwarden/        # Backend de secretos
-│   └── authelia/         # SSO / forward auth (Authelia)
-├── monitoring/           # Grafana + Loki + Prometheus
-├── secrets/              # Secretos específicos (SOPS)
-├── tools/                # PostgreSQL + Redis
-└── declarations/         # Aplicaciones de media (Jellyfin, *arr, etc.)
+├── flux-system/          # Flux CD sync configuration
+├── namespaces/           # All namespace definitions (centralized)
+├── system/
+│   ├── cert-manager/     # TLS certificate management
+│   └── metrics-server/   # Resource metrics for kubectl top / HPA
+├── network/
+│   ├── metallb/          # L2 load balancer
+│   └── traefik/          # Ingress controller + per-namespace Authelia middlewares
+├── storage/
+│   └── nfs-provisioner/  # Dynamic NFS storage (storageClass: nfs-client)
+├── security/
+│   └── authelia/         # Forward auth / SSO
+├── monitoring/
+│   ├── prometheus/       # Prometheus + AlertManager
+│   ├── grafana/          # Dashboards
+│   ├── loki-stack/       # Loki + Promtail
+│   └── goldilocks/       # VPA recommendations
+├── tools/                # See Tools section above
+├── media/                # See Media section above
+└── secrets/              # SOPS-encrypted secrets
 ```
 
-## Configuraciones Importantes
+## Flux Deployment Order
 
-### MetalLB
-- **Namespace**: `metallb-system` con privilegios elevados
-- **FRR deshabilitado**: Solo usa modo L2
-- **Pool de IPs**: 10.42.20.40-10.42.20.90
+```
+Namespaces
+    └── cert-manager + metrics-server
+            └── MetalLB
+                    └── Traefik + middlewares
+                            └── NFS provisioner
+                                    └── Secrets (SOPS)
+                                            └── Monitoring
+                                                └── Security (Authelia)
+                                                    └── Tools (PostgreSQL → Valkey → apps)
+                                                        └── Media
+```
 
-### Cert-manager
-- **Namespace**: `cert-manager`
-- **CRDs incluidas**: Instala automáticamente las CRDs necesarias
-- **Integración**: Proporciona certificados TLS a otros servicios
-
-### Namespaces
-- **Centralizados**: Todos los namespaces se crean en la primera etapa desde `apps/namespaces/`
-- **Privilegios especiales**: `metallb-system` tiene `pod-security.kubernetes.io/enforce: privileged`
-- **Sin duplicación**: Ya no es necesario crear `namespace.yaml` en cada aplicación
-
-### Servicios y IPs
-- **Traefik**: 10.42.20.50
-- **Grafana**: 10.42.20.51 (monitoring)
-- **Authentik**: 10.42.20.72
-- **PostgreSQL**: 10.42.20.70
-- **Redis**: 10.42.20.71
-- **Jellyfin**: 10.42.20.60
-- **Jellyseerr**: 10.42.20.61
-- **Prowlarr**: 10.42.20.62
-- **Radarr**: 10.42.20.63
-- **Sonarr**: 10.42.20.64
-- **Bazarr**: 10.42.20.67
-- **Transmission Movies**: 10.42.20.69
-- **Transmission Shows**: 10.42.20.68
-
-### Dependencias Críticas
-- **Namespaces** → **Cert-manager**: Namespaces deben existir antes
-- **Namespaces** → **Metrics Server**: Namespace kube-system debe existir
-- **External Secrets** → **Monitoring**: Grafana requiere secretos para datasources
-- **External Secrets** → **Bitwarden**: Sistema de gestión de secretos
-- **Bitwarden** → **Secrets Config**: Backend de secretos disponible
-- **Secrets Config** → **Tools**: Secretos específicos para PostgreSQL/Redis
-- **PostgreSQL/Redis** → **Authentik**: Bases de datos requeridas
-- **Authentik** → **Media**: Aplicaciones usan middlewares de autenticación
-- **MetalLB** → **Traefik**: LoadBalancer para servicios
-- **Namespaces** → **Todo**: Evita errores de "namespace not found"
-
-## Comandos Útiles
+## Useful Commands
 
 ```bash
-# Ver estado de Flux
+# Flux status
 flux get kustomizations
 
-# Ver logs de reconciliación
-kubectl logs -n flux-system deployment/kustomize-controller
+# Force reconciliation
+flux reconcile kustomization apps --with-source
+flux reconcile helmrelease n8n -n tools --force
 
-# Forzar reconciliación
-flux reconcile kustomization apps-monitoring
-flux reconcile kustomization apps
-
-# Ver recursos de MetalLB
-kubectl get pods -n metallb-system
-kubectl get ipaddresspool -n metallb-system
-
-# Ver servicios con IPs asignadas
-kubectl get svc -A | grep LoadBalancer
-
-# Ver métricas de nodos/pods
+# Node and pod resource usage
 kubectl top nodes
-kubectl top pods -A
+kubectl top pods -A --sort-by=memory
 
-# Acceder a Grafana (usuario/admin, contraseña de secret)
-kubectl port-forward -n monitoring svc/grafana 3000:80
+# Run Renovate manually
+kubectl create job --from=cronjob/renovate renovate-manual -n tools
+kubectl logs -n tools -l job-name=renovate-manual -f
 
+# Zigbee2MQTT / Mosquitto logs
+kubectl logs -n tools deployment/zigbee2mqtt -f
+kubectl logs -n tools deployment/mosquitto -f
+
+# Trigger etcd backup manually
+kubectl create job --from=cronjob/etcd-backup etcd-backup-manual -n tools
+
+# Certificate status
+kubectl get certificates -A
+kubectl get certificaterequests -A
 ```
 
-## Notas de Seguridad
+## Renovate Update Policy
 
-- **Cert-manager**: Certificados TLS automáticos para servicios internos y externos
-- Secretos gestionados con SOPS y External Secrets
-- Namespaces con políticas de seguridad apropiadas
-- Authentik como punto central de autenticación
-- Bitwarden como backend de secretos
+| Package group | Schedule | Patch auto-merge |
+|---|---|---|
+| n8n, Home Assistant, Traefik, Authelia | Any time (as soon as detected) | n8n / HA: yes — Traefik / Authelia: no |
+| Media stack | Mondays before 9 AM ART | No (single grouped PR) |
+| Infrastructure (cert-manager, MetalLB) | Mondays before 9 AM ART | No |
+| Everything else | Mondays before 9 AM ART | Yes |
+| Major versions (all packages) | Mondays — requires Dependency Dashboard approval | No |
