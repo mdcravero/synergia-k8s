@@ -88,18 +88,22 @@ spec:
               memory: 1500Mi
 
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 18789
+            exec:
+              command:
+                - node
+                - -e
+                - "const h=require('http'),r=h.get('http://localhost:18789/healthz',res=>process.exit(res.statusCode===200?0:1));r.on('error',()=>process.exit(1));r.setTimeout(3000,()=>{r.destroy();process.exit(1)})"
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 5
 
           readinessProbe:
-            httpGet:
-              path: /readyz
-              port: 18789
-            initialDelaySeconds: 15
+            exec:
+              command:
+                - node
+                - -e
+                - "const h=require('http'),r=h.get('http://localhost:18789/readyz',res=>process.exit(res.statusCode===200?0:1));r.on('error',()=>process.exit(1));r.setTimeout(3000,()=>{r.destroy();process.exit(1)})"
+            initialDelaySeconds: 20
             periodSeconds: 10
 
           volumeMounts:
