@@ -58,8 +58,7 @@ data:
 
       agents: {
         defaults: {
-          // Verify Vertex model slug at docs.openclaw.ai/providers/vertex
-          model: "vertex/gemini-1.5-pro",
+          model: "google/gemini-2.5-flash",
         }
       }
     }
