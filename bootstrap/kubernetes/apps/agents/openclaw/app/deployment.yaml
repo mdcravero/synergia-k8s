@@ -58,13 +58,6 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: TELEGRAM_BOT_TOKEN
-            - name: GOOGLE_CLOUD_PROJECT
-              valueFrom:
-                secretKeyRef:
-                  name: secret-openclaw
-                  key: GOOGLE_CLOUD_PROJECT
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: /etc/gcp/gcp-sa.json
             - name: HA_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -75,6 +68,11 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: GEMINI_API_KEY
+            - name: OPENCLAW_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: OPENCLAW_AUTH_TOKEN
 
           resources:
             requests:
@@ -109,9 +107,6 @@ spec:
               mountPath: /home/node/.openclaw
             - name: auth
               mountPath: /home/node/.config/openclaw
-            - name: gcp-sa
-              mountPath: /etc/gcp
-              readOnly: true
 
       volumes:
         - name: config
@@ -126,11 +121,5 @@ spec:
         - name: auth
           persistentVolumeClaim:
             claimName: openclaw-auth
-        - name: gcp-sa
-          secret:
-            secretName: secret-openclaw
-            items:
-              - key: gcp-sa.json
-                path: gcp-sa.json
         - name: openclaw-runtime
           emptyDir: {}
