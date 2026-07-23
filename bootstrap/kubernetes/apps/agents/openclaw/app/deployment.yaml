@@ -70,6 +70,11 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: HA_TOKEN
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: GEMINI_API_KEY
 
           resources:
             requests:
