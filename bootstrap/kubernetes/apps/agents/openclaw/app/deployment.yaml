@@ -6,6 +6,8 @@ metadata:
   namespace: agents
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: openclaw
@@ -26,7 +28,7 @@ spec:
       initContainers:
         - name: copy-config
           image: busybox:latest
-          command: ["sh", "-c", "cp /etc/openclaw-config/openclaw.json /home/node/.openclaw/openclaw.json"]
+          command: ["sh", "-c", "cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json"]
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -34,8 +36,8 @@ spec:
             - name: config
               mountPath: /etc/openclaw-config
               readOnly: true
-            - name: data
-              mountPath: /home/node/.openclaw
+            - name: openclaw-runtime
+              mountPath: /etc/openclaw
 
       containers:
         - name: openclaw
@@ -47,7 +49,7 @@ spec:
 
           env:
             - name: OPENCLAW_CONFIG_PATH
-              value: /home/node/.openclaw/openclaw.json
+              value: /etc/openclaw/openclaw.json
             - name: OPENCLAW_SKIP_ONBOARDING
               value: "true"
             - name: TELEGRAM_BOT_TOKEN
@@ -95,6 +97,8 @@ spec:
             - name: config
               mountPath: /etc/openclaw-config
               readOnly: true
+            - name: openclaw-runtime
+              mountPath: /etc/openclaw
             - name: data
               mountPath: /home/node/.openclaw
             - name: auth
@@ -122,3 +126,5 @@ spec:
             items:
               - key: gcp-sa.json
                 path: gcp-sa.json
+        - name: openclaw-runtime
+          emptyDir: {}
