@@ -7,6 +7,10 @@ metadata:
 data:
   openclaw.json: |
     {
+      gateway: {
+        mode: "local",
+      },
+
       channels: {
         telegram: {
           enabled: true,
