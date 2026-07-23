@@ -23,6 +23,20 @@ spec:
         fsGroup: 1000
         runAsNonRoot: true
 
+      initContainers:
+        - name: copy-config
+          image: busybox:latest
+          command: ["sh", "-c", "cp /etc/openclaw-config/openclaw.json /home/node/.openclaw/openclaw.json"]
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: config
+              mountPath: /etc/openclaw-config
+              readOnly: true
+            - name: data
+              mountPath: /home/node/.openclaw
+
       containers:
         - name: openclaw
           image: ghcr.io/openclaw/openclaw:latest
@@ -33,7 +47,7 @@ spec:
 
           env:
             - name: OPENCLAW_CONFIG_PATH
-              value: /etc/openclaw/openclaw.json
+              value: /home/node/.openclaw/openclaw.json
             - name: OPENCLAW_SKIP_ONBOARDING
               value: "true"
             - name: TELEGRAM_BOT_TOKEN
@@ -79,7 +93,7 @@ spec:
 
           volumeMounts:
             - name: config
-              mountPath: /etc/openclaw
+              mountPath: /etc/openclaw-config
               readOnly: true
             - name: data
               mountPath: /home/node/.openclaw
@@ -93,6 +107,9 @@ spec:
         - name: config
           configMap:
             name: openclaw-config
+            items:
+              - key: openclaw.json
+                path: openclaw.json
         - name: data
           persistentVolumeClaim:
             claimName: openclaw-data
