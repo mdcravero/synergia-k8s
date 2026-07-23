@@ -78,11 +78,6 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: MISTRAL_API_KEY
-            - name: OPENCLAW_AUTH_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: secret-openclaw
-                  key: OPENCLAW_AUTH_TOKEN
 
           resources:
             requests:

@@ -9,10 +9,6 @@ data:
     {
       gateway: {
         mode: "local",
-        auth: {
-          mode: "token",
-          token: "${OPENCLAW_AUTH_TOKEN}",
-        },
       },
 
       channels: {
