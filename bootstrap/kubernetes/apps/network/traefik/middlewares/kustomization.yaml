@@ -7,3 +7,4 @@ resources:
   - middleware-authelia-maintainerr.yaml
   - middleware-authelia-goldilocks.yaml
   - middleware-authelia-zigbee2mqtt.yaml
+  - middleware-authelia-openclaw.yaml

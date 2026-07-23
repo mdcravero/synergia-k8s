@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openclaw-config
+  namespace: agents
+data:
+  openclaw.json: |
+    {
+      channels: {
+        telegram: {
+          enabled: true,
+          // Long polling — no webhook needed
+          dmPolicy: "allowlist",
+          allowFrom: [535462698],
+        }
+      },
+
+      // MCP servers — each runs as a subprocess inside the container
+      // Verify exact npm package names at docs.openclaw.ai/gateway/config-tools
+      mcp: {
+        servers: {
+          // Home Assistant — requires HA_TOKEN in secret-openclaw
+          "home-assistant": {
+            command: "npx",
+            args: [
+              "-y",
+              "@anthropic-ai/mcp-server-home-assistant",
+              "--url", "http://home-assistant.tools.svc.cluster.local:8123",
+              "--token", "${HA_TOKEN}"
+            ]
+          },
+          // Prometheus — read-only metrics queries for Osiris
+          "prometheus": {
+            command: "npx",
+            args: [
+              "-y",
+              "mcp-prometheus",
+              "--url", "http://prometheus-server.monitoring.svc.cluster.local"
+            ]
+          }
+          // Add Omada, n8n, Kubernetes (read-only) here when MCP packages confirmed
+        }
+      },
+
+      // Enable all configured MCP servers for the agent
+      tools: {
+        sandbox: {
+          tools: {
+            alsoAllow: ["bundle-mcp"]
+          }
+        }
+      },
+
+      agents: {
+        defaults: {
+          // Verify Vertex model slug at docs.openclaw.ai/providers/vertex
+          model: "vertex/gemini-1.5-pro",
+        }
+      }
+    }

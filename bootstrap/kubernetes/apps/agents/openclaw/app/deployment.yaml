@@ -1,0 +1,107 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openclaw
+  namespace: agents
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openclaw
+  template:
+    metadata:
+      labels:
+        app: openclaw
+    spec:
+      nodeSelector:
+        type: wk-amd
+
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        runAsNonRoot: true
+
+      containers:
+        - name: openclaw
+          image: ghcr.io/openclaw/openclaw:latest
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 18789
+
+          env:
+            - name: OPENCLAW_CONFIG_PATH
+              value: /etc/openclaw/openclaw.json
+            - name: OPENCLAW_SKIP_ONBOARDING
+              value: "true"
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: TELEGRAM_BOT_TOKEN
+            - name: GOOGLE_CLOUD_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: GOOGLE_CLOUD_PROJECT
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /etc/gcp/gcp-sa.json
+            - name: HA_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: HA_TOKEN
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1500Mi
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 18789
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 5
+
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 18789
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/openclaw
+              readOnly: true
+            - name: data
+              mountPath: /home/node/.openclaw
+            - name: auth
+              mountPath: /home/node/.config/openclaw
+            - name: gcp-sa
+              mountPath: /etc/gcp
+              readOnly: true
+
+      volumes:
+        - name: config
+          configMap:
+            name: openclaw-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: openclaw-data
+        - name: auth
+          persistentVolumeClaim:
+            claimName: openclaw-auth
+        - name: gcp-sa
+          secret:
+            secretName: secret-openclaw
+            items:
+              - key: gcp-sa.json
+                path: gcp-sa.json
