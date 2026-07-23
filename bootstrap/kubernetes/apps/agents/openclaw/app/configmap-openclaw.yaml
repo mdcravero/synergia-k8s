@@ -39,7 +39,13 @@ data:
 
       agents: {
         defaults: {
-          model: "google/gemini-3.1-flash",
+          model: {
+            primary: "groq/llama-3.3-70b-versatile",
+            fallbacks: [
+              "mistral/mistral-small-latest",
+              "google/gemini-3.1-flash",
+            ],
+          },
         }
       }
     }

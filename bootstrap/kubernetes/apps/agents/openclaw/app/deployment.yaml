@@ -68,6 +68,16 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: GEMINI_API_KEY
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: GROQ_API_KEY
+            - name: MISTRAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: MISTRAL_API_KEY
             - name: OPENCLAW_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:
