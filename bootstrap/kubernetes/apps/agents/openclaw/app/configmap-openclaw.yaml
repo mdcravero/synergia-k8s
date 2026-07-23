@@ -36,10 +36,9 @@ data:
       agents: {
         defaults: {
           model: {
-            primary: "groq/llama-3.3-70b-versatile",
+            primary: "mistral/mistral-small-latest",
             fallbacks: [
-              "mistral/mistral-small-latest",
-              "google/gemini-3.1-flash",
+              "groq/llama3-70b-8192",
             ],
           },
         }
