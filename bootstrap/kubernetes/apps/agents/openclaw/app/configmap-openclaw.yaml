@@ -9,6 +9,9 @@ data:
     {
       gateway: {
         mode: "local",
+        controlUi: {
+          allowedOrigins: ["https://openclaw.synergia.net.ar"],
+        },
       },
 
       channels: {
