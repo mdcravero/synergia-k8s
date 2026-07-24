@@ -9,6 +9,10 @@ data:
     {
       gateway: {
         mode: "local",
+        auth: {
+          mode: "token",
+          token: "__GATEWAY_TOKEN__",
+        },
         controlUi: {
           allowedOrigins: ["https://openclaw.synergia.net.ar"],
         },

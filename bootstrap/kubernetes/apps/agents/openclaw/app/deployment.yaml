@@ -29,7 +29,18 @@ spec:
       initContainers:
         - name: copy-config
           image: busybox:latest
-          command: ["sh", "-c", "cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json"]
+          command:
+            - sh
+            - -c
+            - |
+              cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json
+              sed -i "s/__GATEWAY_TOKEN__/${OPENCLAW_GATEWAY_TOKEN}/" /etc/openclaw/openclaw.json
+          env:
+            - name: OPENCLAW_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: OPENCLAW_GATEWAY_TOKEN
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
