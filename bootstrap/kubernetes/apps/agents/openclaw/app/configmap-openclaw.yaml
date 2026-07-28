@@ -47,8 +47,10 @@ data:
       agents: {
         defaults: {
           model: {
-            primary: "google/gemini-3.5-flash",
+            primary: "google/gemini-flash-latest",
             fallbacks: [
+              "google/gemini-3.5-flash",
+              "google/gemini-3-flash-lite",
               "mistral/mistral-small-latest",
             ],
           },
