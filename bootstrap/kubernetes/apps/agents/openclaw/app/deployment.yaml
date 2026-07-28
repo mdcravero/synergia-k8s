@@ -16,6 +16,8 @@ spec:
     metadata:
       labels:
         app: openclaw
+      annotations:
+        configmap.reloader.stakater.com/reload: "openclaw-config"
     spec:
       nodeSelector:
         type: wk-amd
