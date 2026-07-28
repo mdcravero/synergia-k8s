@@ -11,11 +11,14 @@ data:
         mode: "local",
         auth: {
           mode: "token",
-          token: "__GATEWAY_TOKEN__",
         },
         controlUi: {
           allowedOrigins: ["https://openclaw.synergia.net.ar"],
         },
+      },
+
+      commands: {
+        ownerAllowFrom: ["telegram:535462698"],
       },
 
       channels: {
@@ -23,6 +26,7 @@ data:
           enabled: true,
           dmPolicy: "allowlist",
           allowFrom: [535462698],
+          groupAllowFrom: [535462698],
         }
       },
 
@@ -47,6 +51,9 @@ data:
             fallbacks: [
               "mistral/mistral-small-latest",
             ],
+          },
+          memorySearch: {
+            enabled: false,
           },
         }
       }

@@ -29,18 +29,7 @@ spec:
       initContainers:
         - name: copy-config
           image: busybox:latest
-          command:
-            - sh
-            - -c
-            - |
-              cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json
-              sed -i "s/__GATEWAY_TOKEN__/${OPENCLAW_GATEWAY_TOKEN}/" /etc/openclaw/openclaw.json
-          env:
-            - name: OPENCLAW_GATEWAY_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: secret-openclaw
-                  key: OPENCLAW_GATEWAY_TOKEN
+          command: ["sh", "-c", "cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json"]
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -80,6 +69,15 @@ spec:
               value: /etc/openclaw/openclaw.json
             - name: OPENCLAW_SKIP_ONBOARDING
               value: "true"
+            - name: OPENCLAW_NO_RESPAWN
+              value: "1"
+            - name: NODE_COMPILE_CACHE
+              value: /tmp/openclaw-compile-cache
+            - name: OPENCLAW_GATEWAY_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: OPENCLAW_GATEWAY_TOKEN
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
