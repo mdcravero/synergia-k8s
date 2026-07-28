@@ -28,6 +28,7 @@ Kubernetes home lab running on Talos Linux, managed with Flux CD (GitOps). All c
 | [Authelia](https://www.authelia.com/) | SSO / forward auth for internal services |
 | [Renovate](https://docs.renovatebot.com/) | Automated dependency updates (self-hosted) |
 | [Goldilocks](https://goldilocks.docs.fairwinds.com/) | VPA-based resource recommendations |
+| [Reloader](https://github.com/stakater/Reloader) | Restarts workloads automatically when their ConfigMaps or Secrets change |
 
 ## Applications
 
@@ -103,6 +104,25 @@ sops -e -i bootstrap/kubernetes/apps/secrets/secret-myapp.yaml
 sops bootstrap/kubernetes/apps/secrets/secret-myapp.yaml
 ```
 
+## Config Reload
+
+Kubernetes does not restart pods when a mounted ConfigMap or Secret changes, so a config-only commit would leave the running workload on the old values. [Reloader](https://github.com/stakater/Reloader) watches all namespaces and triggers a rolling restart when a referenced resource is updated.
+
+Opt in per workload with a pod template annotation:
+
+```yaml
+spec:
+  template:
+    metadata:
+      annotations:
+        # Restart when this specific ConfigMap changes
+        configmap.reloader.stakater.com/reload: "openclaw-config"
+        # Restart when this specific Secret changes
+        secret.reloader.stakater.com/reload: "secret-openclaw"
+```
+
+To watch every ConfigMap and Secret the workload references, use `reloader.stakater.com/auto: "true"` instead of naming them individually.
+
 ## Project Structure
 
 ```
@@ -111,7 +131,8 @@ bootstrap/kubernetes/apps/
 ├── namespaces/           # All namespace definitions (centralized)
 ├── system/
 │   ├── cert-manager/     # TLS certificate management
-│   └── metrics-server/   # Resource metrics for kubectl top / HPA
+│   ├── metrics-server/   # Resource metrics for kubectl top / HPA
+│   └── reloader/         # Auto-restart on ConfigMap/Secret changes
 ├── network/
 │   ├── metallb/          # L2 load balancer
 │   └── traefik/          # Ingress controller + per-namespace Authelia middlewares
@@ -133,7 +154,7 @@ bootstrap/kubernetes/apps/
 
 ```
 Namespaces
-    └── cert-manager + metrics-server
+    └── cert-manager + metrics-server + Reloader
             └── MetalLB
                     └── Traefik + middlewares
                             └── NFS provisioner
