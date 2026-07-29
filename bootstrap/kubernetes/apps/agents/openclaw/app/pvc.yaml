@@ -24,3 +24,19 @@ spec:
   resources:
     requests:
       storage: 512Mi
+---
+# Writable runtime config directory. The ConfigMap is read-only, but OpenClaw
+# writes backups next to the config file and installs provider plugins under
+# <config-dir>/npm — those must survive pod restarts.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openclaw-runtime
+  namespace: agents
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

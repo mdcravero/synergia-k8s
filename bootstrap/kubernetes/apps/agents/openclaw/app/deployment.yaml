@@ -163,4 +163,5 @@ spec:
           persistentVolumeClaim:
             claimName: openclaw-auth
         - name: openclaw-runtime
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: openclaw-runtime
