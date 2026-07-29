@@ -60,8 +60,8 @@ spec:
               memory: 32Mi
 
         - name: openclaw
-          image: ghcr.io/openclaw/openclaw:latest
-          imagePullPolicy: Always
+          image: ghcr.io/openclaw/openclaw:2026.6.34
+          imagePullPolicy: IfNotPresent
 
           ports:
             - containerPort: 18789
