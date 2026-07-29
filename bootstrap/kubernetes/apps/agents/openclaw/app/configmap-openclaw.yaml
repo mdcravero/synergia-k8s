@@ -47,8 +47,9 @@ data:
       agents: {
         defaults: {
           model: {
-            primary: "google/gemini-flash-latest",
+            primary: "moonshot/kimi-k2.6",
             fallbacks: [
+              "google/gemini-flash-latest",
               "google/gemini-3.5-flash",
               "google/gemini-3-flash-lite",
               "mistral/mistral-small-latest",
