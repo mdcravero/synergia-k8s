@@ -47,13 +47,12 @@ data:
       agents: {
         defaults: {
           model: {
-            // Groq leads: ~400ms responses on a free tier, and both models
-            // handle tool calling well. Google follows as the higher-quota
-            // backstop, Mistral Small last as a weak but always-available tail.
-            primary: "groq/openai/gpt-oss-120b",
+            // Groq is deliberately absent: its free tier caps at 8k tokens per
+            // minute (12k for llama-3.3-70b), well under this agent's base
+            // prompt, so every call returned 413 and burned ~70s in retries
+            // before failing over. Re-add it only on a paid Groq tier.
+            primary: "google/gemini-flash-latest",
             fallbacks: [
-              "groq/llama-3.3-70b-versatile",
-              "google/gemini-flash-latest",
               "google/gemini-3.5-flash",
               "google/gemini-3-flash-lite",
               "mistral/mistral-small-latest",
