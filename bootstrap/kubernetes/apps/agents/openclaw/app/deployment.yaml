@@ -29,9 +29,18 @@ spec:
         runAsNonRoot: true
 
       initContainers:
+        # The ConfigMap is the single source of truth for the runtime config.
+        # OpenClaw keeps its own .last-good/.bak copies and, since /etc/openclaw
+        # is a PVC, it would restore them over anything written externally
+        # ("missing-meta-vs-last-good") — silently reverting GitOps changes.
+        # Clearing that recovery state first makes the copy stick; Git is the
+        # real backup.
         - name: copy-config
           image: busybox:latest
-          command: ["sh", "-c", "cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json"]
+          command:
+            - sh
+            - -c
+            - "rm -f /etc/openclaw/openclaw.json.last-good /etc/openclaw/openclaw.json.bak* /etc/openclaw/openclaw.json.clobbered.*; cp /etc/openclaw-config/openclaw.json /etc/openclaw/openclaw.json"
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
