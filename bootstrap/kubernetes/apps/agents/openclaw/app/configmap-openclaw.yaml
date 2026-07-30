@@ -47,8 +47,12 @@ data:
       agents: {
         defaults: {
           model: {
-            primary: "moonshot/kimi-k2.6",
+            // Groq leads: ~400ms responses on a free tier, and both models
+            // handle tool calling well. Google follows as the higher-quota
+            // backstop, Mistral Small last as a weak but always-available tail.
+            primary: "groq/openai/gpt-oss-120b",
             fallbacks: [
+              "groq/llama-3.3-70b-versatile",
               "google/gemini-flash-latest",
               "google/gemini-3.5-flash",
               "google/gemini-3-flash-lite",

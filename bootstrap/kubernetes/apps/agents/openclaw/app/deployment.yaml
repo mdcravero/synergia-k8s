@@ -42,6 +42,22 @@ spec:
             - name: openclaw-runtime
               mountPath: /etc/openclaw
 
+        # Groq is not a built-in provider — it ships as a separate npm plugin.
+        # The runtime PVC keeps it across restarts, so this is a no-op once
+        # installed; it only does work when the PVC starts empty. Non-blocking:
+        # if npm is unreachable the gateway still starts and falls back to Google.
+        - name: install-plugins
+          image: ghcr.io/openclaw/openclaw:2026.6.34
+          command:
+            - sh
+            - -c
+            - "ls -d /etc/openclaw/npm/projects/*groq* >/dev/null 2>&1 || node /app/openclaw.mjs plugins install @openclaw/groq-provider || true"
+          volumeMounts:
+            - name: openclaw-runtime
+              mountPath: /etc/openclaw
+            - name: data
+              mountPath: /home/node/.openclaw
+
       containers:
         - name: socat-proxy
           image: alpine/socat:latest
@@ -105,11 +121,6 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: MISTRAL_API_KEY
-            - name: MOONSHOT_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: secret-openclaw
-                  key: MOONSHOT_API_KEY
 
           resources:
             requests:
