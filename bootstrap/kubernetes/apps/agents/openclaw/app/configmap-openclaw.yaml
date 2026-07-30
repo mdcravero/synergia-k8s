@@ -30,19 +30,23 @@ data:
         }
       },
 
-      // MCP servers — disabled until correct npm package names are confirmed
-      // mcp: {
-      //   servers: {
-      //     "home-assistant": {
-      //       command: "npx",
-      //       args: ["-y", "PACKAGE_NAME", "--url", "http://home-assistant.tools.svc.cluster.local:8123", "--token", "${HA_TOKEN}"]
-      //     },
-      //     "prometheus": {
-      //       command: "npx",
-      //       args: ["-y", "PACKAGE_NAME", "--url", "http://prometheus-server.monitoring.svc.cluster.local"]
-      //     }
-      //   }
-      // },
+      // Home Assistant exposes a native MCP Server (core integration, no npm
+      // package needed). Without this the agent improvises unauthenticated
+      // curl calls against /api/states, which Home Assistant rejects and
+      // counts toward an IP ban. ${HA_TOKEN} is expanded from the env at load,
+      // so the token stays in the SOPS secret and never lands in Git.
+      // Requires the "Model Context Protocol Server" integration enabled in
+      // Home Assistant; it only exposes entities marked visible to Assist.
+      mcp: {
+        servers: {
+          "home-assistant": {
+            url: "http://home-assistant.tools.svc.cluster.local:8123/mcp_server/sse",
+            headers: {
+              Authorization: "Bearer ${HA_TOKEN}",
+            },
+          },
+        }
+      },
 
       agents: {
         defaults: {
