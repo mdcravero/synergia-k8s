@@ -48,8 +48,35 @@ data:
         }
       },
 
+      // Every tool definition ships in the prompt on every turn. Left at the
+      // defaults this agent sent ~84k tokens for a one-line message, which
+      // exhausted free-tier quotas, pushed Gemini past its 45s response
+      // deadline, and gave the model a huge menu to pick the wrong tool from.
+      // These plugins carry tools this deployment never uses.
+      plugins: {
+        deny: [
+          "browser",        // headless browsing; no skill here needs it
+          "canvas",         // experimental rendering for paired nodes
+          "phone-control",  // no paired phone
+          "talk-voice",     // Telegram is used as text only
+        ],
+      },
+
       agents: {
         defaults: {
+          // Allowlist, not denylist: 56 skills load by default and 39 of them
+          // cannot even run here (macOS apps, Sonos, Spotify, iMessage...).
+          // Anything omitted is simply absent from the prompt.
+          skills: [
+            "netbox-diagrama-red",
+            "netbox-diagrama-red-full-topology",
+            "camsnap",
+            "diagram-maker",
+            "github",
+            "summarize",
+            "weather",
+          ],
+
           model: {
             // Groq is deliberately absent: its free tier caps at 8k tokens per
             // minute (12k for llama-3.3-70b), well under this agent's base
