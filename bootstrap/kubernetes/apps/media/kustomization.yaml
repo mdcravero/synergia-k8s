@@ -7,4 +7,5 @@ resources:
   - ./prowlarr/app
   - ./radarr/app
   - ./sonarr/app
+  - ./lidarr/app
   - ./maintainerr/app

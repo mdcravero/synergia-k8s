@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trans-music
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trans-music
+  template:
+    metadata:
+      labels:
+        app: trans-music
+    spec:
+      containers:
+        - name: trans-music
+          image: "lscr.io/linuxserver/transmission:4.1.3"
+          resources:
+            requests:
+              cpu: 15m
+              memory: 112Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          ports:
+            - containerPort: 9091
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-transmission-music
+                  key: username
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  name: secret-transmission-music
+                  key: password
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: downloads
+              mountPath: /downloads
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: trans-music-config
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: trans-music-down

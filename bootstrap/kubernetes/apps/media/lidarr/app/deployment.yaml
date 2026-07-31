@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: lidarr
+  name: lidarr
+  namespace: media
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      run: lidarr
+  template:
+    metadata:
+      labels:
+        run: lidarr
+      annotations: {}
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "America/Argentina/Cordoba"
+          image: lscr.io/linuxserver/lidarr:version-3.1.0.4875
+          name: lidarr
+          resources:
+            requests:
+              cpu: 35m
+              memory: 300Mi
+            limits:
+              cpu: 150m
+              memory: 340Mi
+          ports:
+            - containerPort: 8686
+              name: webui
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /media
+            - name: downloads
+              mountPath: /downloads
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: lidarr-config
+        - name: media
+          persistentVolumeClaim:
+            claimName: jellyfin-media
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: trans-music-down
