@@ -4,6 +4,7 @@ metadata:
   name: home-assistant
 resources:
   - pvc-home-assistant.yaml
+  - configmap-configuration.yaml
   - service.yaml
   - deployment.yaml
   - ingress.yaml
