@@ -230,13 +230,13 @@ data:
                 expr: |
                   sum by (instance, job) (
                     pg_stat_database_numbackends{job="kubernetes-pods-tools",datname!~"template.*"}
-                  ) >= 15
+                  ) >= 35
                 for: 5m
                 labels:
                   severity: warning
                 annotations:
                   summary: "PostgreSQL connection count high"
-                  description: "Total backends across databases is at least 8 (cluster max_connections is 10) on {{ $labels.instance }}."
+                  description: "Total backends across databases is {{ $value }} (cluster max_connections is 100) on {{ $labels.instance }}."
 
     alertmanager:
       enabled: true
