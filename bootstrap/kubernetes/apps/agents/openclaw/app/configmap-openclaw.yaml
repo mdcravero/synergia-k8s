@@ -82,10 +82,18 @@ data:
             // minute (12k for llama-3.3-70b), well under this agent's base
             // prompt, so every call returned 413 and burned ~70s in retries
             // before failing over. Re-add it only on a paid Groq tier.
-            primary: "google/gemini-flash-latest",
+            //
+            // Pinned to explicit stable slugs instead of "gemini-flash-latest":
+            // per AI Studio's own rate-limit dashboard, 3.6 Flash and 3.5 Flash
+            // are both past their free-tier RPM/TPM/RPD ceiling for this period,
+            // while 2.5 Flash / 3 Flash / 2.5 Flash Lite still have full headroom.
+            // "google/gemini-3-flash" resolves to gemini-3-flash-preview, the
+            // same preview build that once took 90s to respond, so 2.5 Flash
+            // (GA, no observed latency issues) leads instead.
+            primary: "google/gemini-2.5-flash",
             fallbacks: [
-              "google/gemini-3.5-flash",
-              "google/gemini-3-flash-lite",
+              "google/gemini-3-flash",
+              "google/gemini-2.5-flash-lite",
               "mistral/mistral-small-latest",
             ],
           },
