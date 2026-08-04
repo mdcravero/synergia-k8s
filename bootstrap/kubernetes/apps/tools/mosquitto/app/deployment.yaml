@@ -21,7 +21,7 @@ spec:
         runAsNonRoot: true
       initContainers:
         - name: init-config
-          image: eclipse-mosquitto:2.0.21
+          image: eclipse-mosquitto:2.0.22
           securityContext:
             runAsUser: 1883
             runAsGroup: 1883
@@ -50,7 +50,7 @@ spec:
               mountPath: /mosquitto/config
       containers:
         - name: mosquitto
-          image: eclipse-mosquitto:2.0.21
+          image: eclipse-mosquitto:2.0.22
           ports:
             - containerPort: 1883
               name: mqtt
