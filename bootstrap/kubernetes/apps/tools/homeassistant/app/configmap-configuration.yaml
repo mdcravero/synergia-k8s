@@ -17,12 +17,11 @@ data:
     script: !include scripts.yaml
     scene: !include scenes.yaml
 
-    http:
-      use_x_forwarded_for: true
-      trusted_proxies:
-        - 10.0.0.0/8
-        - 172.16.0.0/12
-        - 10.42.0.0/16
+    # http: block removed — HA 2026.8 deprecated YAML-based http config and
+    # auto-imported use_x_forwarded_for/trusted_proxies into UI storage
+    # (Settings > System > Network). It stops working entirely in 2027.2.0.
+    # Values now live in .storage/http on the NFS PVC, outside Git — the one
+    # tradeoff of following HA's own migration path here.
 
     recorder:
       db_url: !env_var POSTGRES_URL
