@@ -15,16 +15,16 @@ spec:
         app: mosquitto
     spec:
       securityContext:
-        fsGroup: 1883
-        runAsUser: 1883
-        runAsGroup: 1883
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
         runAsNonRoot: true
       initContainers:
         - name: init-config
           image: eclipse-mosquitto:2.0.22
           securityContext:
-            runAsUser: 1883
-            runAsGroup: 1883
+            runAsUser: 1000
+            runAsGroup: 1000
           command:
             - sh
             - -c
