@@ -30,7 +30,7 @@ spec:
             name: home-assistant-configuration
       containers:
         - name: home-assistant-app
-          image: homeassistant/home-assistant:2026.8.0
+          image: homeassistant/home-assistant:2026.8.1
           env:
             - name: TZ
               value: "America/Argentina/Córdoba"
