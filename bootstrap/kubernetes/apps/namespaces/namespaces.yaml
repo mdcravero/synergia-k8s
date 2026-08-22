@@ -12,6 +12,7 @@ metadata:
   name: metallb-system
   labels:
     name: metallb-system
+    goldilocks.fairwinds.com/enabled: "true"
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
@@ -22,6 +23,7 @@ metadata:
   name: traefik
   labels:
     name: traefik
+    goldilocks.fairwinds.com/enabled: "true"
 ---
 apiVersion: v1
 kind: Namespace
@@ -47,6 +49,7 @@ metadata:
   name: security
   labels:
     name: security
+    goldilocks.fairwinds.com/enabled: "true"
 ---
 apiVersion: v1
 kind: Namespace
@@ -77,6 +80,7 @@ metadata:
   name: cert-manager
   labels:
     name: cert-manager
+    goldilocks.fairwinds.com/enabled: "true"
 ---
 apiVersion: v1
 kind: Namespace
