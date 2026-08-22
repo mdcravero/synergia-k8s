@@ -8,3 +8,4 @@ resources:
   - middleware-authelia-goldilocks.yaml
   - middleware-authelia-zigbee2mqtt.yaml
   - middleware-authelia-openclaw.yaml
+  - middleware-authelia-sabnzbd.yaml
