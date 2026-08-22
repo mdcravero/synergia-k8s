@@ -54,11 +54,11 @@ data:
 
     resources:
       requests:
-        cpu: 25m
-        memory: 210Mi
+        cpu: 100m
+        memory: 256Mi
       limits:
-        cpu: 50m
-        memory: 240Mi
+        cpu: 1000m
+        memory: 512Mi
 
     # -- Configures the probes for the main Pod.
     # @default -- See values.yaml
@@ -82,6 +82,15 @@ data:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 10
+      startup:
+        enabled: true
+        custom: true
+        spec:
+          tcpSocket:
+            port: 9696
+          failureThreshold: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
 
     # -- Configure persistence settings for the chart under this key.
     ## Config persistence is required for the Prometheus exporter sidecar.
