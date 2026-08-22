@@ -48,6 +48,8 @@ spec:
               mountPath: /media
             - name: downloads
               mountPath: /downloads
+            - name: downloads-usenet
+              mountPath: /downloads-usenet
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -58,3 +60,6 @@ spec:
         - name: downloads
           persistentVolumeClaim:
             claimName: trans-movies-down
+        - name: downloads-usenet
+          persistentVolumeClaim:
+            claimName: sabnzbd-down

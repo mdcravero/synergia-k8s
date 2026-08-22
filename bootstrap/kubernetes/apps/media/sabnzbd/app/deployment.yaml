@@ -3,8 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    run: lidarr
-  name: lidarr
+    run: sabnzbd
+  name: sabnzbd
   namespace: media
 spec:
   replicas: 1
@@ -12,11 +12,11 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      run: lidarr
+      run: sabnzbd
   template:
     metadata:
       labels:
-        run: lidarr
+        run: sabnzbd
       annotations: {}
     spec:
       securityContext:
@@ -29,37 +29,27 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Argentina/Cordoba"
-          image: lscr.io/linuxserver/lidarr:version-3.1.0.4875
-          name: lidarr
+          image: lscr.io/linuxserver/sabnzbd:latest
+          name: sabnzbd
           resources:
             requests:
-              cpu: 35m
-              memory: 300Mi
+              cpu: 100m
+              memory: 256Mi
             limits:
-              cpu: 150m
-              memory: 340Mi
+              cpu: 1500m
+              memory: 1Gi
           ports:
-            - containerPort: 8686
+            - containerPort: 8080
               name: webui
           volumeMounts:
             - name: config
               mountPath: /config
-            - name: media
-              mountPath: /media
             - name: downloads
               mountPath: /downloads
-            - name: downloads-usenet
-              mountPath: /downloads-usenet
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: lidarr-config
-        - name: media
-          persistentVolumeClaim:
-            claimName: jellyfin-media
+            claimName: sabnzbd-config
         - name: downloads
-          persistentVolumeClaim:
-            claimName: trans-music-down
-        - name: downloads-usenet
           persistentVolumeClaim:
             claimName: sabnzbd-down

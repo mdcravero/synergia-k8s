@@ -9,3 +9,4 @@ resources:
   - ./sonarr/app
   - ./lidarr/app
   - ./maintainerr/app
+  - ./sabnzbd/app
