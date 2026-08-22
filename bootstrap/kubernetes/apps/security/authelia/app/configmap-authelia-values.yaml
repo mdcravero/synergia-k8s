@@ -80,6 +80,8 @@ data:
             policy: one_factor
           - domain: openclaw.synergia.net.ar
             policy: one_factor
+          - domain: sabnzbd.synergia.net.ar
+            policy: one_factor
       storage:
         postgres:
           enabled: true
