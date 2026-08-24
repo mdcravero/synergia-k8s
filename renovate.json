@@ -60,6 +60,13 @@
       "automerge": false,
       "dependencyDashboardApproval": true,
       "labels": ["breaking-change", "renovate"]
+    },
+    {
+      "description": "zigbee2mqtt: migrates its own config schema on every version bump (can break HA discovery) — check each release individually, never auto-merge, always review changelog before bumping",
+      "matchPackageNames": ["ghcr.io/koenkk/zigbee2mqtt"],
+      "schedule": ["at any time"],
+      "automerge": false,
+      "labels": ["breaking-change", "renovate"]
     }
   ]
 }
