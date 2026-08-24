@@ -69,6 +69,43 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /app/data
+        - name: bridge-online-healer
+          # zigbee2mqtt sometimes fails to republish a retained
+          # "online" bridge/state after a restart, leaving every HA
+          # entity availability-linked to it stuck "unavailable" even
+          # though the bridge is actually up and publishing. Force it.
+          image: eclipse-mosquitto:2.0.22
+          command:
+            - sh
+            - -c
+            - |
+              sleep 20
+              for i in $(seq 1 30); do
+                mosquitto_pub -h mosquitto.tools.svc.cluster.local -p 1883 \
+                  -u "$MQTT_USER" -P "$MQTT_PASSWORD" \
+                  -t zigbee2mqtt/bridge/state -m '{"state":"online"}' -r -q 1 \
+                  && break
+                sleep 5
+              done
+              sleep infinity
+          env:
+            - name: MQTT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mosquitto
+                  key: username
+            - name: MQTT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-mosquitto
+                  key: password
+          resources:
+            requests:
+              cpu: 5m
+              memory: 8Mi
+            limits:
+              cpu: 20m
+              memory: 32Mi
       volumes:
         - name: conf-cm
           configMap:
