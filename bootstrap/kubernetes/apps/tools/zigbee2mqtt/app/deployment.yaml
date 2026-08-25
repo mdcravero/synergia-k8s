@@ -6,6 +6,13 @@ metadata:
   namespace: tools
 spec:
   replicas: 1
+  strategy:
+    # Only one process may hold the Zigbee coordinator's TCP socket
+    # (10.42.30.30:6638) at a time. RollingUpdate briefly runs old+new
+    # pods together, which both races for that socket and lets the
+    # old pod's MQTT disconnect (LWT) overwrite the new pod's correct
+    # "online" bridge/state with a stale retained "offline".
+    type: Recreate
   selector:
     matchLabels:
       app: zigbee2mqtt
