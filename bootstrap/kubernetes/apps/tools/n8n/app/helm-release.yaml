@@ -15,7 +15,7 @@ spec:
         kind: HelmRepository
         name: n8n
         namespace: tools
-      version: 1.24.32
+      version: 1.24.33
   interval: 1h
   timeout: 15m
   releaseName: n8n
