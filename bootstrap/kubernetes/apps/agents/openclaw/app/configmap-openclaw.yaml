@@ -85,14 +85,18 @@ data:
             //
             // gemini-2.5-flash and gemini-2.5-flash-lite are retired: Google
             // returns a 404 "no longer available to new users" on every key
-            // we've tried, project/billing status doesn't matter. Moved to
-            // the current stable line (3.6 Flash / 3.5 Flash Lite) per
-            // Google's own suggested replacements. gemini-3-flash-preview
-            // stays last before Mistral -- it's a preview build, prone to
-            // slow responses or 503 "overloaded" under high demand.
-            primary: "google/gemini-3.6-flash",
+            // we've tried, project/billing status doesn't matter.
+            // "google/gemini-3.6-flash" is NOT usable here either, despite
+            // being Google's suggested replacement: this pinned OpenClaw
+            // build (2026.6.34) doesn't have it in its own model registry
+            // and rejects it client-side with "Unknown model" before ever
+            // calling Google. Confirmed working on this build instead:
+            // gemini-3.5-flash-lite (fast, free-tier quota is tight -- a
+            // single tool-heavy turn can burn through it and 429) and
+            // gemini-3-flash-preview (fallback; preview build, prone to
+            // slow responses or 503 "overloaded" under high demand).
+            primary: "google/gemini-3.5-flash-lite",
             fallbacks: [
-              "google/gemini-3.5-flash-lite",
               "google/gemini-3-flash-preview",
               "mistral/mistral-small-latest",
             ],
