@@ -1,0 +1,68 @@
+---
+# Computes days remaining on the talosconfig client cert and pushes it as
+# a Prometheus metric, so alerting_rules.yml can warn via Telegram before
+# it silently expires again (see ../TALOSCONFIG-CERT-RENEWAL.md).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: talosconfig-cert-check
+  namespace: backup-system
+  labels:
+    app.kubernetes.io/name: talosconfig-cert-check
+    app.kubernetes.io/component: cert-check
+    app.kubernetes.io/part-of: synergia-k8s
+spec:
+  schedule: "0 6 * * *"          # Daily at 6 AM UTC
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 300
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: cert-check
+              image: alpine:3.20
+              command:
+                - sh
+                - -c
+                - |
+                  set -e
+                  apk add --no-cache openssl coreutils curl >/dev/null
+
+                  grep "crt:" /talosconfig/config | awk '{print $2}' \
+                    | base64 -d > /tmp/client.crt
+
+                  ENDDATE=$(openssl x509 -in /tmp/client.crt -noout -enddate | cut -d= -f2)
+                  EXPIRY_EPOCH=$(date -d "${ENDDATE}" +%s)
+                  NOW_EPOCH=$(date +%s)
+                  DAYS_LEFT=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+
+                  echo "talosconfig client cert expires in ${DAYS_LEFT} days (${ENDDATE})"
+
+                  cat <<EOF | curl --silent --show-error --data-binary @- \
+                    "${PUSHGATEWAY_URL}/metrics/job/talosconfig-cert-check/cert/talosconfig"
+                  # TYPE talos_client_cert_expiry_days gauge
+                  talos_client_cert_expiry_days ${DAYS_LEFT}
+                  EOF
+              env:
+                - name: PUSHGATEWAY_URL
+                  value: "http://prometheus-prometheus-pushgateway.monitoring.svc.cluster.local:9091"
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "10m"
+                limits:
+                  memory: "64Mi"
+                  cpu: "100m"
+              volumeMounts:
+                - name: talosconfig
+                  mountPath: /talosconfig
+                  readOnly: true
+          volumes:
+            - name: talosconfig
+              secret:
+                secretName: talosconfig

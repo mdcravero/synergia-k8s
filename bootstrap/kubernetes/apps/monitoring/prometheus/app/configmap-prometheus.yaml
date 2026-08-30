@@ -9,7 +9,7 @@ data:
     scrapeConfigs: null
 
     prometheus-pushgateway:
-      enabled: false
+      enabled: true
 
     server:
       name: server

@@ -6,6 +6,7 @@ metadata:
 
 resources:
   - etcd-backup.yaml
+  - talosconfig-cert-check.yaml
 
 namespace: backup-system
 
