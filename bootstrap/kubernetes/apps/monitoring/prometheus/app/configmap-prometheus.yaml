@@ -108,6 +108,10 @@ data:
           - job_name: kube-state-metrics
             static_configs:
               - targets: ['prometheus-kube-state-metrics.monitoring.svc.cluster.local:8080']
+          - job_name: pushgateway
+            honor_labels: true
+            static_configs:
+              - targets: ['prometheus-prometheus-pushgateway.monitoring.svc.cluster.local:9091']
           - job_name: flux-system
             kubernetes_sd_configs:
               - role: pod
@@ -208,6 +212,16 @@ data:
                 annotations:
                   summary: "Kustomization {{ $labels.name }} failed"
                   description: "Kustomization {{ $labels.name }} in namespace {{ $labels.namespace }} is not Ready. Run: flux get ks"
+          - name: certificates
+            rules:
+              - alert: TalosConfigCertExpiringSoon
+                expr: talos_client_cert_expiry_days < 7
+                for: 0m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "talosconfig client cert expires in {{ $value }} days"
+                  description: "Renew it: see bootstrap/kubernetes/apps/tools/backup/TALOSCONFIG-CERT-RENEWAL.md in synergia-k8s. Backups (etcd-backup) will start failing once it expires."
           - name: postgresql
             rules:
               - alert: PostgresqlExporterUnreachable
