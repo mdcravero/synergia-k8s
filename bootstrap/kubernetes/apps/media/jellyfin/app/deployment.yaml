@@ -42,8 +42,6 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
-            - name: render
-              mountPath: /dev/dri
       volumes:
         - name: config
           persistentVolumeClaim:
@@ -51,7 +49,3 @@ spec:
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
-        - name: render
-          hostPath:
-            path: /dev/dri
-            type: Directory
