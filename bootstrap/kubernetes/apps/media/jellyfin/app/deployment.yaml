@@ -25,8 +25,14 @@ spec:
         - env:
             - name: TZ
               value: "Argentina/Cordoba/Arroyito"
+            - name: LIBVA_DRIVER_NAME
+              value: "iHD"
+            - name: LIBVA_DRIVERS_PATH
+              value: "/usr/lib/jellyfin-ffmpeg/lib/dri"
           image: jellyfin/jellyfin:10.11.11
           name: jellyfin
+          securityContext:
+            privileged: true
           resources:
             requests:
               cpu: 50m
