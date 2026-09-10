@@ -139,7 +139,7 @@ data:
                   {
                     "name": "instance",
                     "type": "query",
-                    "datasource": "${DS_PROMETHEUS}",
+                    "datasource": "Prometheus",
                     "query": "label_values(up{role=\"workstation\"}, instance)",
                     "refresh": 2,
                     "includeAll": false,
@@ -153,7 +153,7 @@ data:
                   "id": 1,
                   "title": "Up",
                   "type": "stat",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
                   "targets": [
                     { "expr": "up{instance=\"$instance\"}", "legendFormat": "up", "refId": "A" }
@@ -171,7 +171,7 @@ data:
                   "id": 2,
                   "title": "Load average",
                   "type": "timeseries",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 6, "y": 0, "w": 18, "h": 4 },
                   "targets": [
                     { "expr": "node_load1{instance=\"$instance\"}", "legendFormat": "load1", "refId": "A" },
@@ -184,7 +184,7 @@ data:
                   "title": "PSI - some (waiting)",
                   "description": "Fraction of time at least one task was stalled waiting on this resource. Earliest signal of an oncoming freeze.",
                   "type": "timeseries",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
                   "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 } },
                   "targets": [
@@ -198,7 +198,7 @@ data:
                   "title": "PSI - full (stalled)",
                   "description": "Fraction of time ALL tasks were stalled on this resource simultaneously. No CPU variant by definition.",
                   "type": "timeseries",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
                   "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 } },
                   "targets": [
@@ -210,7 +210,7 @@ data:
                   "id": 5,
                   "title": "Temperatures (hwmon)",
                   "type": "timeseries",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
                   "fieldConfig": { "defaults": { "unit": "celsius" } },
                   "targets": [
@@ -222,7 +222,7 @@ data:
                   "title": "GPU busy % (textfile collector)",
                   "description": "Only populated on hosts running the freeze-watch textfile collector for amdgpu.",
                   "type": "timeseries",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
                   "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 } },
                   "targets": [
@@ -233,7 +233,7 @@ data:
                   "id": 7,
                   "title": "Memory available",
                   "type": "timeseries",
-                  "datasource": "${DS_PROMETHEUS}",
+                  "datasource": "Prometheus",
                   "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
                   "fieldConfig": { "defaults": { "unit": "bytes" } },
                   "targets": [
