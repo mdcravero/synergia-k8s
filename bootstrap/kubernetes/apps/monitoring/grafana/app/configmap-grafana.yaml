@@ -92,6 +92,14 @@ data:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/default
+          - name: workstations
+            orgId: 1
+            folder: 'Workstations'
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/workstations
 
     dashboards:
       default:
@@ -111,6 +119,130 @@ data:
           gnetId: 18376
           revision: 3
           datasource: Prometheus
+
+      workstations:
+        freeze-forensics:
+          datasource: Prometheus
+          json: |-
+            {
+              "title": "Workstation Freeze Forensics",
+              "uid": "workstation-freeze-forensics",
+              "tags": ["workstation", "node-exporter"],
+              "timezone": "browser",
+              "schemaVersion": 39,
+              "version": 1,
+              "editable": true,
+              "refresh": "30s",
+              "time": { "from": "now-6h", "to": "now" },
+              "templating": {
+                "list": [
+                  {
+                    "name": "instance",
+                    "type": "query",
+                    "datasource": "${DS_PROMETHEUS}",
+                    "query": "label_values(up{role=\"workstation\"}, instance)",
+                    "refresh": 2,
+                    "includeAll": false,
+                    "multi": false,
+                    "sort": 1
+                  }
+                ]
+              },
+              "panels": [
+                {
+                  "id": 1,
+                  "title": "Up",
+                  "type": "stat",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+                  "targets": [
+                    { "expr": "up{instance=\"$instance\"}", "legendFormat": "up", "refId": "A" }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "mappings": [
+                        { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+                      ],
+                      "thresholds": { "mode": "absolute", "steps": [ { "value": null, "color": "red" }, { "value": 1, "color": "green" } ] }
+                    }
+                  }
+                },
+                {
+                  "id": 2,
+                  "title": "Load average",
+                  "type": "timeseries",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 6, "y": 0, "w": 18, "h": 4 },
+                  "targets": [
+                    { "expr": "node_load1{instance=\"$instance\"}", "legendFormat": "load1", "refId": "A" },
+                    { "expr": "node_load5{instance=\"$instance\"}", "legendFormat": "load5", "refId": "B" },
+                    { "expr": "node_load15{instance=\"$instance\"}", "legendFormat": "load15", "refId": "C" }
+                  ]
+                },
+                {
+                  "id": 3,
+                  "title": "PSI - some (waiting)",
+                  "description": "Fraction of time at least one task was stalled waiting on this resource. Earliest signal of an oncoming freeze.",
+                  "type": "timeseries",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+                  "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 } },
+                  "targets": [
+                    { "expr": "rate(node_pressure_cpu_waiting_seconds_total{instance=\"$instance\"}[1m])", "legendFormat": "cpu", "refId": "A" },
+                    { "expr": "rate(node_pressure_memory_waiting_seconds_total{instance=\"$instance\"}[1m])", "legendFormat": "memory", "refId": "B" },
+                    { "expr": "rate(node_pressure_io_waiting_seconds_total{instance=\"$instance\"}[1m])", "legendFormat": "io", "refId": "C" }
+                  ]
+                },
+                {
+                  "id": 4,
+                  "title": "PSI - full (stalled)",
+                  "description": "Fraction of time ALL tasks were stalled on this resource simultaneously. No CPU variant by definition.",
+                  "type": "timeseries",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+                  "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 } },
+                  "targets": [
+                    { "expr": "rate(node_pressure_memory_stalled_seconds_total{instance=\"$instance\"}[1m])", "legendFormat": "memory", "refId": "A" },
+                    { "expr": "rate(node_pressure_io_stalled_seconds_total{instance=\"$instance\"}[1m])", "legendFormat": "io", "refId": "B" }
+                  ]
+                },
+                {
+                  "id": 5,
+                  "title": "Temperatures (hwmon)",
+                  "type": "timeseries",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+                  "fieldConfig": { "defaults": { "unit": "celsius" } },
+                  "targets": [
+                    { "expr": "node_hwmon_temp_celsius{instance=\"$instance\"}", "legendFormat": "{{chip}} {{sensor}}", "refId": "A" }
+                  ]
+                },
+                {
+                  "id": 6,
+                  "title": "GPU busy % (textfile collector)",
+                  "description": "Only populated on hosts running the freeze-watch textfile collector for amdgpu.",
+                  "type": "timeseries",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+                  "fieldConfig": { "defaults": { "unit": "percent", "min": 0, "max": 100 } },
+                  "targets": [
+                    { "expr": "amdgpu_busy_percent{instance=\"$instance\"}", "legendFormat": "{{card}}", "refId": "A" }
+                  ]
+                },
+                {
+                  "id": 7,
+                  "title": "Memory available",
+                  "type": "timeseries",
+                  "datasource": "${DS_PROMETHEUS}",
+                  "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
+                  "fieldConfig": { "defaults": { "unit": "bytes" } },
+                  "targets": [
+                    { "expr": "node_memory_MemAvailable_bytes{instance=\"$instance\"}", "legendFormat": "available", "refId": "A" },
+                    { "expr": "node_memory_MemTotal_bytes{instance=\"$instance\"}", "legendFormat": "total", "refId": "B" }
+                  ]
+                }
+              ]
+            }
 
     datasources:
       datasources.yaml:
