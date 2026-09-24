@@ -88,6 +88,8 @@ spec:
               value: "7"                   # Snapshots to retain
             - name: RCLONE_CONFIG_MEGA_TYPE
               value: "mega"
+            - name: RCLONE_CONFIG_MEGA_HARD_DELETE
+              value: "true"                # Skip Mega trash (it counts toward quota)
             - name: RCLONE_CONFIG_MEGA_USER
               valueFrom:
                 secretKeyRef:

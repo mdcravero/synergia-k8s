@@ -25,15 +25,24 @@ spec:
                 - |
                   set -e
                   echo "[$(date)] Syncing HA backups to Mega..."
-                  rclone copy /config/backups/ "mega:${MEGA_PATH}/" --progress
+                  # Only upload recent backups so pruned files are not re-uploaded
+                  rclone copy /config/backups/ "mega:${MEGA_PATH}/" \
+                    --max-age "${RETENTION_DAYS}d" --progress
+                  echo "[$(date)] Deleting backups older than ${RETENTION_DAYS} days..."
+                  rclone delete "mega:${MEGA_PATH}/" \
+                    --min-age "${RETENTION_DAYS}d" -v
                   echo "[$(date)] Files in Mega:"
                   rclone ls "mega:${MEGA_PATH}/"
                   echo "[$(date)] Sync complete"
               env:
                 - name: MEGA_PATH
                   value: "backups/homeassistant/synergia-k8s"
+                - name: RETENTION_DAYS
+                  value: "14"                # Days of backups to keep in Mega
                 - name: RCLONE_CONFIG_MEGA_TYPE
                   value: "mega"
+                - name: RCLONE_CONFIG_MEGA_HARD_DELETE
+                  value: "true"              # Skip Mega trash (it counts toward quota)
                 - name: RCLONE_CONFIG_MEGA_USER
                   valueFrom:
                     secretKeyRef:
