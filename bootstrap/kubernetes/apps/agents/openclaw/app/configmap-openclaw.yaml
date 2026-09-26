@@ -62,6 +62,46 @@ data:
         ],
       },
 
+      // The bundled "alibaba" plugin only advertises video-generation, so it
+      // cannot serve text. DashScope's OpenAI-compatible endpoint is wired up
+      // here as a custom provider instead -- "mode: merge" keeps the stock
+      // catalog (google/mistral/groq...) and adds these entries on top rather
+      // than replacing it.
+      //
+      // Use the -intl host: the mainland endpoint (dashscope.aliyuncs.com)
+      // rejects international account keys with an auth error that reads like
+      // a bad key. ${ALIBABA_API_KEY} is expanded from the env at load, so
+      // the key stays in the SOPS secret and never lands in Git -- same
+      // pattern as ${HA_TOKEN} above.
+      models: {
+        mode: "merge",
+        providers: {
+          alibaba: {
+            baseUrl: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+            apiKey: "${ALIBABA_API_KEY}",
+            api: "openai-completions",
+            models: [
+              {
+                id: "qwen3.8-flash",
+                name: "Qwen3.8-Flash",
+                reasoning: false,
+                input: ["text", "image"],
+                contextWindow: 131072,
+                maxTokens: 8192,
+              },
+              {
+                id: "qwen3.8-max",
+                name: "Qwen3.8-Max",
+                reasoning: false,
+                input: ["text", "image"],
+                contextWindow: 131072,
+                maxTokens: 8192,
+              },
+            ],
+          },
+        },
+      },
+
       agents: {
         defaults: {
           // Allowlist, not denylist: 56 skills load by default and 39 of them
@@ -95,8 +135,14 @@ data:
             // single tool-heavy turn can burn through it and 429) and
             // gemini-3-flash-preview (fallback; preview build, prone to
             // slow responses or 503 "overloaded" under high demand).
-            primary: "google/gemini-3.5-flash-lite",
+            //
+            // Qwen3.8-Flash is primary: 128k context clears this agent's base
+            // prompt, which is where the Groq free tier failed. The Gemini
+            // entries stay as fallbacks so a DashScope outage or quota trip
+            // degrades instead of taking the agent down.
+            primary: "alibaba/qwen3.8-flash",
             fallbacks: [
+              "google/gemini-3.5-flash-lite",
               "google/gemini-3-flash-preview",
               "mistral/mistral-small-latest",
             ],

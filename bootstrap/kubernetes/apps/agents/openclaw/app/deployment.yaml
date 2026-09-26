@@ -130,6 +130,11 @@ spec:
                 secretKeyRef:
                   name: secret-openclaw
                   key: MISTRAL_API_KEY
+            - name: ALIBABA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-openclaw
+                  key: ALIBABA_API_KEY
 
           resources:
             requests:
