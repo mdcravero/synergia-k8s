@@ -56,7 +56,7 @@ spec:
         # installed; it only does work when the PVC starts empty. Non-blocking:
         # if npm is unreachable the gateway still starts and falls back to Google.
         - name: install-plugins
-          image: ghcr.io/openclaw/openclaw:2026.9.6
+          image: ghcr.io/openclaw/openclaw:2026.6.34
           command:
             - sh
             - -c
@@ -85,7 +85,7 @@ spec:
               memory: 32Mi
 
         - name: openclaw
-          image: ghcr.io/openclaw/openclaw:2026.9.6
+          image: ghcr.io/openclaw/openclaw:2026.6.34
           imagePullPolicy: IfNotPresent
 
           ports:
