@@ -140,12 +140,11 @@ data:
             // prompt, which is where the Groq free tier failed. The Gemini
             // entries stay as fallbacks so a DashScope outage or quota trip
             // degrades instead of taking the agent down.
-            // Trying qwen3.8-max to compare answer quality. Measured latency
-            // is no better than flash (~25s vs ~23s mean on a trivial turn,
-            // both dominated by reasoning tokens); gemini-3.5-flash-lite does
-            // the same turn in ~3.7s. Revert to flash if max does not justify
-            // itself on real traffic.
-            primary: "alibaba/qwen3.8-max",
+            // qwen3.8-max was tried as primary and is now returning 403 "free
+            // quota has been exhausted" -- its free allowance is far smaller
+            // than flash's, which still answers fine. It stays in the catalog
+            // for a paid plan; until then flash is the only usable Qwen here.
+            primary: "alibaba/qwen3.8-flash",
             fallbacks: [
               "google/gemini-3.5-flash-lite",
               "google/gemini-3-flash-preview",
