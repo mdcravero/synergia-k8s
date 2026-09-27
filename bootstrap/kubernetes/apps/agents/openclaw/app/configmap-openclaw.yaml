@@ -152,9 +152,12 @@ data:
               "mistral/mistral-small-latest",
             ],
           },
-          memorySearch: {
-            enabled: false,
-          },
+          // agents.defaults.memorySearch was removed in 2026.9.x and the key is
+          // now rejected outright ("Unrecognized key"), which blocks startup.
+          // Dropped rather than translated to the new memory.search block:
+          // that block does not validate on 2026.6.34, and the ConfigMap can
+          // reach the old pod before the image bump does. Re-add it explicitly
+          // once the rollout is confirmed on 2026.9.6.
         }
       }
     }
