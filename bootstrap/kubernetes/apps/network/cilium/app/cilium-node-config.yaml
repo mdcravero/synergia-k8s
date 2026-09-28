@@ -1,0 +1,30 @@
+---
+# Per-node opt-in for the flannel -> Cilium migration.
+#
+# Cilium only takes over a node once that node carries the label below. Until
+# then the node keeps using flannel, which is what makes the rollout reversible
+# one node at a time.
+#
+# Enable a node:
+#   kubectl label node <node> io.cilium.migration/cilium-default=true
+#
+# Roll it back:
+#   kubectl label node <node> io.cilium.migration/cilium-default-
+#
+# NOT referenced by any kustomization.yaml: apply it by hand during the
+# migration (see MIGRATION-FROM-FLANNEL.md). The label, not Flux, is what
+# advances the rollout.
+apiVersion: cilium.io/v2
+kind: CiliumNodeConfig
+metadata:
+  name: cilium-default
+  namespace: kube-system
+spec:
+  nodeSelector:
+    matchLabels:
+      io.cilium.migration/cilium-default: "true"
+  defaults:
+    write-cni-conf-when-ready: /host/etc/cni/net.d/05-cilium.conflist
+    custom-cni-conf: "false"
+    cni-chaining-mode: "none"
+    cni-exclusive: "true"

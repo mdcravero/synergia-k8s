@@ -1,0 +1,114 @@
+# Cilium values for the hybrid flannel -> Cilium migration.
+#
+# NOT referenced by any kustomization.yaml on purpose: while these values are in
+# migration mode they must be applied by hand, one node at a time, following
+# MIGRATION-FROM-FLANNEL.md. Wiring them into Flux would migrate every node at
+# once.
+#
+# Apply with:
+#   helm install cilium cilium/cilium --version 1.20.2 \
+#     --namespace kube-system --values helm-values-migration.yaml
+
+# --- Migration mode -------------------------------------------------------
+# A second, separate overlay runs alongside flannel. Both CNIs coexist and pods
+# keep talking across migrated and unmigrated nodes, as long as the pod CIDRs do
+# not overlap.
+#
+# In use today: pods 10.244.0.0/16 (flannel), services 10.96.0.0/12,
+# LAN 10.42.20.0/24. 10.245.0.0/16 is free.
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - "10.245.0.0/16"
+    clusterPoolIPv4MaskSize: 24
+
+# Leave flannel-managed pods alone. Without this the operator restarts every pod
+# it does not manage, which is exactly the disruption the per-node rollout is
+# designed to avoid.
+operator:
+  unmanagedPodWatcher:
+    restart: false
+
+# Two VXLAN overlays share the wire during the migration, so they must not
+# share a UDP port. Upstream flannel defaults to 8472, the same as Cilium, which
+# is why the official migration guide warns about a collision. Talos configures
+# flannel on the IANA port 4789 instead (kube-flannel-cfg: "Port": 4789), so
+# Cilium's default does not collide here. Pinned rather than left implicit: the
+# safety of the whole hybrid phase should not rest on a chart default.
+routingMode: tunnel
+tunnelProtocol: vxlan
+tunnelPort: 8472
+
+# No policy enforcement during the migration. Turning this on while half the
+# cluster is still on flannel drops traffic Cilium has no identity for.
+policyEnforcementMode: "never"
+
+bpf:
+  hostLegacyRouting: true
+
+# Opt-in per node via label, so installing the chart changes nothing until a
+# node is explicitly labelled. See cilium-node-config.yaml.
+cni:
+  customConf: true
+  configMap: cilium-config
+
+# --- Talos requirements ---------------------------------------------------
+# Talos provides cgroupv2 and bpffs itself; letting Cilium mount them fails.
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+
+# Talos refuses to let workloads load kernel modules, so SYS_MODULE must be
+# dropped. The rest is the capability set Cilium needs to function.
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+
+# NIC names are not uniform here: end0 on the three RPi4 nodes, enp2s0 on the
+# Radxa. Each agent binds whichever of these exists on its node and ignores the
+# rest. Cilium would usually auto-detect the device holding the default route,
+# so this is defensive rather than required today — but it becomes load-bearing
+# in Phase 6 if kubeProxyReplacement is turned on, and an unlisted NIC fails
+# silently rather than loudly.
+devices: "end0 enp2s0"
+
+# KubePrism, already enabled on this cluster at 127.0.0.1:7445. Reaching the API
+# server through it keeps Cilium working even while the CNI underneath it is
+# being swapped.
+k8sServiceHost: localhost
+k8sServicePort: 7445
+
+# --- Stay out of MetalLB's way --------------------------------------------
+# MetalLB owns LoadBalancer IPs on this cluster: L2 mode, pool
+# 10.42.20.40-10.42.20.90, 14 services. Its speakers run on hostNetwork, so they
+# announce ARP on the real NIC and are unaffected by the CNI swap.
+#
+# Cilium ships enableLBIPAM=true by default. It is inert without a
+# CiliumLoadBalancerIPPool, but leaving it on means the first such pool anyone
+# creates puts two controllers in charge of the same service IPs. Both are
+# pinned off explicitly rather than left to a chart default.
+enableLBIPAM: false
+l2announcements:
+  enabled: false
+
+# --- Deliberately NOT set -------------------------------------------------
+# kubeProxyReplacement: kube-proxy stays for now. Replacing it is a separate
+# change with its own failure modes; stacking it on the CNI swap makes any
+# breakage ambiguous. Revisit once every node is on Cilium.
