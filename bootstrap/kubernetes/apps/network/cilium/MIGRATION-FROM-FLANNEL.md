@@ -93,6 +93,32 @@ Expect `iscsi-tools` and `util-linux-tools` alongside the two existing entries.
 the FDB bug on the other three nodes.** Verify pod-to-pod traffic across nodes
 before continuing.
 
+### Phase 1 execution notes (synergia-05, 2026-09-28)
+
+Done and verified. What the run taught us, for the control-plane nodes later:
+
+- **Use a `talosctl` that matches the node.** The workstation had v1.13.5
+  against v1.11.6 nodes. The run used the v1.11.6 client from the official
+  release, sha256-checked. Worth doing again for Phase 5.
+- **`apply-config --dry-run` first.** Its diff is computed against the live
+  node, so it catches drift between the repo file and reality, not just your own
+  edit. Here it showed exactly the two intended changes.
+- **The reboot is not the long part.** kexec brought the node back in ~20 s. The
+  service outage was ~7 min, and almost all of it was the RPi4 nodes pulling
+  arm64 images they had never needed. Expect the same for each drain.
+- **Wait for rescheduled pods before rebooting.** While the drained node is still
+  up, an uncordon undoes everything. After the reboot, it does not.
+- **The FDB bug did not trigger.** VTEP MAC unchanged, all three peers kept
+  `da:af:d0:1a:c7:f0 dst 10.42.20.12 self permanent`. Check it the same way:
+  `kubectl -n kube-system exec <flannel-pod> -c kube-flannel -- bridge fdb show dev flannel.1`
+  — the pods are labelled `k8s-app=flannel`, not `app=flannel`.
+- **The best functional check is OpenClaw → Home Assistant.** HA lands on a
+  different node after the drain, so a working MCP probe proves inbound
+  cross-node traffic, which is the direction the FDB bug breaks.
+- **Drained pods do not come back.** Traefik, Authelia, Home Assistant and the
+  Flux controllers stayed on the RPi4 nodes after the uncordon. Harmless, but the
+  load distribution is now different from before.
+
 ## Phase 2 — Install Cilium in migration mode
 
 Installing the chart changes nothing on its own: no node carries the migration
