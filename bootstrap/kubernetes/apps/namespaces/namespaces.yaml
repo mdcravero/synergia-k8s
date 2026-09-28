@@ -91,3 +91,16 @@ metadata:
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: longhorn-system
+  labels:
+    name: longhorn-system
+    goldilocks.fairwinds.com/enabled: "true"
+    # Longhorn runs privileged containers to manage disks and mount volumes;
+    # Talos enforces "baseline" by default, which would block them.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

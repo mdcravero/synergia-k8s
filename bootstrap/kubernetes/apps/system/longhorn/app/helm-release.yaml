@@ -1,0 +1,78 @@
+---
+# Longhorn, confined to synergia-05 for now.
+#
+# Only synergia-05 has the Talos prerequisites (iscsi-tools, util-linux-tools)
+# and a dedicated disk: the eMMC, mounted by a Talos UserVolumeConfig at
+# /var/mnt/longhorn. The RPi4 control-plane nodes get the extensions during the
+# Cilium migration's Phase 5; until then every Longhorn component is pinned to
+# the worker, and a pod can only use a Longhorn volume if it runs there too.
+#
+# Several chart defaults would reach beyond this node, so each is overridden on
+# purpose rather than left implicit:
+#   - defaultClass would make Longhorn the cluster's default StorageClass. There
+#     is none today, and since Kubernetes 1.28 a new default is also assigned
+#     retroactively to existing unbound PVCs without a class. Every PVC here
+#     names its class explicitly; keep it that way.
+#   - A replica count of 3 can never be satisfied with one storage node and would
+#     leave every volume degraded.
+#   - The default drain policy blocks draining a node that holds a volume's last
+#     replica, which with one node means every future drain of synergia-05.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+spec:
+  interval: 1h
+  # First install pulls images and the driver deployer waits for the manager;
+  # the 5m Flux default can expire mid-install and leave the release Failed.
+  timeout: 15m
+  chart:
+    spec:
+      chart: longhorn
+      version: "1.12.1"
+      sourceRef:
+        kind: HelmRepository
+        name: longhorn
+        namespace: longhorn-system
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    # Manager, UI and driver deployer (the chart-deployed components).
+    global:
+      nodeSelector:
+        type: wk-amd
+
+    persistence:
+      defaultClass: false
+      defaultClassReplicaCount: 1
+      # Retain: deleting a PVC must not silently destroy the only replica.
+      reclaimPolicy: Retain
+
+    # Four CSI sidecar deployments default to 3 replicas each. On a single node
+    # that is 12 pods for no redundancy.
+    csi:
+      attacherReplicaCount: 1
+      provisionerReplicaCount: 1
+      resizerReplicaCount: 1
+      snapshotterReplicaCount: 1
+
+    defaultSettings:
+      # The eMMC, via the Talos UserVolumeConfig. Not /var/lib/longhorn, which
+      # would land on the NVMe EPHEMERAL partition.
+      defaultDataPath: /var/mnt/longhorn
+      defaultReplicaCount: 1
+      # Instance managers, engine images and CSI (components Longhorn deploys
+      # itself). Format is key:value.
+      systemManagedComponentsNodeSelector: "type:wk-amd"
+      # Let a drain proceed once the consumer is gone and the replica has
+      # stopped, instead of blocking forever on the only copy.
+      nodeDrainPolicy: allow-if-replica-is-stopped
+
+    # With a single replica, backups are the only other copy. Backups are plain
+    # files, so NFS works here even though it cannot host Longhorn's data (it
+    # lacks renameat2 RENAME_NOREPLACE, which blocks the OpenClaw upgrade).
+    defaultBackupStore:
+      backupTarget: nfs://10.42.20.10:/srv/nfs4/k8s/longhorn-backups

@@ -4,3 +4,4 @@ resources:
   - ./cert-manager/app
   - ./metrics-server/app
   - ./reloader/app
+  - ./longhorn/app
