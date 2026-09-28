@@ -253,6 +253,38 @@ overlays is working.
 Leave the cluster in this hybrid state for a few days. It is a supported
 configuration, not a window to rush through.
 
+### Phases 2–4 execution notes (synergia-05, 2026-09-28)
+
+synergia-05 has served pod networking from Cilium since 2026-09-28. Notes for
+the control-plane nodes:
+
+- **Compare values with the guide verbatim before installing.** A summary of
+  the guide missed that `cni.configMap` is not part of it; the values had it
+  pointed at `cilium-config`, which would have broken the CNI config. Caught
+  and fixed before `helm install` (e129781).
+- **Phase 2 is genuinely inert.** After install every node still had only
+  `10-flannel.conflist` and all 61 pods stayed on `10.244`, while
+  `cilium-dbg status` already showed 4/4 nodes reachable over the new overlay.
+  The chart also deploys a `cilium-envoy` DaemonSet (Envoy runs external).
+- **The switch happens at the agent restart, not the reboot.** As soon as the
+  labelled node's agent restarted it wrote `05-cilium.conflist` and renamed
+  flannel's to `10-flannel.conflist.cilium_bak`. The reboot did not revert it:
+  flannel's init did not bring its conflist back.
+- **Much cheaper than Phase 1:** 2 min 24 s, since only the three pinned
+  workloads were still on the node and no images had to be pulled.
+- **Validation that proved the hybrid, in both directions:**
+  - Pods on the migrated node carry `10.245.x`; hostNetwork pods keep the node IP.
+  - Cilium → flannel: OpenClaw's MCP probe to Home Assistant on another node,
+    which also exercises cluster DNS (CoreDNS stays on flannel).
+  - flannel → Cilium: Traefik on a flannel node reaching backends on the
+    migrated node. **A 302 through Traefik proves nothing on its own** — it may
+    be Authelia answering. Check the `Location` header, or hit an unauthenticated
+    health path (`/health` on Jellyfin, `/api/health` on Grafana).
+  - Prometheus, on a flannel node, still scraping the node-exporter that moved
+    to `10.245`.
+- **The FDB bug did not trigger on this reboot either**, but the three peers are
+  still on flannel, so check it again on every control-plane reboot.
+
 ## Phase 5 — Control-plane nodes, one at a time
 
 Same cycle per node, `synergia-01` → `02` → `03`, waiting for full recovery in
