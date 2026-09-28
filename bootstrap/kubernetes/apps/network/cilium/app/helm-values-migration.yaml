@@ -31,11 +31,12 @@ operator:
     restart: false
 
 # Two VXLAN overlays share the wire during the migration, so they must not
-# share a UDP port. Upstream flannel defaults to 8472, the same as Cilium, which
-# is why the official migration guide warns about a collision. Talos configures
-# flannel on the IANA port 4789 instead (kube-flannel-cfg: "Port": 4789), so
-# Cilium's default does not collide here. Pinned rather than left implicit: the
-# safety of the whole hybrid phase should not rest on a chart default.
+# share a UDP port. The official guide uses 8473 because upstream flannel sits
+# on Cilium's default 8472. Talos runs flannel on the IANA port 4789 instead
+# (kube-flannel-cfg: "Port": 4789), so 8472 is free here -- and staying on
+# Cilium's default avoids having to change the tunnel port on a live Cilium
+# cluster after flannel is gone, which is disruptive. Pinned rather than left
+# implicit: the hybrid phase should not rest on a chart default.
 routingMode: tunnel
 tunnelProtocol: vxlan
 tunnelPort: 8472
@@ -49,9 +50,14 @@ bpf:
 
 # Opt-in per node via label, so installing the chart changes nothing until a
 # node is explicitly labelled. See cilium-node-config.yaml.
+#
+# customConf: agents do not write a CNI config until a CiliumNodeConfig tells
+# them to, which only happens on labelled nodes.
+# uninstall: false keeps an agent that restarts on an already-migrated node from
+# deleting its conflist and leaving that node's new pods without networking.
 cni:
   customConf: true
-  configMap: cilium-config
+  uninstall: false
 
 # --- Talos requirements ---------------------------------------------------
 # Talos provides cgroupv2 and bpffs itself; letting Cilium mount them fails.
