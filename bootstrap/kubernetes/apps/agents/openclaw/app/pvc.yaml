@@ -4,6 +4,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: openclaw-data
   namespace: agents
+  annotations:
+    # Retired NFS copy, kept as the rollback for the Longhorn migration.
+    # prune: disabled means removing it from Git later will not make Flux
+    # delete it (nfs-client reclaims with Delete); deleting the data stays
+    # an explicit decision.
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   storageClassName: nfs-client
   accessModes:
@@ -17,6 +23,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: openclaw-auth
   namespace: agents
+  annotations:
+    # Retired NFS copy, kept as the rollback for the Longhorn migration.
+    # prune: disabled means removing it from Git later will not make Flux
+    # delete it (nfs-client reclaims with Delete); deleting the data stays
+    # an explicit decision.
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   storageClassName: nfs-client
   accessModes:
@@ -33,8 +45,57 @@ kind: PersistentVolumeClaim
 metadata:
   name: openclaw-runtime
   namespace: agents
+  annotations:
+    # Retired NFS copy, kept as the rollback for the Longhorn migration.
+    # prune: disabled means removing it from Git later will not make Flux
+    # delete it (nfs-client reclaims with Delete); deleting the data stays
+    # an explicit decision.
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+# Longhorn copies of the three volumes above. NFS lacks renameat2
+# (RENAME_NOREPLACE), which OpenClaw 2026.9.x needs for its startup state
+# migration; Longhorn's ext4 supports it. Longhorn runs only on synergia-05, and
+# the Deployment is already pinned there with nodeSelector type: wk-amd.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openclaw-data-lh
+  namespace: agents
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openclaw-auth-lh
+  namespace: agents
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 512Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openclaw-runtime-lh
+  namespace: agents
+spec:
+  storageClassName: longhorn
   accessModes:
     - ReadWriteOnce
   resources:
