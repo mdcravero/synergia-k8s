@@ -61,12 +61,44 @@ kubectl delete volumes.longhorn.io -n longhorn-system "$PV"
 
 ## Backups
 
-The backup target is `nfs://10.42.20.10:/srv/nfs4/k8s/longhorn-backups`
-(available). Backups are plain files, so NFS works as a target even though it
-cannot host Longhorn's data.
+Target: `nfs://10.42.20.10:/srv/nfs4/k8s/longhorn-backups`. Backups are plain
+files, so NFS works as a target even though it cannot host Longhorn's data.
 
-**A backup target alone takes no backups.** Nothing is scheduled yet; add a
-`RecurringJob` before any volume holds data that matters.
+Schedule: RecurringJob `backup-daily` (`config/recurring-job-backup.yaml`),
+03:00 local / 06:00 UTC, keeps 7, group `default` — so any volume without its
+own recurring-job group is covered. Longhorn turns it into a CronJob of the same
+name in `longhorn-system`, which can be triggered on demand:
+
+```bash
+kubectl create job -n longhorn-system --from=cronjob/backup-daily backup-manual-$(date +%s)
+```
+
+### Restoring (verified 2026-09-28)
+
+Tested end to end on OpenClaw's data volume: the restored copy had the same file
+count and size as the live one, and its SQLite database passed
+`PRAGMA integrity_check`.
+
+1. Get the backup URL:
+   ```bash
+   kubectl get backups.longhorn.io -n longhorn-system \
+     -o custom-columns='VOL:.status.volumeName,STATE:.status.state,URL:.status.url'
+   ```
+2. Create a StorageClass pointing at it, then a PVC on that class:
+   ```yaml
+   apiVersion: storage.k8s.io/v1
+   kind: StorageClass
+   metadata: {name: longhorn-restore}
+   provisioner: driver.longhorn.io
+   reclaimPolicy: Delete
+   volumeBindingMode: Immediate
+   parameters:
+     numberOfReplicas: "1"
+     fromBackup: "<url from step 1>"
+     fsType: ext4
+   ```
+3. Wait for `volumes.longhorn.io/<pv>` to report `restoreRequired: false`, then
+   mount it. The consuming pod must run on synergia-05.
 
 ## Draining synergia-05
 
