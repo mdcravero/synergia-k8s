@@ -116,6 +116,19 @@ data:
         },
       },
 
+      // Memory search stays off, as it was on 2026.6.34 (then
+      // agents.defaults.memorySearch). 2026.9.x moved the setting here and
+      // turns it on by default, which silently re-enabled it after the
+      // upgrade: it indexed every session, asked for OpenAI embeddings this
+      // deployment has no key for (vector search stuck "paused"), and scheduled
+      // memory-core dreaming jobs. Kept out of agents.defaults on purpose: the
+      // old key there is rejected by 2026.9.x.
+      memory: {
+        search: {
+          enabled: false,
+        },
+      },
+
       agents: {
         defaults: {
           // Allowlist, not denylist: 56 skills load by default and 39 of them
@@ -163,12 +176,6 @@ data:
               "mistral/mistral-small-latest",
             ],
           },
-          // agents.defaults.memorySearch was removed in 2026.9.x and the key is
-          // now rejected outright ("Unrecognized key"), which blocks startup.
-          // Dropped rather than translated to the new memory.search block:
-          // that block does not validate on 2026.6.34, and the ConfigMap can
-          // reach the old pod before the image bump does. Re-add it explicitly
-          // once the rollout is confirmed on 2026.9.6.
         }
       }
     }

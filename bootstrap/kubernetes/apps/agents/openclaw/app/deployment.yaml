@@ -136,13 +136,19 @@ spec:
                   name: secret-openclaw
                   key: ALIBABA_API_KEY
 
+          # 2026.9.x needs far more memory than 2026.6.34: ~1 GiB at idle, and a
+          # heartbeat turn went past the old 1500Mi limit and was OOMKilled
+          # (exit 137), interrupting the cron run. The request reflects real
+          # idle use so the scheduler accounts for it; the limit leaves room for
+          # peaks. OpenClaw derives its own memory-pressure thresholds from the
+          # limit (warning ~50%, critical ~75%).
           resources:
             requests:
               cpu: 100m
-              memory: 512Mi
+              memory: 1Gi
             limits:
               cpu: "1"
-              memory: 1500Mi
+              memory: 3Gi
 
           livenessProbe:
             exec:
