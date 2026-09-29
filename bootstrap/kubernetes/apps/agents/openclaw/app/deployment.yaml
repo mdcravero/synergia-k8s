@@ -183,10 +183,10 @@ spec:
                 path: openclaw.json
         - name: data
           persistentVolumeClaim:
-            claimName: openclaw-data
+            claimName: openclaw-data-lh
         - name: auth
           persistentVolumeClaim:
-            claimName: openclaw-auth
+            claimName: openclaw-auth-lh
         - name: openclaw-runtime
           persistentVolumeClaim:
-            claimName: openclaw-runtime
+            claimName: openclaw-runtime-lh
