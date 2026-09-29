@@ -15,6 +15,21 @@ data:
         controlUi: {
           allowedOrigins: ["https://openclaw.synergia.net.ar"],
         },
+        // Since 2026.9.x the gateway rejects requests that carry X-Forwarded-*
+        // headers unless they arrive from a trusted proxy ("Proxy client
+        // attribution is required"). The gateway binds to 127.0.0.1 and the
+        // socat sidecar relays the Service port to it, so every request -- and
+        // Traefik's forwarded headers -- reaches it from 127.0.0.1. socat is a
+        // plain TCP relay and never touches headers; the real proxy is Traefik,
+        // which by default does not trust client-supplied X-Forwarded-* headers.
+        //
+        // Scope of trust: anything that can reach the Service could send forged
+        // X-Forwarded-For through socat, since nothing restricts ingress to it
+        // (flannel enforces no NetworkPolicy). The gateway still refuses to
+        // attribute a forwarded request to loopback, so a forged header cannot
+        // claim local trust, and token auth still applies. Tighten with a
+        // NetworkPolicy once Cilium enforces them.
+        trustedProxies: ["127.0.0.1"],
       },
 
       commands: {
@@ -125,15 +140,13 @@ data:
             // gemini-2.5-flash and gemini-2.5-flash-lite are retired: Google
             // returns a 404 "no longer available to new users" on every key
             // we've tried, project/billing status doesn't matter.
-            // "google/gemini-3.6-flash" is NOT usable here either, despite
-            // being Google's suggested replacement: this pinned OpenClaw
-            // build (2026.6.34) doesn't have it in its own model registry
-            // and rejects it client-side with "Unknown model" before ever
-            // calling Google. Confirmed working on this build instead:
-            // gemini-3.5-flash-lite (fast, free-tier quota is tight -- a
-            // single tool-heavy turn can burn through it and 429) and
-            // gemini-3-flash-preview (fallback; preview build, prone to
-            // slow responses or 503 "overloaded" under high demand).
+            // Up to 2026.6.34, OpenClaw's fixed model registry rejected
+            // gemini-3.6-flash client-side as "Unknown model". Since 2026.9.x
+            // the catalog is discovered per credentialed provider, and
+            // gemini-3.6/3.7/3.8-flash are listed (latency not yet measured
+            // here). In use: gemini-3.5-flash-lite (fast; free-tier quota is
+            // tight, a tool-heavy turn can 429) and gemini-3-flash-preview
+            // (preview build, prone to slow responses or 503 "overloaded").
             //
             // Qwen3.8-Flash is primary: 128k context clears this agent's base
             // prompt, which is where the Groq free tier failed. The Gemini
