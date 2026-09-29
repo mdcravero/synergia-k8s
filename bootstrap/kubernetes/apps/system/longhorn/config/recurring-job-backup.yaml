@@ -1,0 +1,24 @@
+---
+# Daily backup of every Longhorn volume to the NFS backup target.
+#
+# With one replica per volume, these backups are the only other copy of the
+# data. The "default" group applies the job to every volume that has not been
+# assigned another recurring-job group, so a new volume is covered without
+# anyone having to remember to label it.
+#
+# Kept in its own Flux Kustomization, depending on apps-system: RecurringJob is
+# a CRD installed by the Longhorn HelmRelease, so on a cluster rebuilt from
+# scratch it cannot apply until that release has run.
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: backup-daily
+  namespace: longhorn-system
+spec:
+  task: backup
+  # Longhorn evaluates cron in UTC: 06:00 UTC is 03:00 in Argentina.
+  cron: "0 6 * * *"
+  retain: 7
+  concurrency: 1
+  groups:
+    - default

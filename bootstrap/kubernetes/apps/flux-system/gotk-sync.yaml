@@ -61,6 +61,21 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: apps-longhorn-config
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: apps-system
+  interval: 5m0s
+  path: ./bootstrap/kubernetes/apps/system/longhorn/config
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: apps-metallb-install
   namespace: flux-system
 spec:
