@@ -30,6 +30,50 @@ Until then, every Longhorn component is pinned to synergia-05, which means:
 - **Name the class explicitly:** `storageClassName: longhorn`. It is
   deliberately not the default StorageClass (there is none in this cluster).
 
+## Managing it
+
+**Settings live in Git**, in `defaultSettings` of `app/helm-release.yaml`.
+Changing a setting from the UI or `kubectl` does stick (tested: not reverted
+after two minutes), but it drifts silently from Git and can be overwritten the
+next time the chart or its values change. Use the UI to look, Git to configure.
+
+**UI:** https://longhorn.synergia.net.ar — behind Authelia with `two_factor`.
+The UI and its API have no authentication of their own (both answer 200 with no
+credentials) and can delete every volume, and every `synergia.net.ar`
+subdomain reaches Traefik from the internet through Cloudflare. Unauthenticated
+requests to `/`, `/v1/settings` and `/v1/volumes` all redirect to Authelia.
+
+First login asks you to register a second factor (TOTP app or a
+passkey/security key). Authelia first verifies your identity with a one-time
+code, and the notifier here is the filesystem, so the code is written inside
+the Authelia pod (valid 5 minutes):
+
+```bash
+kubectl exec -n security deploy/authelia -- cat /config/notification.txt
+```
+
+The registration is stored in Authelia's Postgres database, so it survives pod
+restarts.
+
+Without going through the internet:
+
+```bash
+kubectl -n longhorn-system port-forward svc/longhorn-frontend 8080:80   # http://localhost:8080
+```
+
+**Day to day with kubectl:**
+
+```bash
+kubectl get volumes.longhorn.io -n longhorn-system        # health and attachment
+kubectl get nodes.longhorn.io -n longhorn-system          # nodes and disks
+kubectl get backups.longhorn.io -n longhorn-system        # backups taken
+kubectl get recurringjobs.longhorn.io -n longhorn-system  # schedules
+```
+
+Anything that can reach the `longhorn-frontend` Service inside the cluster can
+use the API unauthenticated, since flannel enforces no NetworkPolicy. Restrict
+it once Cilium enforces policies.
+
 ## Caveat: the webhook and synergia-05 downtime
 
 Longhorn registers `validator.longhorn.io` with `failurePolicy: Fail`, and it
