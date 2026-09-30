@@ -4,10 +4,6 @@ kind: HelmRepository
 metadata:
   name: longhorn
   namespace: longhorn-system
-  annotations:
-    # Temporary: keeps apps-system from pruning this object while it moves
-    # to apps-storage. Remove once apps-storage owns it.
-    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   interval: 1h
   url: https://charts.longhorn.io
