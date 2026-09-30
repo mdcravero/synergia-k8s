@@ -1,0 +1,27 @@
+---
+# Longhorn UI, reachable from the internet (every synergia.net.ar subdomain is
+# proxied to Traefik through Cloudflare). Longhorn has no authentication, so the
+# Authelia middleware is mandatory, and Authelia requires two_factor for this
+# host. Everything fails closed: without the middleware Traefik drops the
+# router, and without the Authelia rule its default_policy is deny.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn
+  namespace: longhorn-system
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: longhorn-system-middlewares-auth-longhorn@kubernetescrd
+spec:
+  rules:
+    - host: longhorn.synergia.net.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: longhorn-frontend
+                port:
+                  number: 80

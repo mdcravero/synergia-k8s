@@ -9,3 +9,4 @@ resources:
   - middleware-authelia-zigbee2mqtt.yaml
   - middleware-authelia-openclaw.yaml
   - middleware-authelia-sabnzbd.yaml
+  - middleware-authelia-longhorn.yaml

@@ -82,6 +82,11 @@ data:
             policy: one_factor
           - domain: sabnzbd.synergia.net.ar
             policy: one_factor
+          # Longhorn's UI and API have no authentication of their own and can
+          # delete every volume, and every subdomain here reaches Traefik from
+          # the internet through Cloudflare. Password alone is not enough.
+          - domain: longhorn.synergia.net.ar
+            policy: two_factor
       storage:
         postgres:
           enabled: true
