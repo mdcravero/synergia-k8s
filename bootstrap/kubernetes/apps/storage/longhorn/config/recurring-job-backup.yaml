@@ -6,7 +6,7 @@
 # assigned another recurring-job group, so a new volume is covered without
 # anyone having to remember to label it.
 #
-# Kept in its own Flux Kustomization, depending on apps-system: RecurringJob is
+# Kept in its own Flux Kustomization, depending on apps-storage: RecurringJob is
 # a CRD installed by the Longhorn HelmRelease, so on a cluster rebuilt from
 # scratch it cannot apply until that release has run.
 apiVersion: longhorn.io/v1beta2

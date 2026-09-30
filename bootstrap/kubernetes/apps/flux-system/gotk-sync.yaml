@@ -65,9 +65,9 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: apps-system
+    - name: apps-storage
   interval: 5m0s
-  path: ./bootstrap/kubernetes/apps/system/longhorn/config
+  path: ./bootstrap/kubernetes/apps/storage/longhorn/config
   prune: true
   sourceRef:
     kind: GitRepository
