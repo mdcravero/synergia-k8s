@@ -3,6 +3,12 @@ kind: PersistentVolumeClaim
 metadata:
   name: jellyfin-config
   namespace: media
+  annotations:
+    # Retired NFS copy, kept as the rollback for the Longhorn migration
+    # (now media/jellyfin/app/pvc.yaml). prune: disabled means removing it
+    # from Git later will not make Flux delete it; deleting the data stays
+    # an explicit decision.
+    kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: "nfs-client"

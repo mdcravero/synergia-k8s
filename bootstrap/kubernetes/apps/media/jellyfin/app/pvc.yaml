@@ -1,0 +1,21 @@
+---
+# Jellyfin's config on Longhorn (synergia-05's eMMC) instead of NFS: the
+# library database is SQLite and metadata/ holds thousands of small image
+# files, both slow over NFS. Jellyfin is already pinned to synergia-05 for the
+# iGPU, so local storage adds no new node coupling. The media library stays on
+# NFS (shared with the *arr apps, and far larger than the eMMC).
+#
+# The retired NFS copy, jellyfin-config, lives in
+# storage/nfs-provisioner/pvc/pvc-jellyfin.yaml and is kept as the rollback.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-config-lh
+  namespace: media
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
