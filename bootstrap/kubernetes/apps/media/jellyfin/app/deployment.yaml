@@ -7,6 +7,10 @@ metadata:
   namespace: media
 spec:
   replicas: 1
+  # Recreate, not RollingUpdate: the config volume is RWO on Longhorn and holds
+  # a SQLite database, so an old and a new pod must never run at once.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       run: jellyfin
@@ -53,7 +57,7 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: jellyfin-config
+            claimName: jellyfin-config-lh
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
