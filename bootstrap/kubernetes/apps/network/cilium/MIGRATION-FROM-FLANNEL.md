@@ -287,17 +287,25 @@ the control-plane nodes:
 
 ## Phase 5 — Control-plane nodes, one at a time
 
-Same cycle per node, `synergia-01` → `02` → `03`, waiting for full recovery in
-between:
+Same cycle per node, one at a time, waiting for full recovery in between. Start
+with a node that is not the etcd leader (`talosctl etcd status`). The Talos
+upgrade doubles as the migration reboot, so each node reboots once:
 
 ```bash
-talosctl -e <ip> -n <ip> upgrade \
-  --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.11.6
+# Point install.image in controlplane-N.yaml (synergia-k8s-talos) at the
+# schematic, then check the diff against the live node and apply (no reboot)
+talosctl -e <ip> -n <ip> apply-config --dry-run --file controlplane-N.yaml
+talosctl -e <ip> -n <ip> apply-config --file controlplane-N.yaml
 
 kubectl cordon <node> && kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
+# wait until every evicted pod is Running and Ready elsewhere
+
 kubectl label node <node> io.cilium.migration/cilium-default=true
 kubectl -n kube-system delete pod -l k8s-app=cilium --field-selector spec.nodeName=<node>
-talosctl -e <ip> -n <ip> reboot
+# wait for the new agent: /etc/cni/net.d must hold 05-cilium.conflist
+
+talosctl -e <ip> -n <ip> upgrade \
+  --image factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245:v1.11.6
 kubectl uncordon <node>
 ```
 
@@ -305,6 +313,37 @@ Check `talosctl -n <ip> etcd members` and `kubectl get nodes` before moving on.
 Quorum survives one node down; it does not survive two.
 
 The FDB risk shrinks with each node migrated and disappears with the last one.
+
+### Phase 5 execution notes (synergia-02, 2026-10-03)
+
+synergia-02 has been on Cilium since 2026-10-03, with the Longhorn extensions.
+About 12 minutes end to end, with no service outage:
+
+- **Check the schematic before upgrading an RPi4.** These nodes were flashed
+  from the generic `metal-arm64` image and upgraded with the generic installer
+  (see the talos-config README), so the schematic must be extensions-only, with
+  no `rpi_generic` overlay. Re-posting the YAML to `factory.talos.dev/schematics`
+  returned the same ID, `613e1592…`, which confirms it. The factory manifest
+  lists arm64.
+- **Drain: 17 s, plus 3 min until everything was Ready elsewhere.** No PDB
+  blocked it, because nothing PDB-protected ran on the node. Traefik landed on
+  synergia-05 and has run on Cilium since.
+- **No MetalLB failover.** After the 2026-10-02 power cut, which took down the
+  three RPi4s and the switch for 46 min, every VIP was announced from
+  synergia-05. Check `kubectl get servicel2statuses -A` before each drain.
+- **Upgrade plus reboot: 4.5 min** from cordoned to Ready. `get extensions`
+  then lists `iscsi-tools`, `util-linux-tools` and the schematic.
+- **Unlike synergia-05, flannel's init rewrote `10-flannel.conflist` on boot.**
+  The Cilium agent renamed it back to `.cilium_bak` within seconds
+  (`cni-exclusive`), and `05-cilium.conflist` sorts first anyway. Expect this
+  on every reboot until Phase 6 removes flannel.
+- **Peer health probes lag.** synergia-01 and synergia-03 showed 3/4 reachable
+  for one probe interval (~2 min) after the node came back, then 4/4.
+- **Validation:**
+  - A busybox pod pinned to the node got `10.245.1.x`. From there, CoreDNS,
+    Prometheus on flannel and Jellyfin on Cilium all answered.
+  - Prometheus on flannel scraped the node's node-exporter at `10.245.1.23`.
+  - The FDB on all three peers kept synergia-02's VTEP MAC.
 
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 
