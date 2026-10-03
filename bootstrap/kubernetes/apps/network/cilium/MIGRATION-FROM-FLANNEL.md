@@ -355,6 +355,33 @@ About 12 minutes end to end, with no service outage:
    a Flux `HelmRelease` under `app/` wired into `kustomization.yaml`.
 4. Only then consider `kubeProxyReplacement`, as its own change.
 
+## After the migration
+
+These are not part of the CNI swap, but each has to wait for it:
+
+- **Descheduler: install once synergia-03, the last node, is migrated.** The
+  scheduler places a pod only when it is created and never moves it, so drains
+  and power cuts leave the cluster lopsided. On 2026-10-03, synergia-02 had 1
+  pod and synergia-03 had 23. Every drain in Phase 5 reshuffles the cluster
+  again, and the last node drained ends up empty, so its first run is the one
+  that evens things out. Plan, deployed through Flux:
+  - A nightly CronJob running `LowNodeUtilization`.
+  - Exclude `kube-system`, `flux-system`, `longhorn-system`,
+    `metallb-system` and `traefik`. Moving Traefik blips every ingress.
+  - PDBs already protect Postgres (`postgres-cluster`, 0 allowed
+    disruptions), n8n, valkey and Longhorn's components, and the descheduler
+    respects them. Pods pinned to synergia-05 (Jellyfin, OpenClaw, Grafana)
+    have no other node to fit on, so they are not evicted.
+  - Balancing follows resource requests unless metrics-server utilization is
+    enabled, so review requests with Goldilocks first. Each eviction restarts
+    a single-replica app, which is why it runs at night.
+- **Hubble Relay and UI, after Phase 6.** The agents already run Hubble but
+  nothing aggregates it. Put the UI behind Authelia, like Longhorn's.
+- **NetworkPolicies, once Hubble shows the real flows.** Phase 6 restores
+  policy enforcement (`policyEnforcementMode: never` goes away). Start with:
+  - OpenClaw egress, limited with `toFQDNs` to Home Assistant and the LLM APIs.
+  - Ingress to Postgres, limited to the apps that use it.
+
 ## Rollback
 
 Per node, before Phase 6:
