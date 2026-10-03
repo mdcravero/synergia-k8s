@@ -67,9 +67,28 @@ data:
         existingSecret: "secret-homarr-db"
 
 
+    # The chart defaults (1s timeout, 3 failures 10s apart) are too tight for an
+    # RPi4 with the SQLite database on NFS. On every start the iconsUpdater job
+    # rewrites ~29k icons, which takes 22-26s over NFS. better-sqlite3 blocks
+    # the event loop meanwhile, so the probes timed out. On 2026-10-03 this
+    # restarted Homarr 13 times in a row after a node drain. These settings
+    # tolerate ~2 minutes of unresponsiveness before a restart.
     livenessProbe:
       httpGet:
         # -- This is the liveness check endpoint used by Kubernetes to determine if the application is still running.
         path: /api/health/live
         # -- The port on which the liveness check will be performed. This must be the same as the container port exposed by the application.
         port: 7575
+      initialDelaySeconds: 30
+      periodSeconds: 20
+      timeoutSeconds: 5
+      failureThreshold: 6
+
+    readinessProbe:
+      httpGet:
+        path: /api/health/ready
+        port: 7575
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
