@@ -339,6 +339,19 @@ About 12 minutes end to end, with no service outage:
   on every reboot until Phase 6 removes flannel.
 - **Peer health probes lag.** synergia-01 and synergia-03 showed 3/4 reachable
   for one probe interval (~2 min) after the node came back, then 4/4.
+- **The node that hosts `postgres-cluster-0` needs extra steps.** On
+  2026-10-03 that was synergia-03. Its PDB allows 0 disruptions, so
+  `kubectl drain` blocks on it. Never reboot that node with the pod still on it.
+  A pod that restarts in place with a new IP can keep its old `POD_IP`, and
+  Patroni then advertises a dead endpoint. That is what took SSO down after
+  the 2026-10-02 power cut. Instead:
+  1. Delete the pod explicitly: `kubectl delete pod -n tools postgres-cluster-0`.
+     The cordon makes it reschedule onto another node as a new pod object,
+     with a fresh IP.
+  2. Wait until `kubectl get endpoints -n tools postgres-cluster` shows the new
+     pod IP.
+  3. Finish the drain.
+  The `PostgresqlMasterEndpointStale` alert catches it if this goes wrong.
 - **Validation:**
   - A busybox pod pinned to the node got `10.245.1.x`. From there, CoreDNS,
     Prometheus on flannel and Jellyfin on Cilium all answered.
