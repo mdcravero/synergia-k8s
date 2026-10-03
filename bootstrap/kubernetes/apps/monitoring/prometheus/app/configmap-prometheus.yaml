@@ -282,6 +282,36 @@ data:
                 annotations:
                   summary: "PostgreSQL connection count high"
                   description: "Total backends across databases is {{ $value }} (cluster max_connections is 100) on {{ $labels.instance }}."
+              # The postgres-cluster Service has no selector. With
+              # PATRONI_KUBERNETES_USE_ENDPOINTS=true, Patroni writes its own pod
+              # IP into the endpoint and rewrites it every cycle, so a manual
+              # patch is reverted. After the 2026-10-02 power cut the pod
+              # restarted in place with a new IP, but Patroni kept advertising
+              # the old one (10.244.1.213) from about 15:45 to 17:00 UTC.
+              # Authelia, n8n and Homebox crash-looped and SSO was down. The
+              # likely cause is POD_IP from the downward API keeping its
+              # pre-reboot value. The exporter connects over localhost, so the
+              # other Postgres alerts saw nothing. Checked against 7 days of
+              # history: it matches exactly that window and nothing else.
+              - alert: PostgresqlMasterEndpointStale
+                expr: |
+                  (
+                    kube_endpointslice_endpoints{namespace="tools", endpointslice=~"postgres-cluster-[a-z0-9]{5}"}
+                      unless on (address)
+                    label_replace(kube_pod_info{namespace="tools", pod=~"postgres-cluster-[0-9]+"}, "address", "$1", "pod_ip", "(.*)")
+                  )
+                  or
+                  (
+                    absent(kube_endpointslice_endpoints{namespace="tools", endpointslice=~"postgres-cluster-[a-z0-9]{5}"})
+                      and on () (up{job="kube-state-metrics"} == 1)
+                  )
+                for: 10m
+                labels:
+                  severity: critical
+                  instance: "tools/postgres-cluster"
+                annotations:
+                  summary: "postgres-cluster Service does not point at the Postgres pod"
+                  description: "The endpoint address is '{{ $labels.address }}' (empty means no endpoint), and no postgres-cluster pod has that IP. Every app that uses Postgres (Authelia, n8n, Homebox, Home Assistant) times out, and Authelia down means SSO is down. Compare kubectl get endpoints -n tools postgres-cluster with kubectl get pod -n tools postgres-cluster-0 -o wide. Patching the endpoint does not stick, because Patroni rewrites it. Recreate the pod so it starts with a fresh POD_IP: kubectl delete pod -n tools postgres-cluster-0 (short DB outage)."
           # Cluster nodes only: job="node-exporter" leaves out the pop-os
           # workstation, which is scraped by its own job and would otherwise
           # report a "reboot" every time the PC is switched on.
