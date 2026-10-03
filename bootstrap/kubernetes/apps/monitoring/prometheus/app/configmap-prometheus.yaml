@@ -329,6 +329,25 @@ data:
                 annotations:
                   summary: "Node {{ $labels.node }} is NotReady"
                   description: "kubelet on {{ $labels.node }} has not reported Ready for 5 minutes. A planned reboot takes about 4 minutes, so this is longer than that. Check talosctl -n <ip> health and dmesg; on a control-plane node also check etcd members."
+          - name: pods
+            rules:
+              # Restarts rather than the CrashLoopBackOff state: a crash-looping
+              # pod alternates between Running and back-off, which would keep
+              # resetting a "for" clause. Over 2026-09-26..10-03 this would have
+              # fired only on real incidents: Jellyfin (PVC too small), OpenClaw
+              # (2026.9 upgrade), Homarr (probes after a drain), and Authelia, n8n
+              # and Homebox after the 2026-10-02 power cut.
+              - alert: PodCrashLooping
+                expr: |
+                  max by (namespace, pod) (increase(kube_pod_container_status_restarts_total[15m])) >= 3
+                for: 0m
+                labels:
+                  severity: warning
+                  # One Telegram message per pod (Alertmanager groups by instance).
+                  instance: "{{ $labels.namespace }}/{{ $labels.pod }}"
+                annotations:
+                  summary: "{{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $value | printf \"%.0f\" }} times in 15 minutes"
+                  description: "Check Last State with kubectl describe pod -n {{ $labels.namespace }} {{ $labels.pod }}. OOMKilled means the memory limit. Exit 0 or 137 after \"Liveness probe failed\" events means the probe is too tight for the node. Otherwise read kubectl logs --previous. When several apps that use Postgres restart together, Postgres is the one to look at."
 
     alertmanager:
       enabled: true
