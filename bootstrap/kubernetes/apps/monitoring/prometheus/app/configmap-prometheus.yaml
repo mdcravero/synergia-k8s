@@ -312,6 +312,24 @@ data:
                 annotations:
                   summary: "postgres-cluster Service does not point at the Postgres pod"
                   description: "The endpoint address is '{{ $labels.address }}' (empty means no endpoint), and no postgres-cluster pod has that IP. Every app that uses Postgres (Authelia, n8n, Homebox, Home Assistant) times out, and Authelia down means SSO is down. Compare kubectl get endpoints -n tools postgres-cluster with kubectl get pod -n tools postgres-cluster-0 -o wide. Patching the endpoint does not stick, because Patroni rewrites it. Recreate the pod so it starts with a fresh POD_IP: kubectl delete pod -n tools postgres-cluster-0 (short DB outage)."
+              # The HA recorder gives up after ~10 failed connection attempts at
+              # startup and never retries, so HA keeps running with no history.
+              # After the 2026-10-02 power cut HA started before Postgres was
+              # ready and lost ~32h of history (14:41Z on 10-02 to 23:04Z on
+              # 10-03) unnoticed. A working recorder always holds a connection to
+              # the homeassistant database; pg_up guards against Postgres itself
+              # being down, which PostgresqlNotResponding already covers.
+              - alert: HomeAssistantRecorderDisconnected
+                expr: |
+                  sum(pg_stat_activity_count{datname="homeassistant"}) == 0
+                    and on () (max(pg_up{job="kubernetes-pods-tools"}) == 1)
+                for: 15m
+                labels:
+                  severity: critical
+                  instance: "tools/home-assistant"
+                annotations:
+                  summary: "Home Assistant recorder is not connected to Postgres"
+                  description: "No connections to the homeassistant database for 15 minutes while Postgres is up. Home Assistant is not saving history, and the lost data cannot be recovered. Usually the recorder gave up at startup because Postgres was not ready yet. Restart HA: kubectl -n tools rollout restart deployment/home-assistant"
           # Cluster nodes only: job="node-exporter" leaves out the pop-os
           # workstation, which is scraped by its own job and would otherwise
           # report a "reboot" every time the PC is switched on.
