@@ -282,6 +282,53 @@ data:
                 annotations:
                   summary: "PostgreSQL connection count high"
                   description: "Total backends across databases is {{ $value }} (cluster max_connections is 100) on {{ $labels.instance }}."
+          # Cluster nodes only: job="node-exporter" leaves out the pop-os
+          # workstation, which is scraped by its own job and would otherwise
+          # report a "reboot" every time the PC is switched on.
+          - name: nodes
+            rules:
+              - alert: NodeFilesystemAlmostFull
+                expr: |
+                  (1 - node_filesystem_avail_bytes{job="node-exporter",mountpoint="/var"}
+                     / node_filesystem_size_bytes{job="node-exporter",mountpoint="/var"}) * 100 > 80
+                for: 30m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "/var on {{ $labels.instance }} is {{ $value | printf \"%.0f\" }}% full"
+                  description: "/var (EPHEMERAL) holds container images, logs and, on the control-plane nodes, etcd. kubelet starts deleting unused images at 85% and evicts pods below 10% free. Unused images are the usual cause: list them with talosctl -n <ip> image list --namespace cri. kubelet's imageMaximumGCAge (168h) should keep them in check."
+              - alert: NodeFilesystemCritical
+                expr: |
+                  (1 - node_filesystem_avail_bytes{job="node-exporter",mountpoint="/var"}
+                     / node_filesystem_size_bytes{job="node-exporter",mountpoint="/var"}) * 100 > 90
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "/var on {{ $labels.instance }} is {{ $value | printf \"%.0f\" }}% full"
+                  description: "kubelet evicts pods below 10% free (DiskPressure), and an etcd member that runs out of space stops the control plane. Free space now: delete unused images or large pod logs on {{ $labels.instance }}."
+              - alert: NodeRebooted
+                expr: |
+                  time() - node_boot_time_seconds{job="node-exporter"} < 900
+                for: 0m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "{{ $labels.instance }} rebooted less than 15 minutes ago"
+                  description: "Planned reboots (upgrades, migrations) fire this too. If the three RPi4s reboot together, suspect a power cut: check talosctl etcd members, kubectl get pods -A, and, while nodes are still on flannel, the VXLAN FDB on every node."
+              - alert: NodeNotReady
+                expr: |
+                  kube_node_status_condition{condition="Ready",status="true"} == 0
+                for: 5m
+                labels:
+                  severity: critical
+                  # kube-state-metrics reports the node in "node"; "instance" is
+                  # its own address. Copy the node name over so the Telegram
+                  # message, which prints instance, says which node it is.
+                  instance: "{{ $labels.node }}"
+                annotations:
+                  summary: "Node {{ $labels.node }} is NotReady"
+                  description: "kubelet on {{ $labels.node }} has not reported Ready for 5 minutes. A planned reboot takes about 4 minutes, so this is longer than that. Check talosctl -n <ip> health and dmesg; on a control-plane node also check etcd members."
 
     alertmanager:
       enabled: true
@@ -306,7 +353,10 @@ data:
           resolve_timeout: 5m
         route:
           receiver: telegram
-          group_by: ['alertname', 'namespace']
+          # instance splits per-node alerts into one message each. Without it,
+          # three nodes rebooting together share a group, their summaries
+          # differ, and the Telegram message (CommonAnnotations) comes out empty.
+          group_by: ['alertname', 'namespace', 'instance']
           group_wait: 30s
           group_interval: 5m
           repeat_interval: 24h
