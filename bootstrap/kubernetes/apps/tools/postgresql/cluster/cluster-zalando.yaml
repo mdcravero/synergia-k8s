@@ -69,8 +69,10 @@ spec:
       value: "initdb"
     - name: PATRONI_BOOTSTRAP_INITDB_DATA_CHECKSUMS
       value: "true"
-    - name: PATRONI_KUBERNETES_USE_ENDPOINTS
-      value: "true"
+    # PATRONI_KUBERNETES_USE_ENDPOINTS was removed on purpose. Spilo already
+    # defaults to Endpoints, and the variable would override
+    # kubernetes_use_configmaps once the operator switches to ConfigMaps. See
+    # ../PATRONI-DCS-CONFIGMAPS.md.
 
   volume:
     size: 50Gi
@@ -160,9 +162,12 @@ spec:
     #        type: logical
     #        database: foo
     #        plugin: pgoutput
+    # Must satisfy loop_wait + 2*retry_timeout <= ttl. The previous 30/14
+    # broke the rule, so Patroni silently ran loop_wait at 2s: a write to the
+    # Kubernetes API, and so to etcd, every 2 seconds.
     ttl: 30
-    loop_wait: 30
-    retry_timeout: 14
+    loop_wait: 10
+    retry_timeout: 10
     synchronous_mode: false
     synchronous_mode_strict: false
     synchronous_node_count: 1
