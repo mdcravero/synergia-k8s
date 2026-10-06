@@ -358,6 +358,30 @@ About 12 minutes end to end, with no service outage:
   - Prometheus on flannel scraped the node's node-exporter at `10.245.1.23`.
   - The FDB on all three peers kept synergia-02's VTEP MAC.
 
+### Phase 5 execution notes (synergia-01, 2026-10-06)
+
+Same procedure as synergia-02, after a 3-day soak with no issues. About 8
+minutes end to end, with no service outage:
+
+- **Pre-flight was clean.** It was not the etcd leader (synergia-03 was), it
+  had no pods behind a 0-disruption PDB, and it announced no MetalLB VIPs.
+- **Drain:** 36 s, then 3 min 20 s until all 14 evicted pods were Ready
+  elsewhere. Most landed on synergia-02, which the previous drain had left
+  nearly empty, so the migration itself evened out the cluster.
+- **Upgrade plus reboot:** 2.5 min NotReady, quicker than synergia-02.
+  Flannel's conflist reappeared on boot and was renamed again, as expected.
+- **Validation:**
+  - A test pod got `10.245.2.x` and reached CoreDNS, Prometheus (flannel),
+    Jellyfin (Cilium) and Home Assistant.
+  - Prometheus on flannel scraped the node's node-exporter at `10.245.2.115`.
+  - synergia-03's FDB kept the node's VTEP MAC, and health was 4/4 everywhere.
+- **First live run of the `NodeRebooted` alert:** it fired at 17:03 UTC and
+  reached Telegram, with 0 failed notifications.
+
+Only synergia-03 is left on flannel. It runs `postgres-cluster-0`, so follow
+the Postgres note above, or do the Patroni ConfigMaps migration
+(`tools/postgresql/PATRONI-DCS-CONFIGMAPS.md`) first.
+
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 
 1. Set `cluster.network.cni.name: none` in the Talos machine config so flannel is
