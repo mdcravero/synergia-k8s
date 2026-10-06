@@ -378,9 +378,10 @@ minutes end to end, with no service outage:
 - **First live run of the `NodeRebooted` alert:** it fired at 17:03 UTC and
   reached Telegram, with 0 failed notifications.
 
-Only synergia-03 is left on flannel. It runs `postgres-cluster-0`, so follow
-the Postgres note above, or do the Patroni ConfigMaps migration
-(`tools/postgresql/PATRONI-DCS-CONFIGMAPS.md`) first.
+Only synergia-03 is left on flannel. Since Patroni step 1 (2026-10-06),
+`postgres-cluster-0` runs on synergia-01, so it is no longer on synergia-03.
+Check where it runs before draining any node, and follow the Postgres note
+above for whichever node hosts it.
 
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 

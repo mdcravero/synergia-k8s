@@ -118,6 +118,38 @@ Commit and push. The operator recreates the pod, which comes back with a fresh
 
 Let it run for a day before Step 2.
 
+#### Step 1 execution notes (2026-10-06)
+
+Done (`c50ac19f`). Before it, logical backup `1791306438.sql.gz` was taken
+and uploaded.
+- **Database down for 5.5 minutes, not ~1.** Postgres was unavailable from
+  17:11:05 to 17:16:30 UTC:
+  - The pod was rescheduled onto synergia-01, freshly uncordoned and the
+    emptiest node. That node had never run Postgres, so it pulled the 585 MB
+    Spilo image: 2 min 16 s.
+  - Spilo's `launch.sh` decompresses `/a.tar.xz` with xz on **every**
+    container start, about 2.5 minutes on an RPi4 with no log output. Do not
+    mistake that silence for a hang.
+  - Patroni then took about 20 seconds to promote itself (timeline 59 → 60).
+- **Alerts during the window.** `PostgresqlNotResponding` fired, because the
+  exporter started about 3 minutes before Postgres. It resolved at 17:19:48.
+  `PostgresqlMasterEndpointStale` stayed quiet: the endpoint was empty for less
+  than its 10-minute `for`.
+- **Result.** `show-config` changed exactly `loop_wait` 30 → 10 and
+  `retry_timeout` 14 → 10. The "Violated the rule" warning is gone, and the
+  endpoint equals the pod IP (`10.245.2.224`).
+- **Apps.**
+  - Home Assistant's recorder reconnected by itself (3 connections), and so
+    did n8n and Homebox.
+  - Authelia logged no errors and reconnects on the next login; its pool
+    holds no idle connections.
+- **Postgres now runs on synergia-01, which is on Cilium**, not on
+  synergia-03.
+
+**For Step 2:** budget about 3 minutes of downtime, since the image is now on
+synergia-01. That assumes the pod is recreated there. A pod move to another
+node adds the image pull.
+
 ### Step 2: operator in ConfigMaps mode (one restart)
 
 In `operator/configmap-zalando.yaml`, under `configGeneral`, set
