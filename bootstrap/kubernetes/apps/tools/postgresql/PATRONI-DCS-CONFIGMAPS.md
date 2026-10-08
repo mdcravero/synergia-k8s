@@ -169,6 +169,34 @@ What happens:
    the data, becomes leader and labels the pod master. The timeline goes up
    by one, which is normal.
 
+#### Step 2 execution notes (2026-10-08)
+
+Done (`a4d7f84b`). Before it, logical backup `1791501840.sql.gz` was taken.
+- **Order of events.** The operator updated the Service in place first:
+  selector added, LoadBalancer IP `10.42.20.70` kept. Then it recreated the
+  pod. The pod stayed on synergia-01, where the image was already cached.
+- **Database down for about 3 min 20 s** (23:27:25 to 23:30:45 UTC), almost
+  all of it Spilo's xz decompression. Patroni found empty ConfigMaps, adopted
+  the existing data and promoted itself (timeline 60 → 61).
+- **Verification passed:**
+  - `KUBERNETES_USE_CONFIGMAPS=true`, and the ConfigMaps
+    `postgres-cluster-config` and `postgres-cluster-leader` exist.
+  - `show-config` is identical to the pre-change state.
+  - The EndpointSlice is now managed by `endpointslice-controller.k8s.io` and
+    points at the pod IP.
+- **The key test happened as part of the step.** The pod was recreated with a
+  new IP (`10.245.2.224` → `10.245.2.212`), and the endpoint followed it with
+  no Patroni involvement, so no extra pod deletion was needed.
+- **Apps.** Authelia, Home Assistant's recorder and n8n reconnected by
+  themselves.
+- **Alerts.** `PostgresqlNotResponding` fired during startup, as in step 1.
+  `PostgresqlMasterEndpointStale` went `pending` while the endpoint was empty,
+  and its 10-minute `for` kept it from firing. Both cleared by 23:33:41.
+  `kube_endpointslice_endpoints` reads the controller-managed slice fine, so
+  that alert still works in this mode.
+
+Step 4 (cleanup) is due from about 2026-10-15.
+
 ### Step 3: verify
 
 - The Service selector includes `spilo-role: master`, and `EXTERNAL-IP` is

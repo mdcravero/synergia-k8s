@@ -341,10 +341,12 @@ About 12 minutes end to end, with no service outage:
   for one probe interval (~2 min) after the node came back, then 4/4.
 - **The node that hosts `postgres-cluster-0` needs extra steps.** On
   2026-10-03 that was synergia-03. Its PDB allows 0 disruptions, so
-  `kubectl drain` blocks on it. Never reboot that node with the pod still on it.
-  A pod that restarts in place with a new IP can keep its old `POD_IP`, and
-  Patroni then advertises a dead endpoint. That is what took SSO down after
-  the 2026-10-02 power cut. Instead:
+  `kubectl drain` blocks on it. Until 2026-10-08, rebooting that node with the
+  pod still on it was dangerous too: a pod that restarts in place with a new IP
+  could keep its old `POD_IP`, and Patroni then advertised a dead endpoint.
+  That is what took SSO down after the 2026-10-02 power cut. Patroni has run
+  in ConfigMaps mode since then, so Kubernetes maintains the endpoint and that
+  risk is gone. The PDB still blocks the drain, so:
   1. Delete the pod explicitly: `kubectl delete pod -n tools postgres-cluster-0`.
      The cordon makes it reschedule onto another node as a new pod object,
      with a fresh IP.
