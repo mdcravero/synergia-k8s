@@ -52,7 +52,11 @@ data:
       # ignore_instance_limits_annotation_key: ""
 
       # Select if setup uses endpoints (default), or configmaps to manage leader (DCS=k8s)
-      # kubernetes_use_configmaps: false
+      # ConfigMaps since 2026-10-08. The master Service then gets a selector
+      # (spilo-role=master), so Kubernetes, not Patroni, maintains its endpoint
+      # from the real pod IP. In Endpoints mode Patroni published a stale IP
+      # after the 2026-10-02 power cut. See ../PATRONI-DCS-CONFIGMAPS.md.
+      kubernetes_use_configmaps: true
 
       # min number of instances in Postgres cluster. -1 = no limit
       min_instances: -1
