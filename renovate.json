@@ -75,6 +75,26 @@
       "schedule": ["at any time"],
       "automerge": false,
       "labels": ["breaking-change", "renovate"]
+    },
+    {
+      "description": "Updates that restart Postgres. The exporter is a sidecar in the Postgres pod, and operator or Spilo bumps change the StatefulSet, so the operator recreates the single pod. On 2026-10-09 an exporter bump took Postgres down for ~6 min, and with it Authelia (SSO), n8n, Homebox and the HA recorder. Never auto-merge, not even patches: merge alone, at a chosen time. The title suffix reaches the Telegram notification. Spilo is matched by pattern in case Renovate starts tracking it.",
+      "matchPackageNames": ["prometheuscommunity/postgres-exporter", "postgres-operator", "/spilo/"],
+      "automerge": false,
+      "addLabels": ["restarts-postgres"],
+      "commitMessageSuffix": "[restarts Postgres]",
+      "prBodyNotes": [
+        "⚠️ **Merging this restarts Postgres.** The operator recreates `postgres-cluster-0`: about 3–6 minutes without a database, so Authelia (SSO), n8n, Homebox and the Home Assistant recorder are down too. Merge it **on its own**, not together with other PRs, at a time when that is acceptable. `PostgresqlNotResponding` will fire on Telegram and resolve by itself."
+      ]
+    },
+    {
+      "description": "Longhorn: its admission webhook validates every PVC update in the cluster (failurePolicy Fail) and is unavailable while longhorn-manager restarts. On 2026-10-07 a Homarr upgrade merged a minute after a Longhorn upgrade hit that window, and its HelmRelease stalled until reset by hand. Never auto-merge; merge alone.",
+      "matchPackageNames": ["longhorn"],
+      "automerge": false,
+      "addLabels": ["merge-alone"],
+      "commitMessageSuffix": "[merge alone]",
+      "prBodyNotes": [
+        "⚠️ **Merge this on its own.** Upgrading Longhorn restarts its admission webhook, and while it is down every PVC change in the cluster fails. Wait for the `longhorn` HelmRelease to be Ready before merging anything else. Afterwards, the volumes keep their old engine until it is upgraded on purpose."
+      ]
     }
   ]
 }
