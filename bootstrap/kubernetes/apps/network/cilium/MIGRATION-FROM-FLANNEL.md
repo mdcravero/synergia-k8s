@@ -425,13 +425,128 @@ Next is Phase 6.
 
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 
-1. Set `cluster.network.cni.name: none` in the Talos machine config so flannel is
-   not reinstalled.
-2. Remove the flannel DaemonSet and its RBAC.
-3. Move the Helm values out of migration mode: drop `policyEnforcementMode: never`
-   and `operator.unmanagedPodWatcher.restart: false`, and convert the install into
-   a Flux `HelmRelease` under `app/` wired into `kustomization.yaml`.
-4. Only then consider `kubeProxyReplacement`, as its own change.
+**Status:** planned 2026-10-10, not executed. Let the all-Cilium cluster run
+for a day or two first.
+
+Based on Cilium 1.20.2's "Post-migration" section
+(`Documentation/installation/k8s-install-migration.rst`) and checked against
+this cluster. Facts that shape the order:
+
+- **Talos never deletes flannel, but recreates it.** Its
+  `ManifestApplyController` (v1.11.6, `manifest_apply.go`) does a Get for each
+  rendered bootstrap object: if the object exists it is skipped, and if it is
+  missing it is created. It never deletes or updates. So while
+  `cluster.network.cni` is flannel, deleting the flannel DaemonSet just makes
+  Talos recreate it, and switching to `none` leaves the existing objects
+  behind. Switch Talos first, then delete by hand. On Talos ≥ 1.14 this is a
+  `KubeFlannelCNIConfig` document instead of `cni.name: none`.
+- **12 NetworkPolicies exist and have never been enforced.** flannel cannot
+  enforce policy, and Cilium runs `policyEnforcementMode: never`. Setting
+  `default` enforces all of them at once. Reviewed 2026-10-10:
+  - **`kube-system/allow-coredns-egress` (ours, `apps-network`) would break
+    cluster DNS.** It lets CoreDNS egress only on port 53, which cuts it off
+    from the API server (`10.96.0.1:443` → `10.42.20.x:6443`) that its
+    kubernetes plugin watches. Fix it before enforcing.
+  - Flux's 3 policies only allow ingress from `flux-system` plus scraping on
+    8080 and webhooks on 9292, with all egress allowed. That is fine.
+  - Longhorn's 6 are internal. `longhorn-webhook` admits any source on
+    9501/9502, so the API server can still reach it.
+  - CouchDB and Valkey admit any source on their service ports.
+  - No `CiliumNetworkPolicy` exists. Pods without a policy stay allow-all
+    under `default`.
+- **Flux can adopt the hand-installed release.** The live Helm values match
+  `app/helm-values-migration.yaml` exactly (20 keys, 0 differences). A
+  HelmRelease whose release name and storage namespace match an existing
+  release it did not make **upgrades** that release; it does not reinstall it
+  (helm-controller v2 spec). **A mismatch, or deleting the HelmRelease later,
+  uninstalls Cilium**, which means a cluster-wide network outage.
+
+### 6.1 Fix the CoreDNS egress policy (Git, harmless while unenforced)
+
+Add egress to the API server to `allow-coredns-egress`, both the pre-DNAT
+ClusterIP `10.96.0.1/32:443` and the node IPs `10.42.20.0/24:6443`. Or delete
+the policy if it has no purpose. Do this first, while nothing enforces it yet.
+
+### 6.2 Talos: stop managing flannel
+
+Set `cluster.network.cni.name: none` in all four machine configs: dry-run,
+apply, commit in `synergia-k8s-talos`. Expect no reboot. The dry-run tells,
+and its diff must show only that change. flannel keeps running untouched.
+
+### 6.3 Hand Cilium to Flux, values unchanged
+
+Add a `HelmRepository` (`https://helm.cilium.io`) and a `HelmRelease` named
+`cilium` in `kube-system`:
+- Set `releaseName: cilium` explicitly. Set no `targetNamespace`, or else the
+  default release name becomes `kube-system-cilium`.
+- Pin chart `1.20.2`.
+- Use the current values verbatim.
+- Annotate it `kustomize.toolkit.fluxcd.io/prune: disabled`, so that removing
+  it from Git can never uninstall the CNI.
+- Set `upgrade.remediation.strategy: rollback`.
+
+Create it with `spec.suspend: true`, check the rendered spec, then resume.
+Expect Helm revision 2 and no pod restarts. Wire it into the `apps-network`
+Kustomization.
+
+### 6.4 Leave migration mode, in audit mode
+
+One values commit:
+- `cni.customConf: false`. The agents write the CNI config themselves; until
+  now the `CiliumNodeConfig` did that per node.
+- `operator.unmanagedPodWatcher.restart: true`.
+- `policyEnforcementMode: default` **plus `policyAuditMode: true`**: policies
+  are evaluated, and would-be drops are logged as `AUDIT` but let through.
+- Keep `bpf.hostLegacyRouting: true`. eBPF host routing needs kube-proxy
+  replacement, which is out of scope.
+- Keep `tunnelPort: 8472`. Moving to 4789 is optional and disruptive.
+
+Then `kubectl -n kube-system rollout restart ds/cilium` and wait for all
+agents to be Ready. Delete the per-node config with
+`kubectl -n kube-system delete ciliumnodeconfig cilium-default`, and remove
+the `io.cilium.migration/cilium-default` label from the four nodes. Verify
+every node still has `05-cilium.conflist` and that `cilium-dbg status` is OK
+everywhere.
+
+### 6.5 Delete flannel
+
+```bash
+kubectl -n kube-system delete daemonset kube-flannel
+kubectl -n kube-system delete configmap kube-flannel-cfg
+kubectl -n kube-system delete serviceaccount flannel
+kubectl delete clusterrolebinding flannel
+kubectl delete clusterrole flannel
+```
+
+No pod uses flannel any more, so nothing should notice. Its leftovers stay
+until each node's next reboot: the `flannel.1` VXLAN device, the `cni0`
+bridge, the `FLANNEL-*` iptables chains, routes to `10.244.x` and
+`10-flannel.conflist.cilium_bak`. A rolling reboot is optional. If you do one,
+follow the Postgres-node rules in the Phase 5 notes. **This is what finally
+retires the flannel FDB bug.**
+
+### 6.6 Watch the audit log, then enforce
+
+For a day, check `kubectl -n kube-system exec ds/cilium -c cilium-agent --
+hubble observe --verdict AUDIT --last 200` on each node. Every AUDIT line is
+traffic that enforcement would drop. Fix the policy or the app. When the
+audit log is empty, set `policyAuditMode: false`.
+
+### 6.7 Tidy up
+
+- Remove `app/helm-values-migration.yaml` and `app/cilium-node-config.yaml`,
+  or move them into the HelmRelease's history.
+- Mark this runbook complete and update the memory notes.
+
+Only then consider `kubeProxyReplacement`, as its own change.
+
+**Rollback per step:**
+- 6.1 and 6.2: revert the commit.
+- 6.3: suspend the HelmRelease. Never delete it.
+- 6.4: revert the values. Re-apply `cilium-node-config.yaml` if
+  `customConf` has to return.
+- 6.5: Talos recreates flannel if `cni` goes back to flannel. Nodes keep using
+  `05-cilium.conflist` while Cilium is exclusive.
 
 ## After the migration
 
