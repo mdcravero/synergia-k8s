@@ -1,0 +1,37 @@
+---
+# Lets CoreDNS reach the Kubernetes API, which its kubernetes plugin watches.
+#
+# allow-coredns-egress (coredns-network-policy.yaml) only allows egress on
+# port 53, so once Cilium enforces policy CoreDNS would lose the API server
+# and cluster DNS would break. Cilium adds up the allow rules of every policy
+# that selects a pod, so this one complements that NetworkPolicy and does not
+# replace it.
+#
+# Why a CiliumNetworkPolicy and not one more ipBlock rule in the
+# NetworkPolicy:
+# - Cilium translates ClusterIPs in its own datapath even with kube-proxy
+#   running ("Services: ClusterIP: Enabled"), so 10.96.0.1:443 becomes
+#   10.42.20.x:6443 before policy is evaluated.
+# - Those node addresses carry the kube-apiserver identity, and ipBlock rules
+#   never match cluster nodes.
+# The entity matches regardless of which control-plane node serves the call.
+#
+# Inert until Phase 6 of network/cilium/MIGRATION-FROM-FLANNEL.md, while
+# policyEnforcementMode is "never".
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-coredns-to-apiserver
+  namespace: kube-system
+spec:
+  description: "CoreDNS -> kube-apiserver for the kubernetes plugin"
+  endpointSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  egress:
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP

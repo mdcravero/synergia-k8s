@@ -10,7 +10,10 @@ spec:
   policyTypes:
     - Egress
   egress:
-    # Allow egress to any IP on port 53 for DNS queries
+    # Allow egress to any IP on port 53 for DNS queries (upstreams 10.42.20.2
+    # and 1.1.1.1 in the Corefile). API server access, which the kubernetes
+    # plugin needs, is granted separately in coredns-apiserver-cnp.yaml:
+    # ipBlock cannot match cluster nodes under Cilium.
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0
