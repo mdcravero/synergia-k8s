@@ -385,6 +385,44 @@ Only synergia-03 is left on flannel. Since Patroni step 1 (2026-10-06),
 Check where it runs before draining any node, and follow the Postgres note
 above for whichever node hosts it.
 
+### Phase 5 execution notes (synergia-03, 2026-10-10): migration complete
+
+synergia-03 was the last node. **All 71 pods now run on Cilium**, and none
+are left on flannel's `10.244` range.
+
+- **It was the etcd leader.** `talosctl etcd forfeit-leadership` moved
+  leadership to synergia-01 first. No election happened during the reboot,
+  and the leader stayed on synergia-01 throughout.
+- **Steering pods to synergia-05.** To keep image pulls off the RPi4 USB disks
+  while etcd ran on 2 of 3 members, synergia-01 and -02 were also cordoned
+  during the drain. 15 of the 16 pods landed on synergia-05, and the 16
+  pods used only 0.8 GiB.
+- **Mistake: an unplanned 11-minute Postgres outage** (12:56–13:07 UTC). The
+  Zalando operator watches nodes: as soon as the node hosting the master
+  becomes unschedulable, it migrates the master off it. Its log reads
+  `node "synergia-01" became unschedulable … migrating single pod cluster …
+  this will cause downtime`. With only one instance, that means deleting the
+  pod. The StatefulSet is pinned to `kubernetes.io/arch=arm64` (the custom
+  Spilo image is arm64-only), so it could not go to synergia-05 and stayed
+  Pending until synergia-01 and -02 were uncordoned.
+  - Homebox crash-looped meanwhile.
+  - The Home Assistant recorder and the other apps recovered on their own.
+  - The endpoint followed the new pod by itself (ConfigMaps mode).
+  - **Lesson: cordoning the node that hosts `postgres-cluster-0` means
+    Postgres downtime.** Never cordon it as a side measure. If it must be
+    cordoned, plan it as a Postgres restart, and keep at least one other
+    arm64 node schedulable.
+- **Upgrade plus reboot:** 3 min NotReady. Flannel's conflist reappeared on
+  boot and was renamed again.
+- **Validation:**
+  - A test pod got `10.245.3.x` and reached CoreDNS, Prometheus, Jellyfin and
+    Home Assistant.
+  - All four node-exporters are up.
+  - Health is 4/4 on every node.
+  - `NodeRebooted` fired as expected.
+
+Next is Phase 6.
+
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 
 1. Set `cluster.network.cni.name: none` in the Talos machine config so flannel is
