@@ -6,8 +6,11 @@ metadata:
   namespace: tools
 spec:
   schedule: "0 9 * * *"
-  successfulJobsHistoryLimit: 7
-  failedJobsHistoryLimit: 14
+  # Finished Jobs kept for inspection; logs are also in Loki. Keep a few
+  # failed ones: BackupCronJobFailed reads kube_job_failed, so a failed Job
+  # must still exist to alert.
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
