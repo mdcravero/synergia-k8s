@@ -463,6 +463,17 @@ this cluster. Facts that shape the order:
 
 ### 6.1 Fix the CoreDNS egress policy (Git, harmless while unenforced)
 
+**Done 2026-10-10 (`4d10ee4f`).** Instead of ipBlock rules, a separate
+`CiliumNetworkPolicy` (`core-dns/app/coredns-apiserver-cnp.yaml`) allows
+CoreDNS egress to the `kube-apiserver` entity on 6443. Cilium translates
+ClusterIPs in its datapath before policy (`Services: ClusterIP: Enabled`
+even with kube-proxy), and ipBlock never matches cluster nodes. Cilium sums
+allow rules across policies, so the NetworkPolicy stays. The Corefile
+upstreams (`10.42.20.2`, `1.1.1.1`) are outside the cluster, so its
+`0.0.0.0/0:53` rule covers them. The agents imported the policy, and it stays
+inert until enforcement. Confirm it in 6.4's audit log: there should be no
+AUDIT verdicts for kube-dns.
+
 Add egress to the API server to `allow-coredns-egress`, both the pre-DNAT
 ClusterIP `10.96.0.1/32:443` and the node IPs `10.42.20.0/24:6443`. Or delete
 the policy if it has no purpose. Do this first, while nothing enforces it yet.
