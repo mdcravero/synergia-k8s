@@ -1,0 +1,31 @@
+---
+# Drop any identity headers sent by the client before Authelia sets the real ones.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: finance-mafi-strip-remote
+  namespace: finance
+spec:
+  headers:
+    customRequestHeaders:
+      Remote-User: ""
+      Remote-Groups: ""
+      Remote-Email: ""
+      Remote-Name: ""
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: middlewares-auth-finance-mafi
+  namespace: finance
+spec:
+  forwardAuth:
+    address: "http://authelia.security.svc.cluster.local/api/authz/forward-auth"
+    trustForwardHeader: true
+    authResponseHeaders:
+      - "Remote-User"
+      - "Remote-Groups"
+      - "Remote-Email"
+      - "Remote-Name"
+      - "Remote-Given-Name"
+      - "Remote-Family-Name"

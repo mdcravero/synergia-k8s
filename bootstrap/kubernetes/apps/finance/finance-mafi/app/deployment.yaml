@@ -1,0 +1,138 @@
+# Finance MaFi: construction expense tracker (API + PWA in one image).
+# Source: https://github.com/mdcravero/finance-mafi (private). Image tag is bumped by Renovate.
+#
+# Database: prepared by the Zalando operator (tools/postgresql/cluster → preparedDatabases.finance_mafi).
+# The operator writes the credentials straight into this namespace (secretNamespace: finance):
+#   - owner user  → runs migrations (initContainer, dbmate)
+#   - writer user → used by the app (no DDL)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-mafi
+  namespace: finance
+  labels:
+    app: finance-mafi
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0 # if a migration fails, the old pod keeps serving
+  selector:
+    matchLabels:
+      app: finance-mafi
+  template:
+    metadata:
+      labels:
+        app: finance-mafi
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: attachments
+          persistentVolumeClaim:
+            claimName: finance-mafi-attachments
+        - name: tmp
+          emptyDir: {}
+
+      initContainers:
+        - name: migrate
+          image: ghcr.io/mdcravero/finance-mafi:0.2.0
+          command: ["dbmate", "--migrations-dir", "/app/db/migrations", "--no-dump-schema", "--wait", "up"]
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: finance-mafi-owner-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: finance-mafi-owner-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: DATABASE_URL
+              value: postgres://$(DB_USER):$(DB_PASSWORD)@postgres-cluster.tools.svc.cluster.local:5432/finance_mafi?sslmode=require&search_path=app
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+      containers:
+        - name: finance-mafi
+          image: ghcr.io/mdcravero/finance-mafi:0.2.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: TZ
+              value: America/Argentina/Cordoba
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: finance-mafi-writer-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: finance-mafi-writer-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            # Spilo uses a self-signed certificate: encrypted, not verified (same as Homebox/Authelia)
+            - name: DATABASE_URL
+              value: postgres://$(DB_USER):$(DB_PASSWORD)@postgres-cluster.tools.svc.cluster.local:5432/finance_mafi?sslmode=no-verify
+            - name: ATTACHMENTS_DIR
+              value: /data/attachments
+            # Authelia group allowed to use the app (Remote-Groups header)
+            - name: AUTH_GROUP
+              value: finance
+          volumeMounts:
+            - name: attachments
+              mountPath: /data/attachments
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /api/health # checks the DB connection
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 3
+            failureThreshold: 20

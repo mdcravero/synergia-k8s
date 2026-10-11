@@ -58,6 +58,20 @@ spec:
     n8n: n8n
     bot_memory: bot_user
 
+  # Finance MaFi: owner/reader/writer roles + login users (finance_mafi_owner_user runs migrations,
+  # finance_mafi_writer_user runs the app). Their *.credentials secrets are created in the app's
+  # namespace (needs enable_cross_namespace_secret in the operator config).
+  preparedDatabases:
+    finance_mafi:
+      defaultUsers: true
+      secretNamespace: finance
+      schemas:
+        app:
+          defaultRoles: false # schema owned by finance_mafi_owner; grants come from the app migrations
+      extensions:
+        pg_trgm: app
+        unaccent: app
+
   postgresql:
     version: "17"
     parameters: # Expert section

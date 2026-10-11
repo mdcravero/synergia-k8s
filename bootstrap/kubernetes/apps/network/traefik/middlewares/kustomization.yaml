@@ -10,3 +10,4 @@ resources:
   - middleware-authelia-openclaw.yaml
   - middleware-authelia-sabnzbd.yaml
   - middleware-authelia-longhorn.yaml
+  - middleware-authelia-finance-mafi.yaml
