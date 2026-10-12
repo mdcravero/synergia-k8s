@@ -65,28 +65,48 @@ data:
           path: /config/users_database.yml
       access_control:
         default_policy: deny
+        # A rule without a subject matches every signed-in user, and
+        # default_policy only applies when no rule matches the domain. So every
+        # admin UI names its group: without it, a user who only belongs to
+        # "finance" could open all of them.
         rules:
           - domain: auth.synergia.net.ar
             policy: one_factor
           - domain: traefik-dash.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           - domain: prometheus.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           - domain: maintainerr.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           - domain: goldilocks.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           - domain: zigbee2mqtt.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           - domain: openclaw.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           - domain: sabnzbd.synergia.net.ar
             policy: one_factor
+            subject:
+              - group:admins
           # Longhorn's UI and API have no authentication of their own and can
           # delete every volume, and every subdomain here reaches Traefik from
           # the internet through Cloudflare. Password alone is not enough.
           - domain: longhorn.synergia.net.ar
             policy: two_factor
+            subject:
+              - group:admins
           # Hubble UI: every network flow in the cluster, no login of its own.
           - domain: hubble.synergia.net.ar
             policy: two_factor
