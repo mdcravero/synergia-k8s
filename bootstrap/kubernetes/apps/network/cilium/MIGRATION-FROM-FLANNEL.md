@@ -425,8 +425,9 @@ Next is Phase 6.
 
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 
-**Status:** planned 2026-10-10, not executed. Let the all-Cilium cluster run
-for a day or two first.
+**Status:** 6.1–6.5 done (6.1 on 2026-10-10, the rest on 2026-10-12, after
+two days with all nodes on Cilium). Policies run in audit mode. Next is 6.6,
+from 2026-10-13, then 6.7.
 
 Based on Cilium 1.20.2's "Post-migration" section
 (`Documentation/installation/k8s-install-migration.rst`) and checked against
@@ -474,15 +475,18 @@ upstreams (`10.42.20.2`, `1.1.1.1`) are outside the cluster, so its
 inert until enforcement. Confirm it in 6.4's audit log: there should be no
 AUDIT verdicts for kube-dns.
 
-Add egress to the API server to `allow-coredns-egress`, both the pre-DNAT
-ClusterIP `10.96.0.1/32:443` and the node IPs `10.42.20.0/24:6443`. Or delete
-the policy if it has no purpose. Do this first, while nothing enforces it yet.
-
 ### 6.2 Talos: stop managing flannel
 
 Set `cluster.network.cni.name: none` in all four machine configs: dry-run,
 apply, commit in `synergia-k8s-talos`. Expect no reboot. The dry-run tells,
 and its diff must show only that change. flannel keeps running untouched.
+
+**Done 2026-10-12 (talos-config `caa19ae`).**
+- The dry-run and the apply both used `--mode=no-reboot`, so a change that
+  needed a reboot would have failed instead of rebooting.
+- Each diff showed only the `cni` block.
+- Afterwards `talosctl get manifests` listed no flannel manifest on any
+  control plane, and the DaemonSet kept running.
 
 ### 6.3 Hand Cilium to Flux, values unchanged
 
@@ -499,6 +503,16 @@ Add a `HelmRepository` (`https://helm.cilium.io`) and a `HelmRelease` named
 Create it with `spec.suspend: true`, check the rendered spec, then resume.
 Expect Helm revision 2 and no pod restarts. Wire it into the `apps-network`
 Kustomization.
+
+**Done 2026-10-12.** The HelmRelease is `app/helm-release.yaml`.
+- **Before:** `helm template` with the same chart and values matched the live
+  manifest, apart from two Secrets the chart regenerates on every upgrade:
+  `cilium-ca` and `hubble-server-certs`.
+- **Commits:** `2c2733ee` created it suspended, and `1636608e` resumed it.
+- **Result:** "Helm upgrade succeeded … cilium.v2". All 10 Cilium pods kept
+  their UIDs with 0 restarts, the live values still equal Git, and the
+  DaemonSet now carries `helm.toolkit.fluxcd.io/*` labels.
+- **Renovate** now puts `cilium` under manual review.
 
 ### 6.4 Leave migration mode, in audit mode
 
@@ -519,6 +533,25 @@ the `io.cilium.migration/cilium-default` label from the four nodes. Verify
 every node still has `05-cilium.conflist` and that `cilium-dbg status` is OK
 everywhere.
 
+**Done 2026-10-12 (`4f41943f`, Helm revision 3).**
+- **What the upgrade changed:** only `cilium-config` and the operator's
+  ClusterRole, which gains `delete` on pods for the unmanaged-pod watcher. No
+  pod template changed, so nothing restarted by itself.
+- **Agents:** restarted by hand one node at a time instead of `rollout
+  restart` (`maxUnavailable: 2`), in the order synergia-03, -02, -05, -01
+  (Postgres last). Each took 70–100 s to settle: endpoints regenerating and
+  "cilium-health daemon unreachable" right after Ready, then all endpoints
+  ready and health 4/4. Each came up with `PolicyAuditMode: Enabled` and
+  `05-cilium.conflist` in place.
+- **Operator:** also restarted (`rollout restart deployment/cilium-operator`).
+  It reads `cilium-config` only at startup, and the plan above forgot it. It
+  now runs with `unmanaged-pod-watcher-interval=15s`, which acts only on
+  `k8s-app=kube-dns` pods.
+- **CiliumNodeConfig:** deleted, and the labels removed. Its settings equalled
+  the chart defaults once `customConf` was false.
+- **Audit log:** no AUDIT verdicts in the first minutes. Hubble was recording
+  flows, so the empty log is real.
+
 ### 6.5 Delete flannel
 
 ```bash
@@ -528,6 +561,16 @@ kubectl -n kube-system delete serviceaccount flannel
 kubectl delete clusterrolebinding flannel
 kubectl delete clusterrole flannel
 ```
+
+**Done 2026-10-12.**
+- **Deleted:** the five objects above, after saving their YAML. No pod was on
+  `10.244`.
+- **Talos:** did not recreate them.
+- **Afterwards:**
+  - 0 pods outside Running/Completed;
+  - every agent OK with health 4/4;
+  - all 14 MetalLB services, Postgres included, reachable from the LAN;
+  - every in-cluster Prometheus target up.
 
 No pod uses flannel any more, so nothing should notice. Its leftovers stay
 until each node's next reboot: the `flannel.1` VXLAN device, the `cni0`
@@ -541,7 +584,8 @@ retires the flannel FDB bug.**
 For a day, check `kubectl -n kube-system exec ds/cilium -c cilium-agent --
 hubble observe --verdict AUDIT --last 200` on each node. Every AUDIT line is
 traffic that enforcement would drop. Fix the policy or the app. When the
-audit log is empty, set `policyAuditMode: false`.
+audit log is empty, set `policyAuditMode: false`. The agents read it only at
+startup, so restart them again one node at a time, as in 6.4.
 
 ### 6.7 Tidy up
 
