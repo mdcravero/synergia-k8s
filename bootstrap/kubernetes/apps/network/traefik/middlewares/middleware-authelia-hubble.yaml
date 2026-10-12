@@ -1,0 +1,18 @@
+---
+# Authelia forward-auth for the Hubble UI. The UI has no login of its own and
+# shows every network flow in the cluster, so Authelia's access_control
+# requires two_factor and the admins group for hubble.synergia.net.ar.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: middlewares-auth-hubble
+  namespace: kube-system
+spec:
+  forwardAuth:
+    address: "http://authelia.security.svc.cluster.local/api/authz/forward-auth"
+    trustForwardHeader: true
+    authResponseHeaders:
+      - "Remote-User"
+      - "Remote-Groups"
+      - "Remote-Email"
+      - "Remote-Name"

@@ -1,0 +1,27 @@
+---
+# Hubble UI, reachable from the internet like every synergia.net.ar subdomain
+# (proxied to Traefik through Cloudflare). The UI has no authentication, so the
+# Authelia middleware is mandatory; Authelia requires two_factor and the admins
+# group for this host. Everything fails closed: without the middleware Traefik
+# drops the router, and without the Authelia rule its default_policy is deny.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hubble-ui
+  namespace: kube-system
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: kube-system-middlewares-auth-hubble@kubernetescrd
+spec:
+  rules:
+    - host: hubble.synergia.net.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hubble-ui
+                port:
+                  number: 80

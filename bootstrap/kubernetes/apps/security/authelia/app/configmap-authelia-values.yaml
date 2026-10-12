@@ -87,6 +87,11 @@ data:
           # the internet through Cloudflare. Password alone is not enough.
           - domain: longhorn.synergia.net.ar
             policy: two_factor
+          # Hubble UI: every network flow in the cluster, no login of its own.
+          - domain: hubble.synergia.net.ar
+            policy: two_factor
+            subject:
+              - group:admins
           # Finance MaFi: household finances, only the "finance" group, always with 2FA
           - domain: finance.synergia.net.ar
             policy: two_factor

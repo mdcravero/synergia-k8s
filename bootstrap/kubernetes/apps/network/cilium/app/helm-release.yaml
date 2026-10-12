@@ -82,6 +82,17 @@ spec:
       customConf: false
       uninstall: false
 
+    # --- Hubble ------------------------------------------------------------------
+    # The agents' Hubble server is on by default (port 4244). Relay gathers flows
+    # from all four agents, and the UI draws the service map from them. The UI
+    # has no login of its own: ingress.yaml puts it behind Authelia (two_factor,
+    # group admins only), because it shows every flow in the cluster.
+    hubble:
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+
     # --- Talos requirements ---------------------------------------------------
     # Talos provides cgroupv2 and bpffs itself; letting Cilium mount them fails.
     cgroup:
