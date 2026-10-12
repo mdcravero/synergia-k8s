@@ -9,8 +9,10 @@
 # annotation keeps Flux from deleting it if it disappears from Git. To stop
 # reconciling, suspend it.
 #
-# Values copied verbatim from helm-values-migration.yaml, which matched the live
-# release exactly (20 keys) on 2026-10-12.
+# Values started as a verbatim copy of helm-values-migration.yaml (identical
+# to the live release on 2026-10-12). Phase 6.4 then took Cilium out of
+# migration mode: it writes its own CNI config, and policies are evaluated in
+# audit mode.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -36,13 +38,11 @@ spec:
       remediateLastFailure: true
       strategy: rollback
   values:
-    # --- Migration mode -------------------------------------------------------
-    # A second, separate overlay runs alongside flannel. Both CNIs coexist and pods
-    # keep talking across migrated and unmigrated nodes, as long as the pod CIDRs do
-    # not overlap.
-    #
-    # In use today: pods 10.244.0.0/16 (flannel), services 10.96.0.0/12,
-    # LAN 10.42.20.0/24. 10.245.0.0/16 is free.
+    # --- IPAM and overlay -----------------------------------------------------
+    # One /24 per node out of 10.245.0.0/16, allocated by the Cilium operator.
+    # The range dates from the migration, when flannel held 10.244.0.0/16. Talos'
+    # cluster.network.podSubnets still says 10.244.0.0/16; cluster-pool IPAM
+    # does not use it.
     ipam:
       mode: cluster-pool
       operator:
@@ -50,40 +50,36 @@ spec:
           - "10.245.0.0/16"
         clusterPoolIPv4MaskSize: 24
 
-    # Leave flannel-managed pods alone. Without this the operator restarts every pod
-    # it does not manage, which is exactly the disruption the per-node rollout is
-    # designed to avoid.
+    # Restart pods that Cilium does not manage (no CiliumEndpoint), so a pod
+    # can never be left on a stale network. It was off during the migration to
+    # leave flannel's pods alone.
     operator:
       unmanagedPodWatcher:
-        restart: false
+        restart: true
 
-    # Two VXLAN overlays share the wire during the migration, so they must not
-    # share a UDP port. The official guide uses 8473 because upstream flannel sits
-    # on Cilium's default 8472. Talos runs flannel on the IANA port 4789 instead
-    # (kube-flannel-cfg: "Port": 4789), so 8472 is free here -- and staying on
-    # Cilium's default avoids having to change the tunnel port on a live Cilium
-    # cluster after flannel is gone, which is disruptive. Pinned rather than left
-    # implicit: the hybrid phase should not rest on a chart default.
+    # VXLAN on Cilium's default port. Pinned rather than left to a chart
+    # default: changing the tunnel port on a live cluster is disruptive. (During
+    # the migration flannel ran alongside on 4789.)
     routingMode: tunnel
     tunnelProtocol: vxlan
     tunnelPort: 8472
 
-    # No policy enforcement during the migration. Turning this on while half the
-    # cluster is still on flannel drops traffic Cilium has no identity for.
-    policyEnforcementMode: "never"
+    # NetworkPolicies are evaluated, but in audit mode: traffic a policy would
+    # drop is logged with verdict AUDIT and let through. Phase 6.6 of
+    # MIGRATION-FROM-FLANNEL.md turns audit mode off once that log is clean.
+    policyEnforcementMode: "default"
+    policyAuditMode: true
 
+    # eBPF host routing needs kube-proxy replacement, which is not enabled.
     bpf:
       hostLegacyRouting: true
 
-    # Opt-in per node via label, so installing the chart changes nothing until a
-    # node is explicitly labelled. See cilium-node-config.yaml.
-    #
-    # customConf: agents do not write a CNI config until a CiliumNodeConfig tells
-    # them to, which only happens on labelled nodes.
-    # uninstall: false keeps an agent that restarts on an already-migrated node from
-    # deleting its conflist and leaving that node's new pods without networking.
+    # Cilium writes its own CNI config (05-cilium.conflist) and is the only CNI
+    # on the nodes. During the migration a CiliumNodeConfig did this per node.
+    # uninstall: false keeps a restarting agent from deleting the conflist,
+    # which would leave new pods on that node without networking.
     cni:
-      customConf: true
+      customConf: false
       uninstall: false
 
     # --- Talos requirements ---------------------------------------------------
