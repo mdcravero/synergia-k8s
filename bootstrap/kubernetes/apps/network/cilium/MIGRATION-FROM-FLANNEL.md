@@ -623,8 +623,15 @@ These are not part of the CNI swap, but each has to wait for it:
   - Balancing follows resource requests unless metrics-server utilization is
     enabled, so review requests with Goldilocks first. Each eviction restarts
     a single-replica app, which is why it runs at night.
-- **Hubble Relay and UI, after Phase 6.** The agents already run Hubble but
-  nothing aggregates it. Put the UI behind Authelia, like Longhorn's.
+- **Hubble Relay and UI: done 2026-10-12 (`de5832b9`, Helm revision 4).**
+  - **Access:** https://hubble.synergia.net.ar, behind Authelia with
+    `two_factor` and only the `admins` group. Without a session it answers
+    302 to the login.
+  - **State:** Relay reports 4/4 nodes connected over TLS. No agent restarted.
+  - **CLI from an agent pod:** use the relay's ClusterIP, not its DNS name.
+    The agent runs on hostNetwork and resolves through the LAN DNS, which
+    knows nothing about `cluster.local`:
+    `hubble observe --server <relay ClusterIP>:80`.
 - **NetworkPolicies, once Hubble shows the real flows.** Phase 6 restores
   policy enforcement (`policyEnforcementMode: never` goes away). Start with:
   - OpenClaw egress, limited with `toFQDNs` to Home Assistant and the LLM APIs.
