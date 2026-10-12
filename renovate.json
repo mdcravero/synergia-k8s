@@ -57,8 +57,8 @@
       "labels": ["security", "renovate"]
     },
     {
-      "description": "Infrastructure components: require manual review",
-      "matchPackageNames": ["traefik", "cert-manager", "metallb"],
+      "description": "Infrastructure components: require manual review. Cilium is the CNI: a chart bump restarts every agent.",
+      "matchPackageNames": ["traefik", "cert-manager", "metallb", "cilium"],
       "automerge": false,
       "labels": ["infrastructure", "renovate"]
     },

@@ -1,0 +1,148 @@
+---
+# Cilium, the cluster's CNI. Installed by hand with Helm on 2026-09-28 for the
+# flannel migration (MIGRATION-FROM-FLANNEL.md) and adopted by Flux in Phase
+# 6.3: a HelmRelease whose release name and namespace match an existing release
+# upgrades that release instead of installing a new one.
+#
+# Never delete this HelmRelease and never change releaseName: helm-controller
+# would uninstall Cilium, which takes down all pod networking. The prune
+# annotation keeps Flux from deleting it if it disappears from Git. To stop
+# reconciling, suspend it.
+#
+# Values copied verbatim from helm-values-migration.yaml, which matched the live
+# release exactly (20 keys) on 2026-10-12.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+spec:
+  suspend: true
+  releaseName: cilium
+  interval: 30m
+  timeout: 10m
+  chart:
+    spec:
+      chart: cilium
+      version: 1.20.2
+      sourceRef:
+        kind: HelmRepository
+        name: cilium
+      interval: 12h
+  upgrade:
+    remediation:
+      retries: 1
+      remediateLastFailure: true
+      strategy: rollback
+  values:
+    # --- Migration mode -------------------------------------------------------
+    # A second, separate overlay runs alongside flannel. Both CNIs coexist and pods
+    # keep talking across migrated and unmigrated nodes, as long as the pod CIDRs do
+    # not overlap.
+    #
+    # In use today: pods 10.244.0.0/16 (flannel), services 10.96.0.0/12,
+    # LAN 10.42.20.0/24. 10.245.0.0/16 is free.
+    ipam:
+      mode: cluster-pool
+      operator:
+        clusterPoolIPv4PodCIDRList:
+          - "10.245.0.0/16"
+        clusterPoolIPv4MaskSize: 24
+
+    # Leave flannel-managed pods alone. Without this the operator restarts every pod
+    # it does not manage, which is exactly the disruption the per-node rollout is
+    # designed to avoid.
+    operator:
+      unmanagedPodWatcher:
+        restart: false
+
+    # Two VXLAN overlays share the wire during the migration, so they must not
+    # share a UDP port. The official guide uses 8473 because upstream flannel sits
+    # on Cilium's default 8472. Talos runs flannel on the IANA port 4789 instead
+    # (kube-flannel-cfg: "Port": 4789), so 8472 is free here -- and staying on
+    # Cilium's default avoids having to change the tunnel port on a live Cilium
+    # cluster after flannel is gone, which is disruptive. Pinned rather than left
+    # implicit: the hybrid phase should not rest on a chart default.
+    routingMode: tunnel
+    tunnelProtocol: vxlan
+    tunnelPort: 8472
+
+    # No policy enforcement during the migration. Turning this on while half the
+    # cluster is still on flannel drops traffic Cilium has no identity for.
+    policyEnforcementMode: "never"
+
+    bpf:
+      hostLegacyRouting: true
+
+    # Opt-in per node via label, so installing the chart changes nothing until a
+    # node is explicitly labelled. See cilium-node-config.yaml.
+    #
+    # customConf: agents do not write a CNI config until a CiliumNodeConfig tells
+    # them to, which only happens on labelled nodes.
+    # uninstall: false keeps an agent that restarts on an already-migrated node from
+    # deleting its conflist and leaving that node's new pods without networking.
+    cni:
+      customConf: true
+      uninstall: false
+
+    # --- Talos requirements ---------------------------------------------------
+    # Talos provides cgroupv2 and bpffs itself; letting Cilium mount them fails.
+    cgroup:
+      autoMount:
+        enabled: false
+      hostRoot: /sys/fs/cgroup
+
+    # Talos refuses to let workloads load kernel modules, so SYS_MODULE must be
+    # dropped. The rest is the capability set Cilium needs to function.
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_RESOURCE
+
+    # NIC names are not uniform here: end0 on the three RPi4 nodes, enp2s0 on the
+    # Radxa. Each agent binds whichever of these exists on its node and ignores the
+    # rest. Cilium would usually auto-detect the device holding the default route,
+    # so this is defensive rather than required today — but it becomes load-bearing
+    # in Phase 6 if kubeProxyReplacement is turned on, and an unlisted NIC fails
+    # silently rather than loudly.
+    devices: "end0 enp2s0"
+
+    # KubePrism, already enabled on this cluster at 127.0.0.1:7445. Reaching the API
+    # server through it keeps Cilium working even while the CNI underneath it is
+    # being swapped.
+    k8sServiceHost: localhost
+    k8sServicePort: 7445
+
+    # --- Stay out of MetalLB's way --------------------------------------------
+    # MetalLB owns LoadBalancer IPs on this cluster: L2 mode, pool
+    # 10.42.20.40-10.42.20.90, 14 services. Its speakers run on hostNetwork, so they
+    # announce ARP on the real NIC and are unaffected by the CNI swap.
+    #
+    # Cilium ships enableLBIPAM=true by default. It is inert without a
+    # CiliumLoadBalancerIPPool, but leaving it on means the first such pool anyone
+    # creates puts two controllers in charge of the same service IPs. Both are
+    # pinned off explicitly rather than left to a chart default.
+    enableLBIPAM: false
+    l2announcements:
+      enabled: false
+
+    # --- Deliberately NOT set -------------------------------------------------
+    # kubeProxyReplacement: kube-proxy stays for now. Replacing it is a separate
+    # change with its own failure modes; stacking it on the CNI swap makes any
+    # breakage ambiguous. Revisit once every node is on Cilium.

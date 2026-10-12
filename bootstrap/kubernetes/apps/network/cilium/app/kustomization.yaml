@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# helm-values-migration.yaml and cilium-node-config.yaml are deliberately not
+# listed: they belong to the migration and go away in Phase 6.7.
+resources:
+  - helm-source.yaml
+  - helm-release.yaml
