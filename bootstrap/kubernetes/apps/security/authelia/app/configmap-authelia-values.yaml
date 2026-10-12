@@ -30,9 +30,10 @@ data:
           cpu: 200m
           memory: 256Mi
       extraVolumes:
+        # SOPS-encrypted Secret from apps/secrets (secret-authelia-users.yaml).
         - name: users-database
-          configMap:
-            name: authelia-users
+          secret:
+            secretName: authelia-users
       extraVolumeMounts:
         - name: users-database
           mountPath: /config/users_database.yml
