@@ -19,7 +19,6 @@ metadata:
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
 spec:
-  suspend: true
   releaseName: cilium
   interval: 30m
   timeout: 10m
