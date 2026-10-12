@@ -1,0 +1,13 @@
+# Receipts, invoices and delivery-note photos uploaded from the app (the DB only stores metadata).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: finance-mafi-attachments
+  namespace: finance
+spec:
+  storageClassName: "nfs-client"
+  accessModes:
+    - ReadWriteMany # rolling updates briefly run two pods
+  resources:
+    requests:
+      storage: 5Gi

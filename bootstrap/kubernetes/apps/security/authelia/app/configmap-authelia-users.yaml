@@ -22,3 +22,11 @@ data:
         email: matute@synergia.net.ar
         groups:
           - admins
+          - finance
+      fiamma:
+        disabled: false
+        displayname: Fiamma
+        password: "$argon2id$v=19$m=65536,t=3,p=4$ns6vBbPRNbNl2hKBt18Dhw$pM0uD0FLUPVH/eeQe2eTqVuFhw71Xq8I85dA2NP67Yo"
+        email: fiamma@synergia.net.ar
+        groups:
+          - finance

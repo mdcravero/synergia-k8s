@@ -87,6 +87,11 @@ data:
           # the internet through Cloudflare. Password alone is not enough.
           - domain: longhorn.synergia.net.ar
             policy: two_factor
+          # Finance MaFi: household finances, only the "finance" group, always with 2FA
+          - domain: finance.synergia.net.ar
+            policy: two_factor
+            subject:
+              - group:finance
       storage:
         postgres:
           enabled: true
