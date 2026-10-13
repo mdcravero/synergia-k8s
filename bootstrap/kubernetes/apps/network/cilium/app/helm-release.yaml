@@ -57,6 +57,9 @@ spec:
     operator:
       unmanagedPodWatcher:
         restart: true
+      # Restart the operator when cilium-config changes (it reads it only at
+      # startup). Its metrics on :9963 are on by default.
+      rollOutPods: true
 
     # VXLAN on Cilium's default port. Pinned rather than left to a chart
     # default: changing the tunnel port on a live cluster is disruptive. (During
@@ -95,6 +98,32 @@ spec:
         enabled: true
       ui:
         enabled: true
+      # Flow metrics on :9965 of every agent, scraped by the "hubble" job in
+      # monitoring/prometheus. Drops carry the source and destination
+      # namespace, which is what the policy-drop alert reports. Kept small for
+      # the RPi4s: no per-pod or per-DNS-name labels.
+      metrics:
+        enabled:
+          - dns
+          - drop:sourceContext=namespace;destinationContext=namespace
+          - tcp
+          - flow
+          - icmp
+
+    # --- Metrics and rollouts ----------------------------------------------------
+    # Agent metrics on :9962, scraped by the "cilium-agent" job. The agents run
+    # on hostNetwork, so the targets are node IPs.
+    prometheus:
+      enabled: true
+
+    # A cilium-config change rolls the agents by itself (a checksum annotation on
+    # the pod template), one node at a time. Agents read their config only at
+    # startup; before this, every values change needed a hand restart.
+    rollOutCiliumPods: true
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
 
     # --- Talos requirements ---------------------------------------------------
     # Talos provides cgroupv2 and bpffs itself; letting Cilium mount them fails.
