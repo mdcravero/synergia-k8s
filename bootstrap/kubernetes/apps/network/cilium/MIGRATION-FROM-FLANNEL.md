@@ -425,9 +425,9 @@ Next is Phase 6.
 
 ## Phase 6 — Finish (only once all four nodes are on Cilium)
 
-**Status:** 6.1–6.5 done (6.1 on 2026-10-10, the rest on 2026-10-12, after
-two days with all nodes on Cilium). Policies run in audit mode. Next is 6.6,
-from 2026-10-13, then 6.7.
+**Status:** 6.1–6.6 done. 6.1 ran on 2026-10-10, 6.2–6.5 on 2026-10-12
+(after two days with all nodes on Cilium), and 6.6 on 2026-10-13.
+NetworkPolicies are enforced. Only 6.7, the tidy-up, remains.
 
 Based on Cilium 1.20.2's "Post-migration" section
 (`Documentation/installation/k8s-install-migration.rst`) and checked against
@@ -586,6 +586,27 @@ hubble observe --verdict AUDIT --last 200` on each node. Every AUDIT line is
 traffic that enforcement would drop. Fix the policy or the app. When the
 audit log is empty, set `policyAuditMode: false`. The agents read it only at
 startup, so restart them again one node at a time, as in 6.4.
+
+**Done 2026-10-13 (`8d20cbfc`, Helm revision 5).**
+- **Why the audit log alone was not enough:** each agent's Hubble buffer
+  (4095 flows) covers only 1–2.5 minutes here, and the agents have no
+  policy-verdict counter until Hubble metrics are on. So the check combined:
+  - 0 AUDIT in every buffer;
+  - a 3-minute live watch through Relay (770 allowed policy verdicts, 0
+    AUDIT) while generating DNS, Flux and ingress traffic;
+  - the CoreDNS endpoints' BPF policy maps, where the kube-apiserver:6443
+    allow rule was counting real packets;
+  - a review of all 14 NetworkPolicies. The 2 in `finance` were new.
+- **The change:** the rendered chart changed only `policy-audit-mode`.
+- **Restart:** the agents were restarted one node at a time (synergia-03,
+  -02, -05, -01). Each settled in 70–90 s with audit Disabled, health 4/4,
+  all endpoints ready, and 0 "Policy denied" drops.
+- **Afterwards:**
+  - a 3-minute live watch showed 745 policy verdicts with 0 denied;
+  - the only drops were IPv6 "Unsupported L3 protocol";
+  - DNS, Prometheus and the 14 MetalLB services worked;
+  - Authelia's portal answered, and the protected hosts redirected to it.
+- **Rollback:** set `policyAuditMode: true`, then restart the agents.
 
 ### 6.7 Tidy up
 
