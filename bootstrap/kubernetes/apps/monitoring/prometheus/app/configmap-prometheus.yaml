@@ -127,6 +127,44 @@ data:
                 target_label: __address__
               - source_labels: [__meta_kubernetes_pod_label_app]
                 target_label: instance
+          # Cilium agents and operator run on hostNetwork, so pod IP = node IP.
+          # Keeping one container port per job gives one target per pod.
+          - job_name: cilium-agent
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - kube-system
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_k8s_app, __meta_kubernetes_pod_container_port_number]
+                action: keep
+                regex: cilium;9962
+              - source_labels: [__meta_kubernetes_pod_node_name]
+                target_label: instance
+          - job_name: hubble
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - kube-system
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_k8s_app, __meta_kubernetes_pod_container_port_number]
+                action: keep
+                regex: cilium;9965
+              - source_labels: [__meta_kubernetes_pod_node_name]
+                target_label: instance
+          - job_name: cilium-operator
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - kube-system
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_io_cilium_app, __meta_kubernetes_pod_container_port_number]
+                action: keep
+                regex: operator;9963
+              - source_labels: [__meta_kubernetes_pod_node_name]
+                target_label: instance
           - job_name: kubernetes-pods-tools
             scrape_interval: 2m
             scrape_timeout: 90s
@@ -363,7 +401,7 @@ data:
                   severity: warning
                 annotations:
                   summary: "{{ $labels.instance }} rebooted less than 15 minutes ago"
-                  description: "Planned reboots (upgrades, migrations) fire this too. If the three RPi4s reboot together, suspect a power cut: check talosctl etcd members, kubectl get pods -A, and, while nodes are still on flannel, the VXLAN FDB on every node."
+                  description: "Planned reboots (upgrades, migrations) fire this too. If the three RPi4s reboot together, suspect a power cut: check talosctl etcd members, kubectl get pods -A, and Cluster health in cilium-dbg status on each agent."
               - alert: NodeNotReady
                 expr: |
                   kube_node_status_condition{condition="Ready",status="true"} == 0
@@ -396,6 +434,48 @@ data:
                 annotations:
                   summary: "{{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $value | printf \"%.0f\" }} times in 15 minutes"
                   description: "Check Last State with kubectl describe pod -n {{ $labels.namespace }} {{ $labels.pod }}. OOMKilled means the memory limit. Exit 0 or 137 after \"Liveness probe failed\" events means the probe is too tight for the node. Otherwise read kubectl logs --previous. When several apps that use Postgres restart together, Postgres is the one to look at."
+
+          - name: cilium
+            rules:
+              # NetworkPolicies are enforced since 2026-10-13: a pod selected by
+              # a policy loses any traffic its rules do not allow. A new or
+              # changed policy, or a new client of a protected app, shows up here.
+              - alert: CiliumPolicyDrops
+                expr: |
+                  sum by (instance) (increase(cilium_drop_count_total{reason="Policy denied"}[10m])) > 0
+                for: 0m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "{{ $labels.instance }}: Cilium dropped {{ $value | printf \"%.0f\" }} packets by policy in 10 minutes"
+                  description: "A NetworkPolicy is denying traffic. hubble_drop_total{reason=~\"POLICY_DENIED|Policy denied\"} has the source and destination namespaces, and the Hubble UI or hubble observe --verdict DROPPED shows the flows. Fix the policy or the client. To stop dropping while debugging, set policyAuditMode: true in the cilium HelmRelease."
+              - alert: CiliumNodeUnreachable
+                expr: |
+                  max by (instance) (cilium_unreachable_health_endpoints) > 0
+                for: 10m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "{{ $labels.instance }}: Cilium cannot reach {{ $value }} other node(s)"
+                  description: "Pod traffic between nodes is probably broken. Compare Cluster health in cilium-dbg status on every agent. A node that just rebooted settles within about 2 minutes."
+              - alert: CiliumEndpointsNotReady
+                expr: |
+                  sum by (instance) (cilium_endpoint_state{endpoint_state!="ready"}) > 0
+                for: 15m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "{{ $labels.instance }}: {{ $value }} Cilium endpoints not ready for 15 minutes"
+                  description: "Pods on this node may run with missing or stale network policy. Check cilium-dbg endpoint list and the logs of the node's cilium agent."
+              - alert: CiliumAgentDown
+                expr: |
+                  up{job="cilium-agent"} == 0
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "{{ $labels.instance }}: Cilium agent metrics unreachable for 5 minutes"
+                  description: "Without its agent, new pods on this node get no network and policies are not updated. Check kubectl -n kube-system get pods -l k8s-app=cilium -o wide and the agent's logs."
 
     alertmanager:
       enabled: true
