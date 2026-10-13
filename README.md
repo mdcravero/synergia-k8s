@@ -58,12 +58,11 @@ here:
 
 - **CNI.** Cilium runs on every node: cluster-pool IPAM with one `/24` per
   node, and a VXLAN tunnel. kube-proxy still handles services alongside it.
-  - Installed with Helm from
-    `bootstrap/kubernetes/apps/network/cilium/app/helm-values-migration.yaml`;
-    Flux does not manage it.
-  - The flannel DaemonSet that Talos deployed at bootstrap is still present,
-    but no pod traffic goes through it.
-  - See [MIGRATION-FROM-FLANNEL.md](bootstrap/kubernetes/apps/network/cilium/MIGRATION-FROM-FLANNEL.md).
+  - Managed by Flux as a HelmRelease
+    (`bootstrap/kubernetes/apps/network/cilium/app/helm-release.yaml`). Talos
+    runs with `cni: none`.
+  - It replaced flannel in a node-by-node migration; see
+    [MIGRATION-FROM-FLANNEL.md](bootstrap/kubernetes/apps/network/cilium/MIGRATION-FROM-FLANNEL.md).
 - **LoadBalancer services.** MetalLB announces them in L2 mode from a pool on
   the server LAN. Traefik holds the main ingress IP.
 - **External access.** Public hostnames are proxied by Cloudflare to Traefik.

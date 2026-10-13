@@ -9,8 +9,9 @@
 # annotation keeps Flux from deleting it if it disappears from Git. To stop
 # reconciling, suspend it.
 #
-# Values started as a verbatim copy of helm-values-migration.yaml (identical
-# to the live release on 2026-10-12). Phase 6.4 then took Cilium out of
+# Values started as a verbatim copy of the migration's helm-values-migration.yaml
+# (identical to the live release on 2026-10-12; removed in Phase 6.7, last in
+# commit 6d8a68a0). Phase 6.4 then took Cilium out of
 # migration mode: it writes its own CNI config, and policies are evaluated in
 # audit mode.
 apiVersion: helm.toolkit.fluxcd.io/v2

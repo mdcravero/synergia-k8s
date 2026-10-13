@@ -1,7 +1,12 @@
 # Migrating synergia-k8s from flannel to Cilium
 
-Rolling, node-by-node migration. Nothing here is wired into Flux: the manifests in
-`app/` are applied by hand, and a node only moves when it is explicitly labelled.
+**Complete, 2026-10-13.** Cilium is the only CNI and Flux manages it
+(`app/helm-release.yaml`). NetworkPolicies are enforced.
+
+This is the record of a rolling, node-by-node migration. The migration-only
+files it refers to (`app/helm-values-migration.yaml` and
+`app/cilium-node-config.yaml`) were removed in Phase 6.7. Read them with
+`git show 6d8a68a0:bootstrap/kubernetes/apps/network/cilium/app/<file>`.
 
 ## Why
 
@@ -614,13 +619,16 @@ startup, so restart them again one node at a time, as in 6.4.
   or move them into the HelmRelease's history.
 - Mark this runbook complete and update the memory notes.
 
+**Done 2026-10-13.** Both files were removed (last present in `6d8a68a0`), and
+the README now describes the Flux-managed Cilium.
+
 Only then consider `kubeProxyReplacement`, as its own change.
 
 **Rollback per step:**
 - 6.1 and 6.2: revert the commit.
 - 6.3: suspend the HelmRelease. Never delete it.
-- 6.4: revert the values. Re-apply `cilium-node-config.yaml` if
-  `customConf` has to return.
+- 6.4: revert the values. If `customConf` has to return, re-apply
+  `cilium-node-config.yaml` from git history (commit `6d8a68a0`).
 - 6.5: Talos recreates flannel if `cni` goes back to flannel. Nodes keep using
   `05-cilium.conflist` while Cilium is exclusive.
 
