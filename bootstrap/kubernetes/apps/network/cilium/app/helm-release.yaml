@@ -72,7 +72,7 @@ spec:
     # traffic its rules allow, and pods without a policy stay allow-all. Audit
     # mode ran from 2026-10-12 to 2026-10-13 with no AUDIT verdicts (Phase 6.6
     # of MIGRATION-FROM-FLANNEL.md). To debug a suspected policy drop, set
-    # policyAuditMode back to true and restart the agents.
+    # policyAuditMode back to true; rollOutCiliumPods restarts the agents.
     policyEnforcementMode: "default"
     policyAuditMode: false
 

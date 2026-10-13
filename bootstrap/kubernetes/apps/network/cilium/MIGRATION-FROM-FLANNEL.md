@@ -611,7 +611,9 @@ startup, so restart them again one node at a time, as in 6.4.
   - the only drops were IPv6 "Unsupported L3 protocol";
   - DNS, Prometheus and the 14 MetalLB services worked;
   - Authelia's portal answered, and the protected hosts redirected to it.
-- **Rollback:** set `policyAuditMode: true`, then restart the agents.
+- **Rollback:** set `policyAuditMode: true`. Since `b0528dd3`
+  (`rollOutCiliumPods`, `maxUnavailable: 1`), a cilium-config change rolls
+  the agents by itself, one node at a time.
 
 ### 6.7 Tidy up
 
