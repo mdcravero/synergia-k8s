@@ -64,11 +64,13 @@ spec:
     tunnelProtocol: vxlan
     tunnelPort: 8472
 
-    # NetworkPolicies are evaluated, but in audit mode: traffic a policy would
-    # drop is logged with verdict AUDIT and let through. Phase 6.6 of
-    # MIGRATION-FROM-FLANNEL.md turns audit mode off once that log is clean.
+    # NetworkPolicies are enforced: a pod selected by a policy only gets the
+    # traffic its rules allow, and pods without a policy stay allow-all. Audit
+    # mode ran from 2026-10-12 to 2026-10-13 with no AUDIT verdicts (Phase 6.6
+    # of MIGRATION-FROM-FLANNEL.md). To debug a suspected policy drop, set
+    # policyAuditMode back to true and restart the agents.
     policyEnforcementMode: "default"
-    policyAuditMode: true
+    policyAuditMode: false
 
     # eBPF host routing needs kube-proxy replacement, which is not enabled.
     bpf:
