@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - coredns-network-policy.yaml
   - coredns-apiserver-cnp.yaml
+  - coredns-icmp-cnp.yaml

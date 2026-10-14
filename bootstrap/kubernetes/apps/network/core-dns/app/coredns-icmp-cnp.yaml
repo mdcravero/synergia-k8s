@@ -1,0 +1,34 @@
+---
+# Lets CoreDNS send ICMP "destination unreachable" to its two upstreams.
+#
+# Since policies were enforced (2026-10-13), CiliumPolicyDrops fired for a few
+# ICMPv4 packets from kube-system on synergia-05, about one every 2-4 hours.
+# CoreDNS is the only kube-system pod with an egress policy, and that policy
+# allows only DNS (53) and the API server (6443). The likely source: with two
+# upstreams, a slow answer from one arrives after CoreDNS already used the
+# other's and closed the socket, so the pod's kernel replies "port
+# unreachable". DNS itself never failed (no errors in CoreDNS's log).
+#
+# Narrow on purpose: type 3 only, and only towards the forward targets in the
+# Corefile. If the hypothesis is wrong, the alert fires again and the dropped
+# flow tells what it really is. hubble_icmp_total still counts these packets.
+# Remove this policy once the cause of the late upstream answers is understood
+# (e.g. AdGuard latency) and the drops no longer happen.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-coredns-icmp-unreachable
+  namespace: kube-system
+spec:
+  description: "CoreDNS -> its upstreams: ICMP destination unreachable (late DNS replies)"
+  endpointSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  egress:
+    - toCIDR:
+        - 10.42.20.2/32
+        - 1.1.1.1/32
+      icmps:
+        - fields:
+            - type: 3
+              family: IPv4
