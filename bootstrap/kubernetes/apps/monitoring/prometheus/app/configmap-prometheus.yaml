@@ -14,6 +14,12 @@ data:
     server:
       name: server
 
+      # Time and size caps. The PVC lives on NFS, which does not enforce its 8Gi
+      # size, so retentionSize is what keeps the TSDB from filling the shared
+      # NFS disk. Usage was ~0.85 GiB for 15 days on 2026-10-14.
+      retention: "15d"
+      retentionSize: "6GB"
+
       persistentVolume:
         enabled: true
         storageClass: "nfs-client"
@@ -165,6 +171,34 @@ data:
                 regex: operator;9963
               - source_labels: [__meta_kubernetes_pod_node_name]
                 target_label: instance
+          # Per-container CPU and memory from each kubelet's cAdvisor, scraped
+          # directly on :10250 with Prometheus' service account (RBAC
+          # nodes/metrics). Only six metric families are kept, and pause and
+          # pod-level series are dropped: a few hundred series in total.
+          # insecure_skip_verify: synergia-05's kubelet serves a self-signed
+          # certificate (no rotate-server-certificates there); the bearer
+          # token still authenticates every request.
+          - job_name: kubelet-cadvisor
+            scheme: https
+            metrics_path: /metrics/cadvisor
+            authorization:
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            tls_config:
+              insecure_skip_verify: true
+            kubernetes_sd_configs:
+              - role: node
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_node_name]
+                target_label: instance
+            metric_relabel_configs:
+              - source_labels: [__name__]
+                action: keep
+                regex: container_(memory_working_set_bytes|spec_memory_limit_bytes|cpu_usage_seconds_total|cpu_cfs_throttled_periods_total|cpu_cfs_periods_total|oom_events_total)
+              - source_labels: [container]
+                action: drop
+                regex: (|POD)
+              - action: labeldrop
+                regex: (id|image|name)
           - job_name: kubernetes-pods-tools
             scrape_interval: 2m
             scrape_timeout: 90s
@@ -434,6 +468,37 @@ data:
                 annotations:
                   summary: "{{ $labels.namespace }}/{{ $labels.pod }} restarted {{ $value | printf \"%.0f\" }} times in 15 minutes"
                   description: "Check Last State with kubectl describe pod -n {{ $labels.namespace }} {{ $labels.pod }}. OOMKilled means the memory limit. Exit 0 or 137 after \"Liveness probe failed\" events means the probe is too tight for the node. Otherwise read kubectl logs --previous. When several apps that use Postgres restart together, Postgres is the one to look at."
+
+          - name: containers
+            rules:
+              # One OOM kill is enough to notify: PodCrashLooping needs three
+              # restarts in 15 minutes. On 2026-10-13 Jellyfin was OOM-killed
+              # once during a transcode and nothing alerted.
+              - alert: ContainerOOMKilled
+                expr: |
+                  (max by (namespace, pod, container) (kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}) == 1)
+                    and on (namespace, pod, container)
+                  (increase(kube_pod_container_status_restarts_total[15m]) > 0)
+                for: 0m
+                labels:
+                  severity: warning
+                  instance: "{{ $labels.namespace }}/{{ $labels.pod }}"
+                annotations:
+                  summary: "{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) was OOM-killed"
+                  description: "The container hit its memory limit. Compare container_memory_working_set_bytes with the limit around the kill, and raise the limit or find what spiked."
+              - alert: ContainerMemoryNearLimit
+                expr: |
+                  max by (namespace, pod, container) (
+                    container_memory_working_set_bytes{job="kubelet-cadvisor"}
+                      / (container_spec_memory_limit_bytes{job="kubelet-cadvisor"} > 0)
+                  ) > 0.9
+                for: 15m
+                labels:
+                  severity: warning
+                  instance: "{{ $labels.namespace }}/{{ $labels.pod }}"
+                annotations:
+                  summary: "{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) uses {{ $value | humanizePercentage }} of its memory limit"
+                  description: "Above 90% for 15 minutes: the next spike may OOM-kill it. Check whether the usage is steady or still growing before raising the limit."
 
           - name: cilium
             rules:
