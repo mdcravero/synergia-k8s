@@ -118,6 +118,11 @@ data:
             policy: two_factor
             subject:
               - group:finance
+          # Finance Matute: personal finances, only Matías, always with 2FA (the app adds its own PIN)
+          - domain: wallet.synergia.net.ar
+            policy: two_factor
+            subject:
+              - user:matute
       storage:
         postgres:
           enabled: true

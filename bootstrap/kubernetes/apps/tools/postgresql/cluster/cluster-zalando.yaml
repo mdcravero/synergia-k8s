@@ -71,6 +71,16 @@ spec:
       extensions:
         pg_trgm: app
         unaccent: app
+    # Finance Matute (personal finances): same layout as finance_mafi.
+    finance_matute:
+      defaultUsers: true
+      secretNamespace: finance
+      schemas:
+        app:
+          defaultRoles: false # schema owned by finance_matute_owner; grants come from the app migrations
+      extensions:
+        pg_trgm: app
+        unaccent: app
 
   postgresql:
     version: "17"
