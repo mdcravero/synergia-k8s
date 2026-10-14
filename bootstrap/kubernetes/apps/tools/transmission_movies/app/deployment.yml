@@ -22,7 +22,9 @@ spec:
               memory: 112Mi
             limits:
               cpu: 200m
-              memory: 128Mi
+              # 2026-10-14: VPA (Goldilocks) target ~121Mi, upper bound up to ~157Mi
+              # (download peaks over the past week) against a 128Mi limit.
+              memory: 192Mi
           ports:
             - containerPort: 9091
           env:

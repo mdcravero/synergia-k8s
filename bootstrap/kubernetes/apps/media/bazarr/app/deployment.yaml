@@ -21,9 +21,6 @@ spec:
         # runAsUser: 1000
         # runAsGroup: 1000
         fsGroup: 1000
-        volumeMounts:
-          - mountPath: /htpc
-            name: htpc-home
       containers:
         - env:
             - name: TZ
@@ -40,7 +37,8 @@ spec:
               memory: 256Mi
             limits:
               cpu: 50m
-              memory: 280Mi
+              # 2026-10-14: VPA (Goldilocks) target ~259Mi, cAdvisor working set 222Mi of 280Mi.
+              memory: 384Mi
           ports:
             - containerPort: 6767
               name: webui
