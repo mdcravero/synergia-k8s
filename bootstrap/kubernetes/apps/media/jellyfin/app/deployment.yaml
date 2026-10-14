@@ -43,7 +43,12 @@ spec:
               memory: 750Mi
             limits:
               cpu: "2"
-              memory: 900Mi
+              # 900Mi left ~400Mi above Jellyfin's ~500Mi idle. On 2026-10-13 it
+              # was OOM-killed starting an HLS transcode for the WebOS app: an
+              # anime episode with 29 embedded fonts and 9 ASS subtitle tracks
+              # (font extraction, subtitle processing, -probesize 1G and the
+              # VAAPI/QSV pipeline at once). synergia-05 keeps >2 GiB free.
+              memory: 2Gi
           ports:
             - containerPort: 8096
               name: webui
