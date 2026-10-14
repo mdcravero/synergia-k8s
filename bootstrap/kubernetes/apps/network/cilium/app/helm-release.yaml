@@ -101,10 +101,14 @@ spec:
       # Flow metrics on :9965 of every agent, scraped by the "hubble" job in
       # monitoring/prometheus. Drops carry the source and destination
       # namespace, which is what the policy-drop alert reports. Kept small for
-      # the RPi4s: no per-pod or per-DNS-name labels.
+      # the RPi4s: no per-pod labels.
+      # dns only counts lookups that go through Cilium's DNS proxy, i.e. pods
+      # selected by a policy with DNS rules (today only OpenClaw). That keeps
+      # the query label (one series per resolved name) bounded, and Prometheus
+      # keeps the history the Hubble ring buffer cannot.
       metrics:
         enabled:
-          - dns
+          - dns:query;ignoreAAAA;sourceContext=namespace
           - drop:sourceContext=namespace;destinationContext=namespace
           - tcp
           - flow
