@@ -1,0 +1,39 @@
+---
+# Stage A of OpenClaw's egress policy: visibility only, nothing is blocked.
+#
+# The first rule sends the pod's DNS lookups through Cilium's DNS proxy, so
+# Hubble records the names it resolves (and hubble_dns_queries_total{query}
+# keeps them in Prometheus). The second rule allows every destination, so the
+# pod's traffic is exactly as before. In the datapath a port-specific entry
+# (kube-dns:53 → proxy) wins over the all-ports one, so both rules coexist.
+#
+# Stage B replaces the second rule with an allowlist (toFQDNs for the model
+# providers and Telegram, plus Home Assistant), built from what stage A shows
+# after a day or two of real use. The skills (summarize, github, weather,
+# camsnap, netbox) may reach more destinations than the config names.
+#
+# There is no ingress section, so ingress is not restricted by this policy.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: openclaw-egress
+  namespace: agents
+spec:
+  description: "OpenClaw egress, stage A: DNS visibility, everything allowed"
+  endpointSelector:
+    matchLabels:
+      app: openclaw
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toEntities:
+        - all
