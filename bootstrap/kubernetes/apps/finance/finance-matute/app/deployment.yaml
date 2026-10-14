@@ -1,0 +1,134 @@
+# Finance Matute: personal finance tracker (API + PWA in one image).
+# Source: https://github.com/mdcravero/finance-matute (private). Image tag is bumped by Renovate.
+#
+# Database: prepared by the Zalando operator (tools/postgresql/cluster → preparedDatabases.finance_matute).
+# The operator writes the credentials straight into this namespace (secretNamespace: finance):
+#   - owner user  → runs migrations (initContainer, dbmate)
+#   - writer user → used by the app (no DDL)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finance-matute
+  namespace: finance
+  labels:
+    app: finance-matute
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: 1 # the fingerprint challenges live in memory: keep a single replica
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0 # if a migration fails, the old pod keeps serving
+  selector:
+    matchLabels:
+      app: finance-matute
+  template:
+    metadata:
+      labels:
+        app: finance-matute
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: tmp
+          emptyDir: {}
+
+      initContainers:
+        - name: migrate
+          image: ghcr.io/mdcravero/finance-matute:0.1.0
+          command: ["dbmate", "--migrations-dir", "/app/db/migrations", "--no-dump-schema", "--wait", "up"]
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: finance-matute-owner-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: finance-matute-owner-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: DATABASE_URL
+              value: postgres://$(DB_USER):$(DB_PASSWORD)@postgres-cluster.tools.svc.cluster.local:5432/finance_matute?sslmode=require&search_path=app
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+
+      containers:
+        - name: finance-matute
+          image: ghcr.io/mdcravero/finance-matute:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: TZ
+              value: America/Argentina/Cordoba
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: finance-matute-writer-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: finance-matute-writer-user.postgres-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            # Spilo uses a self-signed certificate: encrypted, not verified (same as finance-mafi)
+            - name: DATABASE_URL
+              value: postgres://$(DB_USER):$(DB_PASSWORD)@postgres-cluster.tools.svc.cluster.local:5432/finance_matute?sslmode=no-verify
+            # Personal app: only this Authelia user gets in (whatever the groups)
+            - name: AUTH_USERS
+              value: matute
+            # Minutes without using the app before it asks for the PIN again
+            - name: LOCK_MINUTES
+              value: "5"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /api/health # checks the DB connection
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
+          startupProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 3
+            failureThreshold: 20

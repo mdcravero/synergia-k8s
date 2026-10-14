@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: finance-matute
+  namespace: finance
+  labels:
+    app: finance-matute
+spec:
+  selector:
+    app: finance-matute
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

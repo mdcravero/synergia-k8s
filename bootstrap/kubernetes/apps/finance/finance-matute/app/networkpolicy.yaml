@@ -1,0 +1,22 @@
+# The namespace denies all ingress by default (see finance-mafi/app/networkpolicy.yaml).
+# The app trusts the Remote-* headers set by Authelia via Traefik: only Traefik may reach the pod
+# (kubelet probes come from the host and are allowed by Cilium).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: finance-matute
+  namespace: finance
+spec:
+  podSelector:
+    matchLabels:
+      app: finance-matute
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+      ports:
+        - port: 8080
+          protocol: TCP

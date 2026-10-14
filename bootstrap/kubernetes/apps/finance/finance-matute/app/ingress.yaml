@@ -1,0 +1,23 @@
+# Exposed through Traefik with Authelia (two_factor, only the user "matute"); the app adds its own PIN lock.
+# The strip middleware runs first so a client can never send its own Remote-* identity headers.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-matute-ingress
+  namespace: finance
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: finance-finance-matute-strip-remote@kubernetescrd,finance-middlewares-auth-finance-matute@kubernetescrd
+spec:
+  rules:
+    - host: wallet.synergia.net.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: finance-matute
+                port:
+                  number: 8080

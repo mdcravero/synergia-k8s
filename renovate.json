@@ -71,6 +71,14 @@
       "automergeType": "pr"
     },
     {
+      "description": "Finance Matute: our own app; deploy each tagged release (vX.Y.Z) as soon as CI publishes it. Majors still need approval.",
+      "matchPackageNames": ["ghcr.io/mdcravero/finance-matute"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["at any time"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
       "description": "Major versions: require manual approval from Dependency Dashboard",
       "matchUpdateTypes": ["major"],
       "automerge": false,
