@@ -499,6 +499,26 @@ data:
                 annotations:
                   summary: "{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) uses {{ $value | humanizePercentage }} of its memory limit"
                   description: "Above 90% for 15 minutes: the next spike may OOM-kill it. Check whether the usage is steady or still growing before raising the limit."
+              # Early warning from the past week's peak, not the current value:
+              # Jellyfin idled at ~500Mi of 900Mi and only a transcode start
+              # crossed the limit. Grouped by container rather than pod, so a
+              # restart does not reset the window. It keeps firing until the
+              # limit is raised (or the peak ages out of the 7 days).
+              # Goldilocks gave the same signal; see the memory note about
+              # removing it once this has a few weeks of history.
+              - alert: ContainerMemoryPeakNearLimit
+                expr: |
+                  max by (namespace, container) (max_over_time(container_memory_working_set_bytes{job="kubelet-cadvisor"}[7d]))
+                    / on (namespace, container)
+                  max by (namespace, container) (container_spec_memory_limit_bytes{job="kubelet-cadvisor"} > 0)
+                  > 0.9
+                for: 1h
+                labels:
+                  severity: warning
+                  instance: "{{ $labels.namespace }}/{{ $labels.container }}"
+                annotations:
+                  summary: "{{ $labels.namespace }}/{{ $labels.container }} peaked at {{ $value | humanizePercentage }} of its memory limit in the last 7 days"
+                  description: "Not an outage yet: the next peak may OOM-kill it. Raise the memory limit above the peak plus a margin (container_memory_working_set_bytes over 7d)."
 
           - name: cilium
             rules:
