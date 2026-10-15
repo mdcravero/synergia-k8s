@@ -32,7 +32,7 @@ spec:
           env:
             # ---- Core ----
             - name: TZ
-              value: America/Argentina/Córdoba
+              value: America/Argentina/Cordoba
             - name: HBOX_MODE
               value: production
             - name: HBOX_LOG_LEVEL

@@ -28,7 +28,7 @@ spec:
       containers:
         - env:
             - name: TZ
-              value: "Argentina/Cordoba/Arroyito"
+              value: "America/Argentina/Cordoba"
             - name: LIBVA_DRIVER_NAME
               value: "iHD"
             - name: LIBVA_DRIVERS_PATH

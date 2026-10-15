@@ -33,7 +33,7 @@ spec:
           image: homeassistant/home-assistant:2026.10.1
           env:
             - name: TZ
-              value: "America/Argentina/Córdoba"
+              value: "America/Argentina/Cordoba"
             - name: PYTHONWARNINGS
               value: ignore:Unverified HTTPS request
             - name: HASS_HTTP_USE_X_FORWARDED_FOR
