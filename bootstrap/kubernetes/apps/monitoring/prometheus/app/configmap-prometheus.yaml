@@ -506,6 +506,23 @@ data:
               # limit is raised (or the peak ages out of the 7 days).
               # Goldilocks gave the same signal; see the memory note about
               # removing it once this has a few weeks of history.
+              # A container stuck at its CPU limit stalls: Bazarr (50m) starved
+              # its own SignalR keepalives on 2026-10-14, reconnect threads piled
+              # up, and memory ran out 80 minutes later. This would have fired
+              # about 50 minutes before that OOM kill.
+              - alert: ContainerCPUThrottled
+                expr: |
+                  max by (namespace, container) (
+                    rate(container_cpu_cfs_throttled_periods_total{job="kubelet-cadvisor"}[10m])
+                      / rate(container_cpu_cfs_periods_total{job="kubelet-cadvisor"}[10m])
+                  ) > 0.5
+                for: 30m
+                labels:
+                  severity: warning
+                  instance: "{{ $labels.namespace }}/{{ $labels.container }}"
+                annotations:
+                  summary: "{{ $labels.namespace }}/{{ $labels.container }} is CPU-throttled {{ $value | humanizePercentage }} of the time"
+                  description: "Throttled in more than half of its CFS periods for 30 minutes: it keeps hitting its CPU limit and runs slowly, which can break timeouts and keepalives. Raise limits.cpu, or find what is busy."
               - alert: ContainerMemoryPeakNearLimit
                 expr: |
                   max by (namespace, container) (max_over_time(container_memory_working_set_bytes{job="kubelet-cadvisor"}[7d]))
