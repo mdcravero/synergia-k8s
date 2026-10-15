@@ -24,11 +24,16 @@ spec:
       containers:
         - env:
             - name: TZ
-              value: Pacific/Auckland
+              value: America/Argentina/Cordoba
             - name: PUID
               value: "1000"
             - name: PGID
               value: "1000"
+          # Development channel (floating tag) since 1.6.1, which is how the
+          # 2026-10-14 SignalR reconnect bug arrived. Move to the stable tag once
+          # 1.6.3 is released, and stop Renovate from proposing -development
+          # tags. Do not go back to 1.6.2: the DB may already carry 1.6.3
+          # migrations.
           image: linuxserver/bazarr:1.6.3-development
           name: bazarr
           resources:
