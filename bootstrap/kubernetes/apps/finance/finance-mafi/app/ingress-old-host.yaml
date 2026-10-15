@@ -1,0 +1,36 @@
+# finance.synergia.net.ar was Finance MaFi's first address. With two finance apps (finance-matute is
+# wallet.synergia.net.ar) it moved to mafi.synergia.net.ar; the old address only redirects there, so
+# bookmarks and the installed app keep working. Temporary (302): remove once nobody uses it.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: finance-mafi-old-host
+  namespace: finance
+spec:
+  redirectRegex:
+    regex: ^https?://finance\.synergia\.net\.ar/(.*)
+    replacement: https://mafi.synergia.net.ar/${1}
+    permanent: false
+---
+# Traefik answers the redirect itself: nothing reaches the pod, so no Authelia here.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-mafi-old-host
+  namespace: finance
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.middlewares: finance-finance-mafi-old-host@kubernetescrd
+spec:
+  rules:
+    - host: finance.synergia.net.ar
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: finance-mafi
+                port:
+                  number: 8080
