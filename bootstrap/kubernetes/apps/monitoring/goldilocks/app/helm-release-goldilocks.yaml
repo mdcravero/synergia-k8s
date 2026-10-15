@@ -33,8 +33,9 @@ spec:
         requests:
           cpu: 25m
           memory: 64Mi
+        # No CPU limit. It averages ~30m but runs in bursts across every core
+        # (Go), so even 250m left it ~73% throttled with plenty of quota
+        # unused. A higher limit does not fix that. The request still reserves
+        # its share. Goldilocks is due for removal around 2026-11-11.
         limits:
-          # Was 100m: throttled ~85% for 30 minutes and more (2026-10-14),
-          # which would keep ContainerCPUThrottled firing.
-          cpu: 250m
           memory: 128Mi
