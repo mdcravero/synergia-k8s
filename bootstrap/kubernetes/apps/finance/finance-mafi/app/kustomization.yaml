@@ -7,4 +7,5 @@ resources:
   - service.yaml
   - deployment.yaml
   - ingress.yaml
+  - ingress-old-host.yaml
   - networkpolicy.yaml

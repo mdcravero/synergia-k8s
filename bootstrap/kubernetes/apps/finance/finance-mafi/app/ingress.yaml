@@ -11,7 +11,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: finance-finance-mafi-strip-remote@kubernetescrd,finance-middlewares-auth-finance-mafi@kubernetescrd
 spec:
   rules:
-    - host: finance.synergia.net.ar
+    - host: mafi.synergia.net.ar
       http:
         paths:
           - path: /

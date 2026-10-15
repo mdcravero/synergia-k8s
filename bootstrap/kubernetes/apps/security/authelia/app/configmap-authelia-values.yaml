@@ -114,7 +114,8 @@ data:
             subject:
               - group:admins
           # Finance MaFi: household finances, only the "finance" group, always with 2FA
-          - domain: finance.synergia.net.ar
+          # (finance.synergia.net.ar only redirects here, see finance-mafi/app/ingress-old-host.yaml)
+          - domain: mafi.synergia.net.ar
             policy: two_factor
             subject:
               - group:finance
