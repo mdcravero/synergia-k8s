@@ -33,10 +33,14 @@ spec:
           name: bazarr
           resources:
             requests:
-              cpu: 25m
+              cpu: 50m
               memory: 256Mi
             limits:
-              cpu: 50m
+              # Was 50m. On 2026-10-14 a sync job hit it, SignalR keepalives to
+              # Sonarr/Radarr starved, and the reconnect bug ("socket is already
+              # opened") piled up threads at 98-99.7% throttling until the 384Mi
+              # memory limit OOM-killed the pod. Idle use is ~4m.
+              cpu: 500m
               # 2026-10-14: VPA (Goldilocks) target ~259Mi, cAdvisor working set 222Mi of 280Mi.
               memory: 384Mi
           ports:

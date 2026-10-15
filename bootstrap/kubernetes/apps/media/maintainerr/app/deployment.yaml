@@ -31,7 +31,8 @@ spec:
               cpu: 15m
               memory: 192Mi
             limits:
-              cpu: 50m
+              # Was 50m: throttled up to 75% in short bursts (2026-10-14).
+              cpu: 300m
               memory: 210Mi
           ports:
             - containerPort: 6246
