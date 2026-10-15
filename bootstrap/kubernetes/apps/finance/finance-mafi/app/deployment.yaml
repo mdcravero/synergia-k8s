@@ -45,7 +45,7 @@ spec:
 
       initContainers:
         - name: migrate
-          image: ghcr.io/mdcravero/finance-mafi:0.4.0
+          image: ghcr.io/mdcravero/finance-mafi:0.4.1
           command: ["dbmate", "--migrations-dir", "/app/db/migrations", "--no-dump-schema", "--wait", "up"]
           env:
             - name: DB_USER
@@ -75,7 +75,7 @@ spec:
 
       containers:
         - name: finance-mafi
-          image: ghcr.io/mdcravero/finance-mafi:0.4.0
+          image: ghcr.io/mdcravero/finance-mafi:0.4.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
