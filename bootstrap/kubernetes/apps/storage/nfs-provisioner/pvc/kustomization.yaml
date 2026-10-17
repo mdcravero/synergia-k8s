@@ -4,4 +4,3 @@ metadata:
   name: pvc-core
 resources:
   - pvc-jellyfin.yaml
-  - pvc-bitwarden.yaml
