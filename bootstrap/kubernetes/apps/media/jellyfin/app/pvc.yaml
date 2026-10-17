@@ -7,9 +7,6 @@
 #
 # Sized well above the ~430 MB in use: Jellyfin 10.11 refuses to start
 # unless /config/data has at least 2 GiB free.
-#
-# The retired NFS copy, jellyfin-config, lives in
-# storage/nfs-provisioner/pvc/pvc-jellyfin.yaml and is kept as the rollback.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
