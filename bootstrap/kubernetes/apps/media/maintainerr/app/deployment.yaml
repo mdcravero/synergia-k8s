@@ -30,9 +30,11 @@ spec:
             requests:
               cpu: 15m
               memory: 192Mi
+            # No CPU limit: it was throttled up to 75% at 50m and still up to 69%
+            # at 300m (2026-10-14..17) while averaging a few millicores, which
+            # is burst throttling that a higher limit does not fix. The
+            # request still reserves its share.
             limits:
-              # Was 50m: throttled up to 75% in short bursts (2026-10-14).
-              cpu: 300m
               memory: 210Mi
           ports:
             - containerPort: 6246
