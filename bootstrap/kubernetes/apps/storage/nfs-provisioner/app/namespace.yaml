@@ -3,5 +3,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: nfs-storage
+  annotations:
+    # Never let Flux delete this namespace, even if a Kustomization drops it:
+    # it holds a whole app (pods, PVCs). It was declared in two Kustomizations
+    # until 2026-10-19.
+    kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
     name: nfs-storage
