@@ -23,12 +23,11 @@ data:
         // plain TCP relay and never touches headers; the real proxy is Traefik,
         // which by default does not trust client-supplied X-Forwarded-* headers.
         //
-        // Scope of trust: anything that can reach the Service could send forged
-        // X-Forwarded-For through socat, since nothing restricts ingress to it
-        // (flannel enforces no NetworkPolicy). The gateway still refuses to
-        // attribute a forwarded request to loopback, so a forged header cannot
-        // claim local trust, and token auth still applies. Tighten with a
-        // NetworkPolicy once Cilium enforces them.
+        // Scope of trust: only Traefik can reach socat's port. The
+        // CiliumNetworkPolicy in networkpolicy.yaml admits ingress from the
+        // traefik namespace alone. The gateway also refuses to attribute a
+        // forwarded request to loopback, so a forged header cannot claim local
+        // trust, and token auth still applies.
         trustedProxies: ["127.0.0.1"],
       },
 
@@ -87,6 +86,14 @@ data:
         search: {
           enabled: false,
         },
+      },
+
+      // Anonymous feature statistics (enabled channel and provider names,
+      // plugin count, recent session count) ride along with the daily update
+      // check. Off; the egress policy does not allow telemetry.openclaw.ai
+      // either.
+      telemetry: {
+        enabled: false,
       },
 
       agents: {

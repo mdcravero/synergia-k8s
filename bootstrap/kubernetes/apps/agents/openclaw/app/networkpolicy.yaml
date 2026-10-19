@@ -1,29 +1,35 @@
 ---
-# Stage A of OpenClaw's egress policy: visibility only, nothing is blocked.
+# OpenClaw's network policy, stage B: an egress allowlist plus ingress from
+# Traefik only.
 #
-# The first rule sends the pod's DNS lookups through Cilium's DNS proxy, so
-# Hubble records the names it resolves (and hubble_dns_queries_total{query}
-# keeps them in Prometheus). The second rule allows every destination, so the
-# pod's traffic is exactly as before. In the datapath a port-specific entry
-# (kube-dns:53 → proxy) wins over the all-ports one, so both rules coexist.
+# OpenClaw is an LLM agent that takes instructions from Telegram and holds
+# keys to Home Assistant and NetBox, so a prompt injection is the main risk.
+# With this policy it can reach only the services below. It cannot send data
+# to an arbitrary host or walk the LAN.
 #
-# Stage B replaces the second rule with an allowlist (toFQDNs for the model
-# providers and Telegram, plus Home Assistant), built from what stage A shows
-# after a day or two of real use. The skills (summarize, github, weather,
-# camsnap, netbox) may reach more destinations than the config names.
+# The list comes from stage A (2026-10-14..16: DNS through Cilium's proxy,
+# everything allowed): every name it resolved, from
+# hubble_dns_queries_total{source="agents"}. Deliberately left out:
+#   telemetry.openclaw.ai  telemetry is also off in openclaw.json
+# The summarize, github and camsnap skills cannot run: their binaries (summarize,
+# gh, camsnap/ffmpeg) are not in the image. If they are ever installed, they
+# need their destinations added here.
 #
-# There is no ingress section, so ingress is not restricted by this policy.
+# Anything else is dropped and shows up as CiliumPolicyDrops and in Hubble
+# (namespace agents). To add a destination, add a matchName below.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: openclaw-egress
   namespace: agents
 spec:
-  description: "OpenClaw egress, stage A: DNS visibility, everything allowed"
+  description: "OpenClaw: egress allowlist, ingress from Traefik only (stage B)"
   endpointSelector:
     matchLabels:
       app: openclaw
   egress:
+    # DNS through Cilium's DNS proxy, which is what makes toFQDNs work.
+    # Resolving any name stays allowed; connecting is what is restricted.
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system
@@ -35,5 +41,43 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
-    - toEntities:
-        - all
+    # Model providers, Telegram, OpenClaw's services, npm and weather.
+    - toFQDNs:
+        - matchName: generativelanguage.googleapis.com   # Gemini (primary)
+        - matchName: api.mistral.ai                      # Mistral (fallback)
+        - matchName: api.groq.com                        # Groq (manual picks)
+        - matchName: api.telegram.org                    # Telegram channel
+        - matchName: catalog.openclaw.ai                 # model catalog
+        - matchName: clawhub.ai                          # skill/plugin hub
+        - matchName: registry.npmjs.org                  # groq plugin install
+        - matchName: wttr.in                             # weather skill
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Home Assistant's MCP server (home-assistant.tools.svc:8123).
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: tools
+            app: home-assistant
+      toPorts:
+        - ports:
+            - port: "8123"
+              protocol: TCP
+    # NetBox on the LAN, for the netbox-diagrama-red skill (http://10.42.20.3/api/).
+    - toCIDR:
+        - 10.42.20.3/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+  ingress:
+    # Only Traefik, on socat's port (the Service maps 18789 -> 18780). Kubelet
+    # probes come from the node itself, which Cilium always admits.
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: traefik
+      toPorts:
+        - ports:
+            - port: "18780"
+              protocol: TCP
