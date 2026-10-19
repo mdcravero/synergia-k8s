@@ -225,6 +225,24 @@ The Endpoints-mode leftovers can go once the rollback window has passed:
 
 Keep both until then, because they are what a rollback falls back on.
 
+**Done 2026-10-19,** eleven days after Step 2.
+- **Before:** both objects were saved locally as YAML.
+- **What was removed:** the eight Patroni annotations on
+  `endpoints/postgres-cluster` (`leader`, `acquireTime`, `renewTime`,
+  `optime`, `slots`, `retain_slots`, `transitions`, `ttl`), all frozen since
+  2026-10-08. `endpoints/postgres-cluster-config` (`config`, `history`,
+  `initialize`) was deleted.
+- **What stays:** the headless `service/postgres-cluster-config`, also left
+  over from Endpoints mode. It has no selector and does nothing.
+- **Afterwards:**
+  - `patronictl list` showed Leader running on timeline 63, and
+    `postgres-cluster-leader` kept renewing every loop;
+  - nothing recreated the deleted endpoints;
+  - Patroni and the operator logged no errors;
+  - the LoadBalancer, Authelia, n8n, Homebox and Home Assistant were all fine.
+
+A rollback to Endpoints mode now has no saved state to return to.
+
 ## Rollback
 
 - **Undo Step 2:** revert the commit (`kubernetes_use_configmaps` back to

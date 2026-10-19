@@ -280,9 +280,8 @@ bootstrap/kubernetes/apps/
 ├── network/
 │   ├── metallb/        # L2 load balancer
 │   ├── traefik/        # Ingress controller + Authelia middlewares
-│   ├── cilium/         # CNI values and the migration runbook
-│   ├── core-dns/       # CoreDNS network policies
-│   └── external-services/
+│   ├── cilium/         # CNI (Flux HelmRelease), Hubble UI, migration runbook
+│   └── core-dns/       # CoreDNS network policies
 ├── storage/
 │   ├── nfs-provisioner/
 │   └── longhorn/       # Helm release + recurring backup job
