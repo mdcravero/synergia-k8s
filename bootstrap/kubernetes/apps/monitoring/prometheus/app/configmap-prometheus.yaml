@@ -542,15 +542,21 @@ data:
               # NetworkPolicies are enforced since 2026-10-13: a pod selected by
               # a policy loses any traffic its rules do not allow. A new or
               # changed policy, or a new client of a protected app, shows up here.
+              # keep_firing_for merges bursts: drops come in waves (an app
+              # retrying a blocked connection), and without it every wave
+              # sent its own FIRING/RESOLVED pair to Telegram (2026-10-20).
+              # Now a wave fires once, stays firing until an hour passes
+              # without drops, and the warning route repeats it every 24h.
               - alert: CiliumPolicyDrops
                 expr: |
                   sum by (instance) (increase(cilium_drop_count_total{reason="Policy denied"}[10m])) > 0
                 for: 0m
+                keep_firing_for: 1h
                 labels:
                   severity: warning
                 annotations:
-                  summary: "{{ $labels.instance }}: Cilium dropped {{ $value | printf \"%.0f\" }} packets by policy in 10 minutes"
-                  description: "A NetworkPolicy is denying traffic. hubble_drop_total{reason=~\"POLICY_DENIED|Policy denied\"} has the source and destination namespaces, and the Hubble UI or hubble observe --verdict DROPPED shows the flows. Fix the policy or the client. To stop dropping while debugging, set policyAuditMode: true in the cilium HelmRelease."
+                  summary: "{{ $labels.instance }}: Cilium is dropping traffic by policy ({{ $value | printf \"%.0f\" }} packets in the last 10 minutes when it fired)"
+                  description: "A NetworkPolicy is denying traffic. hubble_drop_total{reason=~\"POLICY_DENIED|Policy denied\"} has the source and destination namespaces, and the Hubble UI or hubble observe --verdict DROPPED shows the flows. Fix the policy or the client. To stop dropping while debugging, set policyAuditMode: true in the cilium HelmRelease. Resolves after an hour without drops."
               - alert: CiliumNodeUnreachable
                 expr: |
                   max by (instance) (cilium_unreachable_health_endpoints) > 0
