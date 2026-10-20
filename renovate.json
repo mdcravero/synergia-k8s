@@ -71,11 +71,12 @@
       "automergeType": "pr"
     },
     {
-      "description": "Finance Matute: our own app. Renovate opens the PR for each tagged release (vX.Y.Z), but it is merged by hand: releases are reviewed (and may be batched) before they reach production.",
+      "description": "Finance Matute: our own app; deploy each tagged release (vX.Y.Z) as soon as CI publishes it, like finance-mafi (a tag is only made when a release is wanted). Majors still need approval.",
       "matchPackageNames": ["ghcr.io/mdcravero/finance-matute"],
       "matchUpdateTypes": ["minor", "patch"],
       "schedule": ["at any time"],
-      "automerge": false
+      "automerge": true,
+      "automergeType": "pr"
     },
     {
       "description": "Major versions: require manual approval from Dependency Dashboard",
