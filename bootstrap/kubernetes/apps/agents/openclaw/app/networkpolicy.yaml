@@ -55,6 +55,18 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    # Telegram's fallback API address. When api.telegram.org times out
+    # (UND_ERR_CONNECT_TIMEOUT), OpenClaw's Telegram client retries against a
+    # hardcoded IP (TELEGRAM_FALLBACK_IPS in its fetch module), without DNS, so
+    # toFQDNs never sees it. Without this rule each fallback was dropped and
+    # fired CiliumPolicyDrops in waves (2026-10-19/20, ~630 packets a day).
+    # Check this IP again after OpenClaw upgrades.
+    - toCIDR:
+        - 149.154.167.220/32
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
     # Home Assistant's MCP server (home-assistant.tools.svc:8123).
     - toEndpoints:
         - matchLabels:
