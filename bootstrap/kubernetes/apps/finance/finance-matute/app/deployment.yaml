@@ -42,7 +42,7 @@ spec:
 
       initContainers:
         - name: migrate
-          image: ghcr.io/mdcravero/finance-matute:0.6.0
+          image: ghcr.io/mdcravero/finance-matute:0.6.1
           command: ["dbmate", "--migrations-dir", "/app/db/migrations", "--no-dump-schema", "--wait", "up"]
           env:
             - name: DB_USER
@@ -72,7 +72,7 @@ spec:
 
       containers:
         - name: finance-matute
-          image: ghcr.io/mdcravero/finance-matute:0.6.0
+          image: ghcr.io/mdcravero/finance-matute:0.6.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
