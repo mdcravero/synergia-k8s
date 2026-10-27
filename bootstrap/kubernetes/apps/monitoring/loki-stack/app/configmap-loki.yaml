@@ -172,6 +172,19 @@ data:
       config:
         clients:
           - url: http://loki-stack.monitoring.svc.cluster.local:3100/loki/api/v1/push
+        snippets:
+          # Pipeline of the chart's kubernetes-pods job, the one that ships
+          # every pod log. The replace stage blanks credentials passed in URLs
+          # before they reach Loki. Homarr polled Sonarr and Radarr every
+          # minute with ?apikey=<key>, and Traefik's access log stored the
+          # full RequestPath, so the keys sat in Loki for 30 days, readable
+          # from Grafana. [^&"\\\s] also stops at the backslash of &,
+          # Go's JSON escape for "&".
+          pipelineStages:
+            - cri: {}
+            - replace:
+                expression: '(?i)(?:api[_-]?key|access[_-]?token|api[_-]?token|x-plex-token|token)=([^&"\\\s]+)'
+                replace: REDACTED
         positions:
           filename: /tmp/positions.yaml
         scrape_configs:
