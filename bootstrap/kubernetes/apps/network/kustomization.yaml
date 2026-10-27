@@ -5,3 +5,4 @@ resources:
   - ./metallb/app
   - ./traefik/app
   - ./core-dns/app
+  - ./cloudflared/app
