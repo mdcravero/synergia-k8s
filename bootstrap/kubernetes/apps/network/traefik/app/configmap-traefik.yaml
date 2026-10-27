@@ -7,8 +7,11 @@ metadata:
 data:
   values.yaml: |-
 
+    # INFO, not DEBUG: DEBUG logs every router and middleware decision for
+    # internet-facing traffic, a lot of volume in Loki for no daily use.
+    # Switch back temporarily when debugging routing.
     log:
-      level: DEBUG
+      level: INFO
 
     accessLog:
       enabled: true
