@@ -96,6 +96,16 @@ data:
         enabled: false,
       },
 
+      // No update checks either. With telemetry off, OpenClaw still asks
+      // telemetry.openclaw.ai/api/latest-version for the newest release once a
+      // day. The egress policy drops it, and OpenClaw retried for hours: about
+      // 40 attempts and a CiliumPolicyDrops wave on 2026-10-27. Upgrades come
+      // from Renovate PRs, so the check adds nothing. false also stops
+      // auto-update applies and the anonymous update pings.
+      update: {
+        checkOnStart: false,
+      },
+
       agents: {
         defaults: {
           // Allowlist, not denylist: 56 skills load by default and 39 of them
