@@ -193,7 +193,7 @@ data:
             metric_relabel_configs:
               - source_labels: [__name__]
                 action: keep
-                regex: container_(memory_working_set_bytes|spec_memory_limit_bytes|cpu_usage_seconds_total|cpu_cfs_throttled_periods_total|cpu_cfs_periods_total|oom_events_total)
+                regex: container_(memory_working_set_bytes|memory_rss|spec_memory_limit_bytes|cpu_usage_seconds_total|cpu_cfs_throttled_periods_total|cpu_cfs_periods_total|oom_events_total)
               - source_labels: [container]
                 action: drop
                 regex: (|POD)
@@ -485,11 +485,19 @@ data:
                   instance: "{{ $labels.namespace }}/{{ $labels.pod }}"
                 annotations:
                   summary: "{{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container }}) was OOM-killed"
-                  description: "The container hit its memory limit. Compare container_memory_working_set_bytes with the limit around the kill, and raise the limit or find what spiked."
+                  description: "The container hit its memory limit. Compare container_memory_rss with the limit around the kill, and raise the limit or find what spiked."
+              # Both memory alerts use RSS (anonymous memory), not the working
+              # set. The working set also counts active page cache, which the
+              # kernel reclaims before it OOM-kills anything. A download client
+              # fills any limit with the cache of the files it writes.
+              # trans-movies "peaked" at 99.8% of 192Mi on 2026-10-27, but
+              # Transmission itself held 9.5 MiB, the rest was cache, and it had
+              # 0 OOM kills. None of the apps here use tmpfs (emptyDir medium
+              # Memory), the one kind of file memory that is not reclaimable.
               - alert: ContainerMemoryNearLimit
                 expr: |
                   max by (namespace, pod, container) (
-                    container_memory_working_set_bytes{job="kubelet-cadvisor"}
+                    container_memory_rss{job="kubelet-cadvisor"}
                       / (container_spec_memory_limit_bytes{job="kubelet-cadvisor"} > 0)
                   ) > 0.9
                 for: 15m
@@ -525,7 +533,7 @@ data:
                   description: "Throttled in more than half of its CFS periods for 30 minutes: it keeps hitting its CPU limit and runs slowly, which can break timeouts and keepalives. Raise limits.cpu, or find what is busy."
               - alert: ContainerMemoryPeakNearLimit
                 expr: |
-                  max by (namespace, container) (max_over_time(container_memory_working_set_bytes{job="kubelet-cadvisor"}[7d]))
+                  max by (namespace, container) (max_over_time(container_memory_rss{job="kubelet-cadvisor"}[7d]))
                     / on (namespace, container)
                   max by (namespace, container) (container_spec_memory_limit_bytes{job="kubelet-cadvisor"} > 0)
                   > 0.9
@@ -535,7 +543,7 @@ data:
                   instance: "{{ $labels.namespace }}/{{ $labels.container }}"
                 annotations:
                   summary: "{{ $labels.namespace }}/{{ $labels.container }} peaked at {{ $value | humanizePercentage }} of its memory limit in the last 7 days"
-                  description: "Not an outage yet: the next peak may OOM-kill it. Raise the memory limit above the peak plus a margin (container_memory_working_set_bytes over 7d)."
+                  description: "Not an outage yet: the next peak may OOM-kill it. Raise the memory limit above the peak plus a margin (container_memory_rss over 7d)."
 
           - name: cilium
             rules:
