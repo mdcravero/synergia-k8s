@@ -5,3 +5,4 @@ resources:
   - ./loki-stack/app
   - ./prometheus/app
   - ./goldilocks/app
+  - ./alloy/app

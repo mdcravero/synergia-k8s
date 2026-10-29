@@ -1,0 +1,26 @@
+---
+# Syslog from the Omada devices and controller, which all sit on VLAN 1
+# (192.168.1.0/24). Syslog over UDP has no authentication, so only that
+# subnet may send; kube-proxy enforces loadBalancerSourceRanges.
+# externalTrafficPolicy: Local keeps the sender's address, so Alloy can
+# tell the devices apart (label source_ip).
+apiVersion: v1
+kind: Service
+metadata:
+  name: alloy-syslog
+  namespace: monitoring
+  annotations:
+    metallb.universe.tf/loadBalancerIPs: 10.42.20.45
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  loadBalancerSourceRanges:
+    - 192.168.1.0/24
+  selector:
+    app.kubernetes.io/name: alloy
+    app.kubernetes.io/instance: alloy
+  ports:
+    - name: syslog
+      port: 514
+      targetPort: syslog
+      protocol: UDP

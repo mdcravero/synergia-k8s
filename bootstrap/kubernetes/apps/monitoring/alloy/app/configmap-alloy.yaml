@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    # Receives syslog from the Omada network gear (gateway, switches, access
+    # point) and the Omada controller, and ships it to Loki. Pod logs
+    # still go through promtail (loki-stack), which reached end of life on
+    # 2026-03-02; Alloy is its replacement, so this is the first step of
+    # moving off it.
+    alloy:
+      configMap:
+        content: |
+          logging {
+            level  = "info"
+            format = "logfmt"
+          }
+
+          // Omada devices send BSD syslog (RFC 3164) over UDP. Alloy runs as
+          // non-root, so it listens on 5514; service-syslog.yaml exposes it
+          // on 514 to the LAN.
+          loki.source.syslog "omada" {
+            listener {
+              address       = "0.0.0.0:5514"
+              protocol      = "udp"
+              syslog_format = "rfc3164"
+              labels        = { job = "omada" }
+            }
+            relabel_rules = loki.relabel.omada.rules
+            forward_to    = [loki.write.default.receiver]
+          }
+
+          // source_ip is the sending device: the syslog Service keeps client
+          // addresses (externalTrafficPolicy: Local), and RFC 3164 hostnames
+          // are not always set.
+          loki.relabel "omada" {
+            forward_to = []
+            rule {
+              source_labels = ["__syslog_connection_ip_address"]
+              target_label  = "source_ip"
+            }
+            rule {
+              source_labels = ["__syslog_message_hostname"]
+              target_label  = "host"
+            }
+            rule {
+              source_labels = ["__syslog_message_app_name"]
+              target_label  = "app"
+            }
+            rule {
+              source_labels = ["__syslog_message_severity"]
+              target_label  = "severity"
+            }
+            rule {
+              source_labels = ["__syslog_message_facility"]
+              target_label  = "facility"
+            }
+          }
+
+          loki.write "default" {
+            endpoint {
+              url = "http://loki-stack.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+            }
+          }
+
+      # No anonymous usage reports to Grafana Labs.
+      enableReporting: false
+
+      extraPorts:
+        - name: syslog
+          port: 5514
+          targetPort: 5514
+          protocol: UDP
+
+      # Alloy needs a writable storage path; the root filesystem is read-only.
+      mounts:
+        extra:
+          - name: storage
+            mountPath: /tmp/alloy
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+
+      # No CPU limit, as elsewhere in the repo: Go bursts get throttled.
+      resources:
+        requests:
+          cpu: 10m
+          memory: 96Mi
+        limits:
+          memory: 256Mi
+
+    # One receiver is enough for a handful of devices. The default DaemonSet
+    # is for collecting node and pod logs, which promtail still does.
+    # Prometheus scrapes it through the alloy job in configmap-prometheus.yaml.
+    controller:
+      type: deployment
+      replicas: 1
+      volumes:
+        extra:
+          - name: storage
+            emptyDir: {}
+
+    # The chart's Service stays internal: it also carries Alloy's web UI,
+    # which has no authentication. Syslog gets its own LoadBalancer in
+    # service-syslog.yaml.
+    service:
+      type: ClusterIP

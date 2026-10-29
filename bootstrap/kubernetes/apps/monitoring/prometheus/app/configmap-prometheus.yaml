@@ -133,6 +133,21 @@ data:
                 target_label: __address__
               - source_labels: [__meta_kubernetes_pod_label_app]
                 target_label: instance
+          # Grafana Alloy, the syslog receiver for the Omada network gear.
+          # Exposes loki_source_syslog_entries_total and
+          # loki_source_syslog_parsing_errors_total.
+          - job_name: alloy
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - monitoring
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name, __meta_kubernetes_pod_container_port_name]
+                action: keep
+                regex: alloy;http-metrics
+              - source_labels: [__meta_kubernetes_pod_name]
+                target_label: instance
           # Cilium agents and operator run on hostNetwork, so pod IP = node IP.
           # Keeping one container port per job gives one target per pod.
           - job_name: cilium-agent
@@ -592,6 +607,29 @@ data:
                 annotations:
                   summary: "{{ $labels.instance }}: Cilium agent metrics unreachable for 5 minutes"
                   description: "Without its agent, new pods on this node get no network and policies are not updated. Check kubectl -n kube-system get pods -l k8s-app=cilium -o wide and the agent's logs."
+
+          - name: syslog
+            rules:
+              # absent(... == 1) also fires when the target is gone entirely,
+              # for example when the pod cannot be scheduled.
+              - alert: AlloySyslogReceiverDown
+                expr: |
+                  absent(up{job="alloy"} == 1)
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Alloy, the syslog receiver for the Omada gear, is down"
+                  description: "Logs from the Omada gateway, switches, access point and controller are not reaching Loki. UDP syslog is fire-and-forget, so they are lost, not queued. Check kubectl -n monitoring get pods -l app.kubernetes.io/name=alloy and its logs."
+              - alert: OmadaSyslogParsingErrors
+                expr: |
+                  sum(increase(loki_source_syslog_parsing_errors_total{job="alloy"}[1h])) > 0
+                for: 0m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Alloy dropped {{ $value | printf \"%.0f\" }} syslog messages it could not parse in the last hour"
+                  description: "A sender does not use the format the listener expects (syslog_format = rfc3164 in configmap-alloy.yaml). Alloy's own logs name the parse error; a firmware update can change the format."
 
     alertmanager:
       enabled: true

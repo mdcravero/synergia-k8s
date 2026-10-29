@@ -1,0 +1,11 @@
+---
+# Not "grafana": that name is taken by the grafana app's source, which
+# points at the grafana-community chart repository.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: grafana-labs
+  namespace: monitoring
+spec:
+  interval: 1h
+  url: https://grafana.github.io/helm-charts
