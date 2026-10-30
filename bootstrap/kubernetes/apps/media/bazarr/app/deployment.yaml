@@ -17,10 +17,17 @@ spec:
         run: bazarr
       annotations: {}
     spec:
+      # linuxserver.io non-root mode (the image supports it): start as the
+      # app user instead of root. PUID/PGID have no effect in this mode;
+      # the uid/gid match them and /config's owner. s6 needs a writable /run
+      # (the emptyDir below), and LSIO_NON_ROOT_USER selects the mode.
       securityContext:
-        # runAsUser: 1000
-        # runAsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - env:
             - name: TZ
@@ -29,6 +36,12 @@ spec:
               value: "1000"
             - name: PGID
               value: "1000"
+            # The image detects non-root mode from /run's owner, and an
+            # emptyDir is always owned by root, so set the flag the
+            # detection would set. Without it, init takes the root path
+            # (usermod, chown, s6-setuidgid) and the app never starts.
+            - name: LSIO_NON_ROOT_USER
+              value: "1"
           # Development channel (floating tag) since 1.6.1, which is how the
           # 2026-10-14 SignalR reconnect bug arrived. Move to the stable tag once
           # 1.6.3 is released, and stop Renovate from proposing -development
@@ -36,6 +49,11 @@ spec:
           # migrations.
           image: linuxserver/bazarr:1.6.3-development
           name: bazarr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               cpu: 50m
@@ -56,7 +74,13 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
+            - name: run
+              mountPath: /run
       volumes:
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
         - name: config
           persistentVolumeClaim:
             claimName: bazarr-config

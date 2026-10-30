@@ -19,8 +19,17 @@ spec:
         run: sonarr
       annotations: {}
     spec:
+      # linuxserver.io non-root mode (the image supports it): start as the
+      # app user instead of root. PUID/PGID have no effect in this mode;
+      # the uid/gid match them and /config's owner. s6 needs a writable /run
+      # (the emptyDir below), and LSIO_NON_ROOT_USER selects the mode.
       securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - env:
             - name: PUID
@@ -29,8 +38,19 @@ spec:
               value: "1000"
             - name: TZ
               value: "America/Argentina/Cordoba"
+            # The image detects non-root mode from /run's owner, and an
+            # emptyDir is always owned by root, so set the flag the
+            # detection would set. Without it, init takes the root path
+            # (usermod, chown, s6-setuidgid) and the app never starts.
+            - name: LSIO_NON_ROOT_USER
+              value: "1"
           image: lscr.io/linuxserver/sonarr:version-4.0.17.2952
           name: sonarr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               cpu: 100m
@@ -51,7 +71,13 @@ spec:
               mountPath: /downloads
             - name: downloads-usenet
               mountPath: /downloads-usenet
+            - name: run
+              mountPath: /run
       volumes:
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
         - name: config
           persistentVolumeClaim:
             claimName: sonarr-config
