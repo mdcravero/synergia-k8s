@@ -172,6 +172,14 @@ data:
           - name: storage
             emptyDir: {}
 
+    # No Kubernetes API access: receiving syslog needs none. The chart's
+    # default RBAC let Alloy read every Secret and ConfigMap in the cluster
+    # (2026-10-29 to 2026-10-30).
+    rbac:
+      create: false
+    serviceAccount:
+      automountServiceAccountToken: false
+
     # The chart's Service stays internal: it also carries Alloy's web UI,
     # which has no authentication. Syslog gets its own LoadBalancer in
     # service-syslog.yaml.

@@ -21,4 +21,37 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: homarr-values
-      valuesKey: values.yaml 
+      valuesKey: values.yaml
+  # The chart hard-codes its RBAC (rbac.enabled has no rules to set), and
+  # those rules let Homarr, which is public, read every Secret and ConfigMap
+  # in the cluster. Its Kubernetes integration only lists pods, nodes,
+  # services, volumes, deployments and ingresses, so the patches drop
+  # secrets and configmaps from both roles. They also delete the
+  # never-expiring homarr-sa-token Secret: the pod uses its projected,
+  # short-lived token, not this one.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: ClusterRole
+              name: homarr-cluster-role
+            patch: |
+              - op: replace
+                path: /rules/0/resources
+                value: ["pods", "services", "persistentvolumeclaims", "namespaces", "persistentvolumes", "nodes"]
+          - target:
+              kind: Role
+              name: homarr-role
+            patch: |
+              - op: replace
+                path: /rules/0/resources
+                value: ["pods", "services", "persistentvolumeclaims", "namespaces", "persistentvolumes", "nodes"]
+          - target:
+              kind: Secret
+              name: homarr-sa-token
+            patch: |
+              $patch: delete
+              apiVersion: v1
+              kind: Secret
+              metadata:
+                name: homarr-sa-token
