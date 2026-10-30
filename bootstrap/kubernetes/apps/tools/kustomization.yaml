@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - ./postgresql/operator # Deploy operator first
   - ./postgresql/cluster # Then deploy cluster
-  - ./valkey/app
   - ./renovate/app
   - ./homarr/app
   - ./homeassistant/app
