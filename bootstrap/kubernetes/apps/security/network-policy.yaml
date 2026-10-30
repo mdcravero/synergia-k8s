@@ -1,0 +1,54 @@
+---
+# Egress containment for Authelia, the login in front of the admin UIs.
+# It keeps the internet (SMTP, NTP) and the cluster's own services
+# (Postgres via postgres-cluster.tools.svc). It loses the home LAN and the
+# nodes' admin ports, so a compromised Authelia cannot walk to the router,
+# Proxmox or the Kubernetes API.
+#
+# Containment, not an allowlist: enableDefaultDeny is off, so only the
+# egressDeny rules below apply. CIDR rules only match traffic that leaves
+# the cluster; pods and ClusterIP services are not affected.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: contain-egress
+  namespace: security
+spec:
+  endpointSelector: {}
+  enableDefaultDeny:
+    egress: false
+    ingress: false
+  egressDeny:
+    # Home networks: the VLANs (10.42.x) and the gear on 192.168.1.0/24.
+    - toCIDRSet:
+        - cidr: 10.42.0.0/16
+        - cidr: 192.168.0.0/16
+        - cidr: 172.16.0.0/12
+    # The Kubernetes API: Authelia does not use it.
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # The nodes' admin ports, and every NodePort: those get around
+    # loadBalancerSourceRanges.
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "10250" # kubelet
+              protocol: TCP
+            - port: "50000" # Talos apid and trustd
+              endPort: 50001
+              protocol: TCP
+            - port: "2379" # etcd
+              endPort: 2380
+              protocol: TCP
+            - port: "30000" # NodePorts
+              endPort: 32767
+              protocol: TCP
+            - port: "30000"
+              endPort: 32767
+              protocol: UDP

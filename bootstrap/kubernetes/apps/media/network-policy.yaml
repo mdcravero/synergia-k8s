@@ -1,0 +1,68 @@
+---
+# Egress containment for the media namespace: Jellyfin, Jellyseerr, the
+# *arr apps and the download clients, several of them public through
+# Traefik and Cloudflare. They keep the internet and the cluster's own
+# services. They lose the home LAN and the nodes' admin ports, so a
+# compromised app cannot walk to the router, the Omada gear, Proxmox,
+# Postgres or the Kubernetes API.
+#
+# Containment, not an allowlist: enableDefaultDeny is off, so only the
+# egressDeny rules below apply and all other traffic stays as it was. A
+# deny wins over any allow. CIDR rules only match traffic that leaves the
+# cluster: pods, and ClusterIP services (which Cilium translates first),
+# are not affected.
+#
+# Exception: media's own LoadBalancer addresses. Sonarr, Radarr and Lidarr
+# reach Transmission at 10.42.20.66/68/69 (Hubble, 2026-10-30), and
+# kube-proxy, not Cilium, translates those, so the policy sees LAN
+# addresses. Pointing the download clients at trans-*.media.svc would let
+# these exceptions go.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: contain-egress
+  namespace: media
+spec:
+  endpointSelector: {}
+  enableDefaultDeny:
+    egress: false
+    ingress: false
+  egressDeny:
+    # Home networks: the VLANs (10.42.x) and the gear on 192.168.1.0/24.
+    - toCIDRSet:
+        - cidr: 10.42.0.0/16
+          except:
+            - 10.42.20.42/32 # bazarr
+            - 10.42.20.60/30 # jellyfin, jellyseerr, prowlarr, radarr
+            - 10.42.20.64/30 # sonarr, lidarr, trans-music
+            - 10.42.20.68/31 # trans-shows, trans-movies
+        - cidr: 192.168.0.0/16
+        - cidr: 172.16.0.0/12
+    # The Kubernetes API: no media app talks to it.
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # The nodes' admin ports, and every NodePort: those get around
+    # loadBalancerSourceRanges (Postgres has one, for instance).
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "10250" # kubelet
+              protocol: TCP
+            - port: "50000" # Talos apid and trustd
+              endPort: 50001
+              protocol: TCP
+            - port: "2379" # etcd
+              endPort: 2380
+              protocol: TCP
+            - port: "30000" # NodePorts
+              endPort: 32767
+              protocol: TCP
+            - port: "30000"
+              endPort: 32767
+              protocol: UDP

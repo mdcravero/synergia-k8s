@@ -1,0 +1,49 @@
+---
+# Egress containment for Traefik, the entry point from the internet. It
+# keeps the cluster's own services (every route's backend is in-cluster:
+# no ExternalName services, 2026-10-30) and the Kubernetes API, which it
+# watches for routes. It loses the home LAN and the nodes' other admin
+# ports, so a compromised Traefik cannot walk to the router, Proxmox or the
+# kubelets.
+#
+# Containment, not an allowlist: enableDefaultDeny is off, so only the
+# egressDeny rules below apply. CIDR rules only match traffic that leaves
+# the cluster; pods and ClusterIP services are not affected. The API
+# server's port 6443 is deliberately not denied.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: contain-egress
+  namespace: traefik
+spec:
+  endpointSelector: {}
+  enableDefaultDeny:
+    egress: false
+    ingress: false
+  egressDeny:
+    # Home networks: the VLANs (10.42.x) and the gear on 192.168.1.0/24.
+    - toCIDRSet:
+        - cidr: 10.42.0.0/16
+        - cidr: 192.168.0.0/16
+        - cidr: 172.16.0.0/12
+    # The nodes' admin ports, and every NodePort: those get around
+    # loadBalancerSourceRanges.
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "10250" # kubelet
+              protocol: TCP
+            - port: "50000" # Talos apid and trustd
+              endPort: 50001
+              protocol: TCP
+            - port: "2379" # etcd
+              endPort: 2380
+              protocol: TCP
+            - port: "30000" # NodePorts
+              endPort: 32767
+              protocol: TCP
+            - port: "30000"
+              endPort: 32767
+              protocol: UDP

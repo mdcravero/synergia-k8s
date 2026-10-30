@@ -10,3 +10,4 @@ resources:
   - ./lidarr/app
   - ./maintainerr/app
   - ./sabnzbd/app
+  - ./network-policy.yaml
