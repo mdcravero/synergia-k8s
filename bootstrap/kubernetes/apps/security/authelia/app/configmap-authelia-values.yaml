@@ -29,12 +29,35 @@ data:
         limits:
           cpu: 200m
           memory: 256Mi
+      # Non-root on a read-only root filesystem. Authelia only reads its
+      # config and secrets (mounted read-only) and talks to Postgres; the
+      # one thing it writes is the filesystem notifier's
+      # /config/notification.txt, so /config is an emptyDir.
+      securityContext:
+        pod:
+          runAsUser: 8000
+          runAsGroup: 8000
+          runAsNonRoot: true
+          fsGroup: 8000
+          seccompProfile:
+            type: RuntimeDefault
+        container:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
       extraVolumes:
+        - name: config
+          emptyDir:
+            sizeLimit: 16Mi
         # SOPS-encrypted Secret from apps/secrets (secret-authelia-users.yaml).
         - name: users-database
           secret:
             secretName: authelia-users
       extraVolumeMounts:
+        - name: config
+          mountPath: /config
         - name: users-database
           mountPath: /config/users_database.yml
           subPath: users_database.yml

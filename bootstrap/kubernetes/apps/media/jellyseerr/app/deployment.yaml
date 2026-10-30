@@ -19,6 +19,14 @@ spec:
         run: jellyseerr
       annotations: {}
     spec:
+      # The image already runs as node (1000), /app/config's owner: enforce it.
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - env:
             - name: TZ
@@ -29,6 +37,11 @@ spec:
               value: "debug"
           image: ghcr.io/seerr-team/seerr:v3.5.1
           name: jellyseerr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               cpu: 50m

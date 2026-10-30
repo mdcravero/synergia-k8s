@@ -19,3 +19,28 @@ spec:
     - kind: ConfigMap
       name: prowlarr-values
       valuesKey: values.yaml
+  # The chart has no securityContext values. The image already runs as
+  # nobody (65534); enforce that and add RuntimeDefault seccomp, no
+  # privilege escalation and no capabilities.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: prowlarr
+            patch: |
+              - op: add
+                path: /spec/template/spec/securityContext
+                value:
+                  runAsUser: 65534
+                  runAsGroup: 65534
+                  runAsNonRoot: true
+                  seccompProfile:
+                    type: RuntimeDefault
+              - op: add
+                path: /spec/template/spec/containers/0/securityContext
+                value:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                      - ALL

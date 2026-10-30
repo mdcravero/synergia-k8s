@@ -79,6 +79,12 @@ data:
       runAsUser: 5984
       runAsGroup: 5984
       runAsNonRoot: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
 
     # ARM64 node selection
     nodeSelector:

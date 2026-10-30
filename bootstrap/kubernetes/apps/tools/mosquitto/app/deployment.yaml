@@ -19,12 +19,18 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       initContainers:
         - name: init-config
           image: eclipse-mosquitto:2.0.22
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           command:
             - sh
             - -c
@@ -51,6 +57,11 @@ spec:
       containers:
         - name: mosquitto
           image: eclipse-mosquitto:2.0.22
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           ports:
             - containerPort: 1883
               name: mqtt
