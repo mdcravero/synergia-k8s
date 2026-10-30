@@ -12,11 +12,10 @@
 # cluster: pods, and ClusterIP services (which Cilium translates first),
 # are not affected.
 #
-# Exception: media's own LoadBalancer addresses. Sonarr, Radarr and Lidarr
-# reach Transmission at 10.42.20.66/68/69 (Hubble, 2026-10-30), and
-# kube-proxy, not Cilium, translates those, so the policy sees LAN
-# addresses. Pointing the download clients at trans-*.media.svc would let
-# these exceptions go.
+# MetalLB addresses are not translated by Cilium (kube-proxy does it after
+# the policy), so to the policy they are LAN addresses and are denied too.
+# In-cluster clients must use service names: the *arr apps reach
+# Transmission at trans-*.media.svc.cluster.local:9091 (since 2026-10-30).
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -31,11 +30,6 @@ spec:
     # Home networks: the VLANs (10.42.x) and the gear on 192.168.1.0/24.
     - toCIDRSet:
         - cidr: 10.42.0.0/16
-          except:
-            - 10.42.20.42/32 # bazarr
-            - 10.42.20.60/30 # jellyfin, jellyseerr, prowlarr, radarr
-            - 10.42.20.64/30 # sonarr, lidarr, trans-music
-            - 10.42.20.68/31 # trans-shows, trans-movies
         - cidr: 192.168.0.0/16
         - cidr: 172.16.0.0/12
     # The Kubernetes API: no media app talks to it.
