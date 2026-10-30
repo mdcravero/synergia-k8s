@@ -19,8 +19,16 @@ spec:
         run: lidarr
       annotations: {}
     spec:
+      # linuxserver.io non-root mode (the image supports it): start as the
+      # app user instead of root. PUID/PGID have no effect in this mode;
+      # the uid/gid match them and /config's owner. s6 needs a writable /run.
       securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - env:
             - name: PUID
@@ -31,6 +39,11 @@ spec:
               value: "America/Argentina/Cordoba"
           image: lscr.io/linuxserver/lidarr:version-3.1.0.4875
           name: lidarr
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           resources:
             requests:
               cpu: 100m
@@ -50,7 +63,13 @@ spec:
               mountPath: /downloads
             - name: downloads-usenet
               mountPath: /downloads-usenet
+            - name: run
+              mountPath: /run
       volumes:
+        - name: run
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
         - name: config
           persistentVolumeClaim:
             claimName: lidarr-config
