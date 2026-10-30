@@ -37,12 +37,21 @@ data:
           }
 
           // source_ip is the sending device: the syslog Service keeps client
-          // addresses (externalTrafficPolicy: Local).
+          // addresses (externalTrafficPolicy: Local). Raw mode still reads
+          // the <PRI> prefix, which carries severity and facility.
           loki.relabel "omada" {
             forward_to = []
             rule {
               source_labels = ["__syslog_connection_ip_address"]
               target_label  = "source_ip"
+            }
+            rule {
+              source_labels = ["__syslog_message_severity"]
+              target_label  = "severity"
+            }
+            rule {
+              source_labels = ["__syslog_message_facility"]
+              target_label  = "facility"
             }
           }
 

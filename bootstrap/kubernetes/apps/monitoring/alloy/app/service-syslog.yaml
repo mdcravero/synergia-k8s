@@ -14,6 +14,9 @@ metadata:
     metallb.io/loadBalancerIPs: 10.42.20.45
 spec:
   type: LoadBalancer
+  # A NodePort would accept syslog from anyone on the LAN, bypassing
+  # loadBalancerSourceRanges. MetalLB in layer 2 mode does not need one.
+  allocateLoadBalancerNodePorts: false
   externalTrafficPolicy: Local
   loadBalancerSourceRanges:
     - 192.168.1.0/24
