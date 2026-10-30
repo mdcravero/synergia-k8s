@@ -18,14 +18,18 @@ data:
             format = "logfmt"
           }
 
-          // Omada devices send BSD syslog (RFC 3164) over UDP. Alloy runs as
-          // non-root, so it listens on 5514; service-syslog.yaml exposes it
-          // on 514 to the LAN.
+          // Raw, not rfc3164 or rfc5424: the Omada controller sends an RFC
+          // 5424-style header ("<PRI>1 ...") with a timestamp that is not
+          // RFC 3339, and TP-Link has changed that timestamp format before.
+          // Both strict parsers rejected its first message (2026-10-30).
+          // Raw keeps each line whole; parse it at query time in Grafana.
+          // Alloy runs as non-root, so it listens on 5514;
+          // service-syslog.yaml exposes it on 514 to the LAN.
           loki.source.syslog "omada" {
             listener {
               address       = "0.0.0.0:5514"
               protocol      = "udp"
-              syslog_format = "rfc3164"
+              syslog_format = "raw"
               labels        = { job = "omada" }
             }
             relabel_rules = loki.relabel.omada.rules
@@ -33,29 +37,12 @@ data:
           }
 
           // source_ip is the sending device: the syslog Service keeps client
-          // addresses (externalTrafficPolicy: Local), and RFC 3164 hostnames
-          // are not always set.
+          // addresses (externalTrafficPolicy: Local).
           loki.relabel "omada" {
             forward_to = []
             rule {
               source_labels = ["__syslog_connection_ip_address"]
               target_label  = "source_ip"
-            }
-            rule {
-              source_labels = ["__syslog_message_hostname"]
-              target_label  = "host"
-            }
-            rule {
-              source_labels = ["__syslog_message_app_name"]
-              target_label  = "app"
-            }
-            rule {
-              source_labels = ["__syslog_message_severity"]
-              target_label  = "severity"
-            }
-            rule {
-              source_labels = ["__syslog_message_facility"]
-              target_label  = "facility"
             }
           }
 
@@ -64,6 +51,9 @@ data:
               url = "http://loki-stack.monitoring.svc.cluster.local:3100/loki/api/v1/push"
             }
           }
+
+      # syslog_format = "raw" is an experimental feature of loki.source.syslog.
+      stabilityLevel: experimental
 
       # No anonymous usage reports to Grafana Labs.
       enableReporting: false

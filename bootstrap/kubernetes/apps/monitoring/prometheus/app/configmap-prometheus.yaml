@@ -629,7 +629,7 @@ data:
                   severity: warning
                 annotations:
                   summary: "Alloy dropped {{ $value | printf \"%.0f\" }} syslog messages it could not parse in the last hour"
-                  description: "A sender does not use the format the listener expects (syslog_format = rfc3164 in configmap-alloy.yaml). Alloy's own logs name the parse error; a firmware update can change the format."
+                  description: "The listener takes raw lines (syslog_format = raw in configmap-alloy.yaml), so this should not happen; a sender may be sending something that is not syslog at all. Alloy's own logs name the parse error."
 
     alertmanager:
       enabled: true
