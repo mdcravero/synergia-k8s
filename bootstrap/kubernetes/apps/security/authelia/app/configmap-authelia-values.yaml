@@ -32,7 +32,8 @@ data:
       # Non-root on a read-only root filesystem. Authelia only reads its
       # config and secrets (mounted read-only) and talks to Postgres; the
       # one thing it writes is the filesystem notifier's
-      # /config/notification.txt, so /config is an emptyDir.
+      # /config/notification.txt, so /config is an emptyDir. Not named
+      # "config": the chart already has a volume by that name.
       securityContext:
         pod:
           runAsUser: 8000
@@ -48,7 +49,7 @@ data:
             drop:
               - ALL
       extraVolumes:
-        - name: config
+        - name: notifier-dir
           emptyDir:
             sizeLimit: 16Mi
         # SOPS-encrypted Secret from apps/secrets (secret-authelia-users.yaml).
@@ -56,7 +57,7 @@ data:
           secret:
             secretName: authelia-users
       extraVolumeMounts:
-        - name: config
+        - name: notifier-dir
           mountPath: /config
         - name: users-database
           mountPath: /config/users_database.yml
