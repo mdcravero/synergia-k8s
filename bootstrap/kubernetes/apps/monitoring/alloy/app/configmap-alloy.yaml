@@ -22,7 +22,8 @@ data:
           // 5424-style header ("<PRI>1 ...") with a timestamp that is not
           // RFC 3339, and TP-Link has changed that timestamp format before.
           // Both strict parsers rejected its first message (2026-10-30).
-          // Raw keeps each line whole; parse it at query time in Grafana.
+          // Raw keeps each line whole; parse it at query time in Grafana,
+          // or count it in loki.process below.
           // Alloy runs as non-root, so it listens on 5514;
           // service-syslog.yaml exposes it on 514 to the LAN.
           loki.source.syslog "omada" {
@@ -33,7 +34,55 @@ data:
               labels        = { job = "omada" }
             }
             relabel_rules = loki.relabel.omada.rules
-            forward_to    = [loki.write.default.receiver]
+            forward_to    = [loki.process.omada.receiver]
+          }
+
+          // Counts lines as they arrive, so dashboards read Prometheus
+          // instead of counting lines in Loki: over a day, those Loki
+          // queries took 7 to 29 s each (2026-10-30). Exported on Alloy's
+          // /metrics as loki_process_custom_<name>, labelled with the
+          // line's labels (job, source_ip, severity, facility). Counters live
+          // in memory; a restart resets them, which increase() handles.
+          // max_idle_duration keeps rare series (say, severity="error")
+          // from expiring between lines.
+          loki.process "omada" {
+            stage.metrics {
+              metric.counter {
+                name              = "omada_syslog_lines_total"
+                description       = "Syslog lines received from the Omada gear and controller."
+                match_all         = true
+                action            = "inc"
+                max_idle_duration = "168h"
+              }
+            }
+
+            // The gateway's WAN IN drops ("[ACL]...ACTION=Block,...,Dport=443"),
+            // by destination port. dport only exists for the counter: it is
+            // dropped again so it does not become a Loki stream label.
+            stage.match {
+              selector = "{source_ip=\"10.42.20.1\"} |= \"ACTION=Block\""
+
+              stage.regex {
+                expression = "Dport=(?P<dport>[0-9]+)"
+              }
+              stage.labels {
+                values = { dport = "" }
+              }
+              stage.metrics {
+                metric.counter {
+                  name              = "omada_firewall_blocks_total"
+                  description       = "Connections the gateway's WAN IN ACL rules blocked."
+                  match_all         = true
+                  action            = "inc"
+                  max_idle_duration = "168h"
+                }
+              }
+              stage.label_drop {
+                values = ["dport"]
+              }
+            }
+
+            forward_to = [loki.write.default.receiver]
           }
 
           // source_ip is the sending device: the syslog Service keeps client
