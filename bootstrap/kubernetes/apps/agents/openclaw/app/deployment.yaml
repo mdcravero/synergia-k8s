@@ -36,7 +36,7 @@ spec:
         # Clearing that recovery state first makes the copy stick; Git is the
         # real backup.
         - name: copy-config
-          image: busybox:latest
+          image: busybox:1.38.0
           command:
             - sh
             - -c
@@ -69,7 +69,7 @@ spec:
 
       containers:
         - name: socat-proxy
-          image: alpine/socat:latest
+          image: alpine/socat:1.8.1.3
           command: ["socat", "TCP-LISTEN:18780,fork,reuseaddr", "TCP:127.0.0.1:18789"]
           securityContext:
             runAsUser: 1000

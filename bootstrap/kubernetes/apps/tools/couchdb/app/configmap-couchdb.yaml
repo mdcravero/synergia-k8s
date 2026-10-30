@@ -9,6 +9,12 @@ data:
     # Single-node cluster suitable for Obsidian Self-hosted LiveSync
     clusterSize: 1
 
+    # The chart's default init image is busybox:latest, pulled on every start.
+    initImage:
+      repository: busybox
+      tag: "1.38.0"
+      pullPolicy: IfNotPresent
+
     # Disable auto-creation — secret couchdb-couchdb is managed via SOPS
     createAdminSecret: false
 
