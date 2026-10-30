@@ -35,10 +35,15 @@ data:
         - name: PGID
           value: "1000"
 
+      # ClusterIP, not LoadBalancer: on the LAN it answered with no auth, and
+      # with web.enable-lifecycle (needed by the localhost reload sidecar) any
+      # host, IoT and Guest VLANs included, could POST /-/quit and stop
+      # alerting. Grafana uses this Service; people use the Authelia-protected
+      # ingress below.
       service:
         enabled: true
         annotations: {}
-        type: LoadBalancer
+        type: ClusterIP
         servicePort: 80
 
       ingress:
