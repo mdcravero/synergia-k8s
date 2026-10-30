@@ -3,14 +3,15 @@
 # (192.168.1.0/24). Syslog over UDP has no authentication, so only that
 # subnet may send; kube-proxy enforces loadBalancerSourceRanges.
 # externalTrafficPolicy: Local keeps the sender's address, so Alloy can
-# tell the devices apart (label source_ip).
+# tell the devices apart (label source_ip). It also means the Alloy pod must
+# run on a node MetalLB announces from; configmap-alloy.yaml pins that.
 apiVersion: v1
 kind: Service
 metadata:
   name: alloy-syslog
   namespace: monitoring
   annotations:
-    metallb.universe.tf/loadBalancerIPs: 10.42.20.45
+    metallb.io/loadBalancerIPs: 10.42.20.45
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local

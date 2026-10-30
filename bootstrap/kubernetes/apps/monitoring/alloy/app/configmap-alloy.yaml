@@ -106,6 +106,19 @@ data:
     controller:
       type: deployment
       replicas: 1
+      # The syslog Service uses externalTrafficPolicy: Local, so MetalLB only
+      # announces 10.42.20.45 from a node that runs this pod. MetalLB skips
+      # nodes labelled exclude-from-external-load-balancers, which Talos puts
+      # on the control planes: on any of them the address goes unannounced
+      # and syslog never arrives (seen 2026-10-30). Today that leaves
+      # synergia-05, the node that already announces every LoadBalancer.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node.kubernetes.io/exclude-from-external-load-balancers
+                    operator: DoesNotExist
       volumes:
         extra:
           - name: storage
