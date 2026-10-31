@@ -111,10 +111,6 @@ data:
           gnetId: 315
           revision: 3
           datasource: Prometheus
-        postgresql:
-          gnetId: 12485
-          revision: 1
-          datasource: Prometheus
         # Alertmanager's own health (notifications, silences, config
         # reloads); imported by hand on 2026-07-09 and now provisioned.
         alertmanager:
