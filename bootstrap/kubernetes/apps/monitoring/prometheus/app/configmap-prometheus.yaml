@@ -155,7 +155,12 @@ data:
                 target_label: instance
           # Cilium agents and operator run on hostNetwork, so pod IP = node IP.
           # Keeping one container port per job gives one target per pod.
+          # The official Cilium dashboards (grafana.com 16611, 16613) filter on
+          # pod and k8s_app and use [1m] rate windows, so these two jobs keep
+          # both labels and scrape every 30s: with the global 1m interval a
+          # 1m window holds a single sample and rate() returns nothing.
           - job_name: cilium-agent
+            scrape_interval: 30s
             kubernetes_sd_configs:
               - role: pod
                 namespaces:
@@ -167,7 +172,12 @@ data:
                 regex: cilium;9962
               - source_labels: [__meta_kubernetes_pod_node_name]
                 target_label: instance
+              - source_labels: [__meta_kubernetes_pod_name]
+                target_label: pod
+              - source_labels: [__meta_kubernetes_pod_label_k8s_app]
+                target_label: k8s_app
           - job_name: hubble
+            scrape_interval: 30s
             kubernetes_sd_configs:
               - role: pod
                 namespaces:
@@ -179,6 +189,10 @@ data:
                 regex: cilium;9965
               - source_labels: [__meta_kubernetes_pod_node_name]
                 target_label: instance
+              - source_labels: [__meta_kubernetes_pod_name]
+                target_label: pod
+              - source_labels: [__meta_kubernetes_pod_label_k8s_app]
+                target_label: k8s_app
           - job_name: cilium-operator
             kubernetes_sd_configs:
               - role: pod

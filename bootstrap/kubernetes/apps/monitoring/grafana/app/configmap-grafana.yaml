@@ -115,18 +115,18 @@ data:
           gnetId: 12485
           revision: 1
           datasource: Prometheus
-        flux-cluster-stats:
-          gnetId: 18376
-          revision: 3
+        # Alertmanager's own health (notifications, silences, config
+        # reloads); imported by hand on 2026-07-09 and now provisioned.
+        alertmanager:
+          gnetId: 9578
+          revision: 4
           datasource: Prometheus
         # Isovalent's official Cilium dashboards; the metrics come from the
-        # cilium-agent, hubble and cilium-operator scrape jobs.
+        # cilium-agent and hubble scrape jobs, which keep the pod and k8s_app
+        # labels these dashboards filter on. The operator dashboard (16612)
+        # is left out: most of its panels are for AWS ENI/EC2 IPAM.
         cilium-agent:
           gnetId: 16611
-          revision: 1
-          datasource: Prometheus
-        cilium-operator:
-          gnetId: 16612
           revision: 1
           datasource: Prometheus
         hubble:
