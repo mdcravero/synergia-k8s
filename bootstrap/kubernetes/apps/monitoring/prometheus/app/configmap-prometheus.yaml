@@ -266,6 +266,13 @@ data:
                 target_label: __address__
               - action: labelmap
                 regex: __meta_kubernetes_pod_label_(.+)
+              # The "PostgreSQL Database" dashboard (grafana.com 9628) selects
+              # by release, the Helm label of the exporter chart it was made
+              # for. Here the exporter is a sidecar of the Zalando cluster, so
+              # its cluster-name stands in. Only pods with that label get it.
+              - source_labels: [__meta_kubernetes_pod_label_cluster_name]
+                regex: (.+)
+                target_label: release
               - source_labels: [__meta_kubernetes_namespace]
                 action: replace
                 target_label: kubernetes_namespace

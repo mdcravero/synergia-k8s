@@ -111,6 +111,13 @@ data:
           gnetId: 315
           revision: 3
           datasource: Prometheus
+        # Postgres (the Zalando cluster's postgres-exporter sidecar). A new
+        # file name on purpose: "postgresql.json" once held two dashboards
+        # (9628, then 12485) and Grafana tangled them under one internal ID.
+        postgresql-database:
+          gnetId: 9628
+          revision: 8
+          datasource: Prometheus
         # Alertmanager's own health (notifications, silences, config
         # reloads); imported by hand on 2026-07-09 and now provisioned.
         alertmanager:
