@@ -34,3 +34,28 @@ spec:
                 name: finance-mafi
                 port:
                   number: 8080
+---
+# Except /sw.js, which reaches the app. Browsers that opened v0.2.0 here keep its service worker, which
+# answers every visit from its cache, so they never reach the redirect; and a redirected /sw.js cannot
+# replace it. With RETIRED_HOSTS the app answers this address's /sw.js with a worker that clears the
+# cache, unregisters itself and reloads, and then the redirect works. Public: it is a fixed script, no data.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: finance-mafi-old-host-sw
+  namespace: finance
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+spec:
+  rules:
+    - host: finance.synergia.net.ar
+      http:
+        paths:
+          - path: /sw.js
+            pathType: Exact
+            backend:
+              service:
+                name: finance-mafi
+                port:
+                  number: 8080
