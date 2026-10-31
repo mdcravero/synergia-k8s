@@ -133,6 +133,12 @@ data:
           gnetId: 16613
           revision: 1
           datasource: Prometheus
+        # Log viewer for Loki ("Logs / App"). Dropped from this list by
+        # mistake in 09fe3e5a; its file kept it alive on the Grafana PVC.
+        loki-logs:
+          gnetId: 13639
+          revision: 2
+          datasource: loki-home
 
       workstations:
         freeze-forensics:
