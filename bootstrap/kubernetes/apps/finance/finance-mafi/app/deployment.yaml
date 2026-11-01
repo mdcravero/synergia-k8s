@@ -102,6 +102,9 @@ spec:
             # Authelia group allowed to use the app (Remote-Groups header)
             - name: AUTH_GROUP
               value: finance
+            # Old addresses that only redirect here: their /sw.js removes the worker an old version left (ingress-old-host.yaml)
+            - name: RETIRED_HOSTS
+              value: finance.synergia.net.ar
           volumeMounts:
             - name: attachments
               mountPath: /data/attachments
