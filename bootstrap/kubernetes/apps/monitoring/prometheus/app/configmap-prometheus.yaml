@@ -727,10 +727,13 @@ data:
                 annotations:
                   summary: "HelmRelease {{ $labels.exported_namespace }}/{{ $labels.name }} is not Ready"
                   description: "Run: flux get hr -n {{ $labels.exported_namespace }} {{ $labels.name }}. A stalled release (RetriesExceeded) needs flux reconcile hr --reset after the fix."
+              # 15m, not 5m: a Kustomization also reports Ready=False while it
+              # waits on a dependency (DependencyNotReady), and a long Helm
+              # upgrade upstream (Cilium, Longhorn) can last several minutes.
               - alert: FluxKustomizationFailed
                 expr: |
                   gotk_resource_info{customresource_kind="Kustomization",ready="False",suspended!="true"} == 1
-                for: 5m
+                for: 15m
                 labels:
                   severity: warning
                 annotations:
