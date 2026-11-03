@@ -67,10 +67,6 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /media
-            - name: downloads
-              mountPath: /downloads
-            - name: downloads-usenet
-              mountPath: /downloads-usenet
             - name: run
               mountPath: /run
       volumes:
@@ -81,12 +77,10 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: sonarr-config
+        # The library and the download clients' folders (under
+        # /media/downloads) share this one volume, so imports are
+        # hardlinks. The remote path mappings translate the clients'
+        # /downloads/ to /media/downloads/{torrents/<app>,usenet}/.
         - name: media
           persistentVolumeClaim:
             claimName: jellyfin-media
-        - name: downloads
-          persistentVolumeClaim:
-            claimName: trans-shows-down
-        - name: downloads-usenet
-          persistentVolumeClaim:
-            claimName: sabnzbd-down

@@ -71,6 +71,7 @@ spec:
               mountPath: /config
             - name: downloads
               mountPath: /downloads
+              subPath: downloads/torrents/movies
             - name: run
               mountPath: /run
       volumes:
@@ -81,6 +82,10 @@ spec:
         - name: config
           persistentVolumeClaim:
             claimName: trans-movies-config
+        # Downloads live on the media library volume (under downloads/), so
+        # the *arr apps import them with a hardlink instead of a copy. A
+        # copy between two NFS volumes filled Radarr's page cache and
+        # OOM-killed it (2026-11-03).
         - name: downloads
           persistentVolumeClaim:
-            claimName: trans-movies-down
+            claimName: jellyfin-media
