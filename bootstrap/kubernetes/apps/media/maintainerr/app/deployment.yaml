@@ -30,7 +30,7 @@ spec:
         - env:
             - name: TZ
               value: "America/Argentina/Cordoba"
-          image: maintainerr/maintainerr:3.31.0
+          image: maintainerr/maintainerr:3.32.0
           name: maintainerr
           securityContext:
             allowPrivilegeEscalation: false
