@@ -47,6 +47,9 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+    # Traefik ranks routers by rule length, and Path(`/sw.js`) is one character shorter than the redirect's
+    # PathPrefix(`/`): without this the redirect wins and /sw.js never reaches the app.
+    traefik.ingress.kubernetes.io/router.priority: "1000"
 spec:
   rules:
     - host: finance.synergia.net.ar
