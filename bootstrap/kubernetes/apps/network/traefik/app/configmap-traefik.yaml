@@ -65,8 +65,10 @@ data:
     service:
       enabled: true
       single: true
-      type: LoadBalancer
+      # The chart reads the type from spec; a top-level service.type was
+      # never a chart value, and chart 42.3.1's schema rejects it.
       spec:
+        type: LoadBalancer
         loadBalancerIP: "10.42.20.40"
 
     ingressRoute:
