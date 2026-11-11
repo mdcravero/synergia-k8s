@@ -710,6 +710,88 @@ data:
               "weekStart": ""
             }
 
+        # The cluster nodes' temperatures from node-exporter's hwmon
+        # collector: the hottest sensor of each node, then every sensor for
+        # detail. The red line is the NodeTemperatureHigh alert (75 °C).
+        node-temperatures:
+          datasource: Prometheus
+          json: |-
+            {
+              "title": "Node Temperatures",
+              "uid": "node-temperatures",
+              "tags": ["nodes", "temperature", "node-exporter"],
+              "timezone": "browser",
+              "schemaVersion": 39,
+              "version": 1,
+              "editable": true,
+              "refresh": "1m",
+              "time": { "from": "now-24h", "to": "now" },
+              "panels": [
+                {
+                  "id": 1,
+                  "title": "Now (hottest sensor)",
+                  "type": "stat",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 0, "w": 24, "h": 5 },
+                  "targets": [
+                    { "expr": "max by (node) (node_hwmon_temp_celsius{job=\"node-exporter\"})", "legendFormat": "{{node}}", "refId": "A", "instant": true }
+                  ],
+                  "options": {
+                    "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+                    "colorMode": "background",
+                    "graphMode": "none",
+                    "textMode": "value_and_name"
+                  },
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "celsius",
+                      "decimals": 0,
+                      "thresholds": { "mode": "absolute", "steps": [ { "value": null, "color": "green" }, { "value": 65, "color": "yellow" }, { "value": 75, "color": "red" } ] }
+                    }
+                  }
+                },
+                {
+                  "id": 2,
+                  "title": "Hottest sensor per node",
+                  "description": "NodeTemperatureHigh fires after 10 minutes above 75 °C (red line). A Raspberry Pi 4 slows its CPU down at 80 °C.",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 5, "w": 24, "h": 10 },
+                  "targets": [
+                    { "expr": "max by (node) (node_hwmon_temp_celsius{job=\"node-exporter\"})", "legendFormat": "{{node}}", "refId": "A" }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "celsius",
+                      "decimals": 1,
+                      "custom": { "thresholdsStyle": { "mode": "line" } },
+                      "thresholds": { "mode": "absolute", "steps": [ { "value": null, "color": "transparent" }, { "value": 75, "color": "red" } ] }
+                    }
+                  },
+                  "options": {
+                    "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull", "max"] },
+                    "tooltip": { "mode": "multi", "sort": "desc" }
+                  }
+                },
+                {
+                  "id": 3,
+                  "title": "All sensors",
+                  "description": "Every hwmon sensor node-exporter reads, by node and chip.",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 15, "w": 24, "h": 10 },
+                  "targets": [
+                    { "expr": "node_hwmon_temp_celsius{job=\"node-exporter\"}", "legendFormat": "{{node}} {{chip}} {{sensor}}", "refId": "A" }
+                  ],
+                  "fieldConfig": { "defaults": { "unit": "celsius", "decimals": 1 } },
+                  "options": {
+                    "legend": { "displayMode": "table", "placement": "right", "calcs": ["lastNotNull", "max"] },
+                    "tooltip": { "mode": "multi", "sort": "desc" }
+                  }
+                }
+              ]
+            }
+
       workstations:
         freeze-forensics:
           datasource: Prometheus

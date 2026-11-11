@@ -882,6 +882,20 @@ data:
                 annotations:
                   summary: "Node {{ $labels.node }} is NotReady"
                   description: "kubelet on {{ $labels.node }} has not reported Ready for 5 minutes. A planned reboot takes about 4 minutes, so this is longer than that. Check talosctl -n <ip> health and dmesg; on a control-plane node also check etcd members."
+              # The hottest hwmon sensor of each node (the SoC; on synergia-05
+              # also any other sensor it exposes). The RPi4 firmware starts
+              # slowing the CPU down at 80 °C, so 75 °C for 10 minutes leaves
+              # time to act first. On 2026-11-11, with the rack at ~28 °C, the
+              # nodes read 38-46 °C. Dashboard: "Node Temperatures".
+              - alert: NodeTemperatureHigh
+                expr: |
+                  max by (instance) (node_hwmon_temp_celsius{job="node-exporter"}) > 75
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "{{ $labels.instance }} is at {{ $value | printf \"%.0f\" }} °C"
+                  description: "The hottest sensor on {{ $labels.instance }} has been above 75 °C for 10 minutes; at 80 °C a Raspberry Pi 4 slows its CPU down. Compare with the rack sensor in Home Assistant (Rack Climate Temp): if the rack is hot too, open the rack door; if only this node is hot, check its fan (PoE HAT on the RPi4s) and what is running on it."
           - name: pods
             rules:
               # Restarts rather than the CrashLoopBackOff state: a crash-looping
