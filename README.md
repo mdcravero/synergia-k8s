@@ -184,7 +184,7 @@ Alertmanager sends to Telegram:
 
 | Group | Alerts |
 |---|---|
-| nodes | `NodeFilesystemAlmostFull` (>80%), `NodeFilesystemCritical` (>90%), `NodeRebooted`, `NodeNotReady` |
+| nodes | `NodeFilesystemAlmostFull` (>80%), `NodeFilesystemCritical` (>90%), `NodeRebooted`, `NodeNotReady`, `NodeTemperatureHigh` (>75 °C for 10 min) |
 | pods | `PodCrashLooping` (3+ restarts in 15 min) |
 | postgresql | `PostgresqlNotResponding`, `PostgresqlExporterUnreachable`, `PostgresqlHighConnectionCount`, `PostgresqlMasterEndpointStale`, `HomeAssistantRecorderDisconnected` |
 | backups | `BackupCronJobFailed`, `BackupCronJobNotScheduled` |
@@ -192,8 +192,9 @@ Alertmanager sends to Telegram:
 | renovate | `RenovateJobFailed`, `RenovateNoSuccessfulRun` |
 | certificates | `TalosConfigCertExpiringSoon` |
 
-Grafana dashboards: Node Exporter Full, Kubernetes cluster, PostgreSQL and
-Flux cluster stats. Its datasources are Prometheus and Loki.
+Grafana dashboards: Node Exporter Full, Kubernetes cluster, PostgreSQL,
+Flux cluster stats and Node Temperatures. Its datasources are Prometheus and
+Loki.
 
 ## Backups
 
