@@ -1,0 +1,37 @@
+---
+# Lets CoreDNS reach the Talos host DNS on its own node (169.254.116.108:53).
+#
+# The Corefile forwards to 10.42.20.2 and 1.1.1.1, a change made by hand on
+# 2026-03-07 that Talos does not know about. `talosctl upgrade-k8s` re-applies
+# Talos's own Corefile, `forward . /etc/resolv.conf`. With
+# machine.features.hostDNS.forwardKubeDNSToHost on (it is, on every node),
+# that resolv.conf points CoreDNS at the Talos host DNS, 169.254.116.108, an
+# address on the node itself.
+#
+# If Cilium gives that address the host identity, allow-coredns-egress cannot
+# cover it: ipBlock rules never match cluster nodes. Every external lookup
+# from a pod would then be dropped until the Corefile is restored. This policy
+# is the safety net for those upgrade-k8s runs. If Cilium sees the address as
+# world instead, the NetworkPolicy's 0.0.0.0/0:53 rule already allows it.
+#
+# Harmless while the Corefile forwards elsewhere. The host DNS forwards to the
+# node's nameservers (AdGuard, 10.42.20.2), so it adds no new destination.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-coredns-to-host-dns
+  namespace: kube-system
+spec:
+  description: "CoreDNS -> Talos host DNS on its node (169.254.116.108:53)"
+  endpointSelector:
+    matchLabels:
+      k8s-app: kube-dns
+  egress:
+    - toEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
