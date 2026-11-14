@@ -175,6 +175,8 @@ SMLIGHT SLZB-06U (CC2652P)
 
 Prometheus scrapes:
 - the nodes (node-exporter) and kube-state-metrics;
+- etcd on the three control planes (`:2381`, exposed by Talos's
+  `listen-metrics-urls`);
 - Traefik, the Flux controllers and the PostgreSQL exporter.
 
 Alertmanager sends to Telegram:
@@ -185,6 +187,7 @@ Alertmanager sends to Telegram:
 | Group | Alerts |
 |---|---|
 | nodes | `NodeFilesystemAlmostFull` (>80%), `NodeFilesystemCritical` (>90%), `NodeRebooted`, `NodeNotReady`, `NodeTemperatureHigh` (>75 °C for 10 min) |
+| etcd | `EtcdMemberDown`, `EtcdNoLeader`, `EtcdFrequentLeaderChanges` (>4 in 1 h), `EtcdSlowWALFsync` (p99 >0.5 s), `EtcdSlowBackendCommit` (p99 >0.25 s), `EtcdDatabaseNearQuota` (>80%) |
 | pods | `PodCrashLooping` (3+ restarts in 15 min) |
 | postgresql | `PostgresqlNotResponding`, `PostgresqlExporterUnreachable`, `PostgresqlHighConnectionCount`, `PostgresqlMasterEndpointStale`, `HomeAssistantRecorderDisconnected` |
 | backups | `BackupCronJobFailed`, `BackupCronJobNotScheduled` |
@@ -193,7 +196,7 @@ Alertmanager sends to Telegram:
 | certificates | `TalosConfigCertExpiringSoon` |
 
 Grafana dashboards: Node Exporter Full, Kubernetes cluster, PostgreSQL,
-Flux cluster stats and Node Temperatures. Its datasources are Prometheus and
+Flux cluster stats, Node Temperatures and etcd. Its datasources are Prometheus and
 Loki.
 
 ## Backups
