@@ -485,6 +485,22 @@ data:
                 target_label: instance
               - source_labels: [__meta_kubernetes_pod_node_name]
                 target_label: node
+          # etcd on the three control planes. Talos runs etcd outside
+          # Kubernetes; listen-metrics-urls (synergia-k8s-talos) exposes its
+          # metrics over plain HTTP on 2381. Targets come from the Node
+          # objects, so instance is the node name, as in the node-exporter job.
+          - job_name: etcd
+            kubernetes_sd_configs:
+              - role: node
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_node_labelpresent_node_role_kubernetes_io_control_plane]
+                action: keep
+                regex: "true"
+              - source_labels: [__meta_kubernetes_node_address_InternalIP]
+                target_label: __address__
+                replacement: $1:2381
+              - source_labels: [__meta_kubernetes_node_name]
+                target_label: instance
           - job_name: kube-state-metrics
             static_configs:
               - targets: ['prometheus-kube-state-metrics.monitoring.svc.cluster.local:8080']
@@ -896,6 +912,66 @@ data:
                 annotations:
                   summary: "{{ $labels.instance }} is at {{ $value | printf \"%.0f\" }} °C"
                   description: "The hottest sensor on {{ $labels.instance }} has been above 75 °C for 10 minutes; at 80 °C a Raspberry Pi 4 slows its CPU down. Compare with the rack sensor in Home Assistant (Rack Climate Temp): if the rack is hot too, open the rack door; if only this node is hot, check its fan (PoE HAT on the RPi4s) and what is running on it."
+          # etcd on the RPi4 control planes writes to USB SSDs, the weakest
+          # part of the cluster. Thresholds follow the upstream etcd mixin.
+          # One member down keeps quorum (2 of 3); two stop the control plane.
+          - name: etcd
+            rules:
+              - alert: EtcdMemberDown
+                expr: |
+                  up{job="etcd"} == 0
+                for: 10m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "etcd on {{ $labels.instance }} is not answering"
+                  description: "Prometheus has not reached etcd's metrics on {{ $labels.instance }}:2381 for 10 minutes (a planned reboot takes about 5). etcd keeps quorum with one member down; a second one stops the control plane. Check talosctl -n <ip> service etcd and talosctl etcd members."
+              - alert: EtcdNoLeader
+                expr: |
+                  etcd_server_has_leader{job="etcd"} == 0
+                for: 1m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "etcd on {{ $labels.instance }} has no leader"
+                  description: "This member has seen no leader for a minute, so it cannot serve writes. If every member reports it, the control plane is down: check talosctl etcd members and the network between the control planes."
+              - alert: EtcdFrequentLeaderChanges
+                expr: |
+                  max(increase(etcd_server_leader_changes_seen_total{job="etcd"}[1h])) > 4
+                for: 0m
+                labels:
+                  severity: warning
+                  instance: etcd
+                annotations:
+                  summary: "etcd changed leader {{ $value | printf \"%.0f\" }} times in the last hour"
+                  description: "Usually slow disks or a flapping network on a control plane. Planned reboots also cause a few changes. Compare the WAL fsync and commit panels of the etcd dashboard to find the slow member."
+              - alert: EtcdSlowWALFsync
+                expr: |
+                  histogram_quantile(0.99, sum by (instance, le) (rate(etcd_disk_wal_fsync_duration_seconds_bucket{job="etcd"}[5m]))) > 0.5
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "etcd on {{ $labels.instance }}: WAL fsync p99 {{ $value | printf \"%.2f\" }} s"
+                  description: "Writes to the etcd log on {{ $labels.instance }} take over 0.5 s at the 99th percentile. On the RPi4s that means the USB SSD (or its enclosure) is struggling. Check talosctl -n <ip> dmesg for USB or disk errors."
+              - alert: EtcdSlowBackendCommit
+                expr: |
+                  histogram_quantile(0.99, sum by (instance, le) (rate(etcd_disk_backend_commit_duration_seconds_bucket{job="etcd"}[5m]))) > 0.25
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "etcd on {{ $labels.instance }}: commit p99 {{ $value | printf \"%.2f\" }} s"
+                  description: "Commits to the etcd database on {{ $labels.instance }} take over 0.25 s at the 99th percentile, so the disk is slow. Check talosctl -n <ip> dmesg for USB or disk errors."
+              - alert: EtcdDatabaseNearQuota
+                expr: |
+                  etcd_mvcc_db_total_size_in_bytes{job="etcd"} / etcd_server_quota_backend_bytes{job="etcd"} > 0.8
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "etcd database on {{ $labels.instance }} is {{ $value | humanizePercentage }} of its quota"
+                  description: "At 100 % etcd raises the NOSPACE alarm and stops accepting writes. Defragment one member at a time: talosctl -n <ip> etcd defrag."
           - name: pods
             rules:
               # Restarts rather than the CrashLoopBackOff state: a crash-looping

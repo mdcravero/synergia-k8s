@@ -792,6 +792,458 @@ data:
               ]
             }
 
+        # etcd on the three control planes (Prometheus job "etcd", metrics on
+        # :2381 via listen-metrics-urls in synergia-k8s-talos). The red lines
+        # are the thresholds of the etcd alerts.
+        etcd:
+          datasource: Prometheus
+          json: |-
+            {
+              "title": "etcd",
+              "uid": "etcd",
+              "tags": [
+                "etcd",
+                "control-plane",
+                "talos"
+              ],
+              "timezone": "browser",
+              "schemaVersion": 39,
+              "version": 1,
+              "editable": true,
+              "refresh": "1m",
+              "time": {
+                "from": "now-24h",
+                "to": "now"
+              },
+              "panels": [
+                {
+                  "id": 1,
+                  "title": "Members",
+                  "description": "Up and role of each member. A planned reboot shows one member down for a few minutes.",
+                  "type": "stat",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 12,
+                    "h": 5
+                  },
+                  "targets": [
+                    {
+                      "expr": "(max by (instance) (up{job=\"etcd\"}) + on(instance) max by (instance) (etcd_server_is_leader{job=\"etcd\"})) or max by (instance) (up{job=\"etcd\"})",
+                      "legendFormat": "{{instance}}",
+                      "refId": "A",
+                      "instant": true
+                    }
+                  ],
+                  "options": {
+                    "reduceOptions": {
+                      "calcs": [
+                        "lastNotNull"
+                      ],
+                      "fields": "",
+                      "values": false
+                    },
+                    "colorMode": "background",
+                    "graphMode": "none",
+                    "textMode": "value_and_name"
+                  },
+                  "fieldConfig": {
+                    "defaults": {
+                      "mappings": [
+                        {
+                          "type": "value",
+                          "options": {
+                            "0": {
+                              "text": "DOWN",
+                              "color": "red"
+                            },
+                            "1": {
+                              "text": "follower",
+                              "color": "green"
+                            },
+                            "2": {
+                              "text": "LEADER",
+                              "color": "blue"
+                            }
+                          }
+                        }
+                      ],
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "value": null,
+                            "color": "red"
+                          },
+                          {
+                            "value": 1,
+                            "color": "green"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": 2,
+                  "title": "Database size",
+                  "description": "EtcdDatabaseNearQuota fires at 80 % of the quota (etcd stops writing at 100 %).",
+                  "type": "stat",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 12,
+                    "y": 0,
+                    "w": 12,
+                    "h": 5
+                  },
+                  "targets": [
+                    {
+                      "expr": "etcd_mvcc_db_total_size_in_bytes{job=\"etcd\"}",
+                      "legendFormat": "{{instance}}",
+                      "refId": "A",
+                      "instant": true
+                    }
+                  ],
+                  "options": {
+                    "reduceOptions": {
+                      "calcs": [
+                        "lastNotNull"
+                      ],
+                      "fields": "",
+                      "values": false
+                    },
+                    "colorMode": "value",
+                    "graphMode": "area",
+                    "textMode": "value_and_name"
+                  },
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "bytes",
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "value": null,
+                            "color": "green"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": 3,
+                  "title": "WAL fsync p99",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 0,
+                    "y": 5,
+                    "w": 12,
+                    "h": 9
+                  },
+                  "targets": [
+                    {
+                      "expr": "histogram_quantile(0.99, sum by (instance, le) (rate(etcd_disk_wal_fsync_duration_seconds_bucket{job=\"etcd\"}[5m])))",
+                      "legendFormat": "{{instance}}",
+                      "refId": "A"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "s",
+                      "custom": {
+                        "thresholdsStyle": {
+                          "mode": "line"
+                        }
+                      },
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "value": null,
+                            "color": "transparent"
+                          },
+                          {
+                            "value": 0.5,
+                            "color": "red"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "options": {
+                    "legend": {
+                      "displayMode": "table",
+                      "placement": "right",
+                      "calcs": [
+                        "lastNotNull",
+                        "max"
+                      ]
+                    },
+                    "tooltip": {
+                      "mode": "multi",
+                      "sort": "desc"
+                    }
+                  },
+                  "description": "Time to flush the etcd log to disk. EtcdSlowWALFsync fires after 10 minutes above 0.5 s (red line)."
+                },
+                {
+                  "id": 4,
+                  "title": "Backend commit p99",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 12,
+                    "y": 5,
+                    "w": 12,
+                    "h": 9
+                  },
+                  "targets": [
+                    {
+                      "expr": "histogram_quantile(0.99, sum by (instance, le) (rate(etcd_disk_backend_commit_duration_seconds_bucket{job=\"etcd\"}[5m])))",
+                      "legendFormat": "{{instance}}",
+                      "refId": "A"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "s",
+                      "custom": {
+                        "thresholdsStyle": {
+                          "mode": "line"
+                        }
+                      },
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "value": null,
+                            "color": "transparent"
+                          },
+                          {
+                            "value": 0.25,
+                            "color": "red"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "options": {
+                    "legend": {
+                      "displayMode": "table",
+                      "placement": "right",
+                      "calcs": [
+                        "lastNotNull",
+                        "max"
+                      ]
+                    },
+                    "tooltip": {
+                      "mode": "multi",
+                      "sort": "desc"
+                    }
+                  },
+                  "description": "Time to commit to the etcd database. EtcdSlowBackendCommit fires after 10 minutes above 0.25 s (red line)."
+                },
+                {
+                  "id": 5,
+                  "title": "Leader changes (last hour)",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 0,
+                    "y": 14,
+                    "w": 12,
+                    "h": 8
+                  },
+                  "targets": [
+                    {
+                      "expr": "max(increase(etcd_server_leader_changes_seen_total{job=\"etcd\"}[1h]))",
+                      "legendFormat": "leader changes",
+                      "refId": "A"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "short",
+                      "decimals": 0,
+                      "custom": {
+                        "thresholdsStyle": {
+                          "mode": "line"
+                        }
+                      },
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "value": null,
+                            "color": "transparent"
+                          },
+                          {
+                            "value": 4,
+                            "color": "red"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "options": {
+                    "legend": {
+                      "displayMode": "table",
+                      "placement": "right",
+                      "calcs": [
+                        "lastNotNull",
+                        "max"
+                      ]
+                    },
+                    "tooltip": {
+                      "mode": "multi",
+                      "sort": "desc"
+                    }
+                  },
+                  "description": "EtcdFrequentLeaderChanges fires above 4 in an hour."
+                },
+                {
+                  "id": 6,
+                  "title": "Peer round trip p99",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 12,
+                    "y": 14,
+                    "w": 12,
+                    "h": 8
+                  },
+                  "targets": [
+                    {
+                      "expr": "histogram_quantile(0.99, sum by (instance, le) (rate(etcd_network_peer_round_trip_time_seconds_bucket{job=\"etcd\"}[5m])))",
+                      "legendFormat": "{{instance}}",
+                      "refId": "A"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "s"
+                    }
+                  },
+                  "options": {
+                    "legend": {
+                      "displayMode": "table",
+                      "placement": "right",
+                      "calcs": [
+                        "lastNotNull",
+                        "max"
+                      ]
+                    },
+                    "tooltip": {
+                      "mode": "multi",
+                      "sort": "desc"
+                    }
+                  },
+                  "description": "Network latency between the members."
+                },
+                {
+                  "id": 7,
+                  "title": "Proposals",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 0,
+                    "y": 22,
+                    "w": 12,
+                    "h": 8
+                  },
+                  "targets": [
+                    {
+                      "expr": "sum(rate(etcd_server_proposals_committed_total{job=\"etcd\"}[5m]))",
+                      "legendFormat": "committed/s",
+                      "refId": "A"
+                    },
+                    {
+                      "expr": "sum(rate(etcd_server_proposals_failed_total{job=\"etcd\"}[5m]))",
+                      "legendFormat": "failed/s",
+                      "refId": "B"
+                    },
+                    {
+                      "expr": "max(etcd_server_proposals_pending{job=\"etcd\"})",
+                      "legendFormat": "pending",
+                      "refId": "C"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "short"
+                    }
+                  },
+                  "options": {
+                    "legend": {
+                      "displayMode": "table",
+                      "placement": "right",
+                      "calcs": [
+                        "lastNotNull",
+                        "max"
+                      ]
+                    },
+                    "tooltip": {
+                      "mode": "multi",
+                      "sort": "desc"
+                    }
+                  },
+                  "description": "Failed proposals usually mean a leader election or a member that cannot keep up. Pending should stay near zero."
+                },
+                {
+                  "id": 8,
+                  "title": "Database size vs quota",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": {
+                    "x": 12,
+                    "y": 22,
+                    "w": 12,
+                    "h": 8
+                  },
+                  "targets": [
+                    {
+                      "expr": "etcd_mvcc_db_total_size_in_bytes{job=\"etcd\"}",
+                      "legendFormat": "{{instance}} total",
+                      "refId": "A"
+                    },
+                    {
+                      "expr": "etcd_mvcc_db_total_size_in_use_in_bytes{job=\"etcd\"}",
+                      "legendFormat": "{{instance}} in use",
+                      "refId": "B"
+                    },
+                    {
+                      "expr": "max(etcd_server_quota_backend_bytes{job=\"etcd\"})",
+                      "legendFormat": "quota",
+                      "refId": "C"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "bytes"
+                    }
+                  },
+                  "options": {
+                    "legend": {
+                      "displayMode": "table",
+                      "placement": "right",
+                      "calcs": [
+                        "lastNotNull",
+                        "max"
+                      ]
+                    },
+                    "tooltip": {
+                      "mode": "multi",
+                      "sort": "desc"
+                    }
+                  },
+                  "description": "Total size against the quota. In-use size drops after compaction; total size only drops after a defrag."
+                }
+              ]
+            }
+
       workstations:
         freeze-forensics:
           datasource: Prometheus
