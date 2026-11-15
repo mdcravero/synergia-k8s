@@ -107,10 +107,6 @@ data:
           gnetId: 1860
           revision: 37
           datasource: Prometheus
-        kubernetes-cluster:
-          gnetId: 315
-          revision: 3
-          datasource: Prometheus
         # Postgres (the Zalando cluster's postgres-exporter sidecar). A new
         # file name on purpose: "postgresql.json" once held two dashboards
         # (9628, then 12485) and Grafana tangled them under one internal ID.
@@ -1240,6 +1236,371 @@ data:
                     }
                   },
                   "description": "Total size against the quota. In-use size drops after compaction; total size only drops after a defrag."
+                }
+              ]
+            }
+
+        # Per-container CPU and memory against requests and limits, from the
+        # kubelet-cadvisor job (which keeps only seven container_* metrics)
+        # and kube-state-metrics. Replaces gnetId 315, whose 2016 queries use
+        # labels Kubernetes no longer sets. The 7-day memory peak table is the
+        # signal Goldilocks gave; thresholds match the container alerts.
+        pod-resources:
+          datasource: Prometheus
+          json: |-
+            {
+              "title": "Pod Resources",
+              "uid": "pod-resources",
+              "tags": [ "kubernetes", "pods", "resources" ],
+              "timezone": "browser",
+              "schemaVersion": 39,
+              "version": 1,
+              "editable": true,
+              "refresh": "1m",
+              "time": { "from": "now-24h", "to": "now" },
+              "templating": {
+                "list": [
+                  {
+                    "name": "namespace",
+                    "label": "Namespace",
+                    "type": "query",
+                    "datasource": "Prometheus",
+                    "query": "label_values(container_memory_rss{job=\"kubelet-cadvisor\"}, namespace)",
+                    "refresh": 2,
+                    "includeAll": true,
+                    "allValue": ".*",
+                    "multi": true,
+                    "sort": 1,
+                    "current": { "text": "All", "value": "$__all" }
+                  },
+                  {
+                    "name": "node",
+                    "label": "Node",
+                    "description": "Filters the graphs only. The tables fold every replica of a container together, wherever it ran.",
+                    "type": "query",
+                    "datasource": "Prometheus",
+                    "query": "label_values(container_memory_rss{job=\"kubelet-cadvisor\"}, instance)",
+                    "refresh": 2,
+                    "includeAll": true,
+                    "allValue": ".*",
+                    "multi": true,
+                    "sort": 1,
+                    "current": { "text": "All", "value": "$__all" }
+                  }
+                ]
+              },
+              "panels": [
+                {
+                  "id": 1,
+                  "title": "Memory: 7-day peak vs limit",
+                  "description": "One row per container; replicas are folded together (max). Memory is RSS, the same measure the memory alerts use: the working set also counts page cache, which the kernel drops before it OOM-kills anything. \"Peak / limit\" is what ContainerMemoryPeakNearLimit checks; it fires above 90 % (red). \"none\" means the container has no memory limit. This table replaces Goldilocks' recommendations.",
+                  "type": "table",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 0, "w": 24, "h": 11 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "max by (namespace, container) (container_memory_rss{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"})",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "B",
+                      "expr": "max by (namespace, container) (max_over_time(container_memory_rss{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"}[7d]))",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "C",
+                      "expr": "max by (namespace, container) (kube_pod_container_resource_requests{resource=\"memory\", namespace=~\"$namespace\"})",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "D",
+                      "expr": "max by (namespace, container) (container_spec_memory_limit_bytes{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"})",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "E",
+                      "expr": "max by (namespace, container) (max_over_time(container_memory_rss{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"}[7d])) / on (namespace, container) max by (namespace, container) (container_spec_memory_limit_bytes{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"} > 0)",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    }
+                  ],
+                  "transformations": [
+                    { "id": "merge", "options": {} },
+                    {
+                      "id": "organize",
+                      "options": {
+                        "excludeByName": { "Time": true },
+                        "indexByName": { "namespace": 0, "container": 1, "Value #A": 2, "Value #B": 3, "Value #C": 4, "Value #D": 5, "Value #E": 6 },
+                        "renameByName": {
+                          "namespace": "Namespace",
+                          "container": "Container",
+                          "Value #A": "Now",
+                          "Value #B": "7-day peak",
+                          "Value #C": "Request",
+                          "Value #D": "Limit",
+                          "Value #E": "Peak / limit"
+                        }
+                      }
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": { "unit": "bytes", "decimals": 0 },
+                    "overrides": [
+                      {
+                        "matcher": { "id": "byName", "options": "Limit" },
+                        "properties": [
+                          { "id": "mappings", "value": [{"type": "value", "options": {"0": {"text": "none", "color": "orange"}}}] },
+                          { "id": "custom.cellOptions", "value": {"type": "color-text"} },
+                          { "id": "thresholds", "value": {"mode": "absolute", "steps": [{"value": null, "color": "text"}]} }
+                        ]
+                      },
+                      {
+                        "matcher": { "id": "byName", "options": "Peak / limit" },
+                        "properties": [
+                          { "id": "unit", "value": "percentunit" },
+                          { "id": "decimals", "value": 0 },
+                          { "id": "custom.cellOptions", "value": {"type": "color-background", "mode": "basic"} },
+                          {
+                            "id": "thresholds",
+                            "value": {
+                              "mode": "absolute",
+                              "steps": [ {"value": null, "color": "green"}, {"value": 0.7, "color": "yellow"}, {"value": 0.9, "color": "red"} ]
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [{"displayName": "Peak / limit", "desc": true}] }
+                },
+                {
+                  "id": 2,
+                  "title": "CPU: usage vs request and limit",
+                  "description": "One row per container, in cores (0.050 = 50m). \"Now\" is the 5-minute average; \"7-day peak\" is the highest 5-minute average of the week. \"Throttled\" is the share of CPU periods in which the container hit its limit, over 10 minutes; ContainerCPUThrottled fires above 50 % (red) for 30 minutes. Only containers with a CPU limit can be throttled.",
+                  "type": "table",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 11, "w": 24, "h": 11 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "max by (namespace, container) (rate(container_cpu_usage_seconds_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"}[5m]))",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "B",
+                      "expr": "max_over_time(max by (namespace, container) (rate(container_cpu_usage_seconds_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"}[5m]))[7d:5m])",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "C",
+                      "expr": "max by (namespace, container) (kube_pod_container_resource_requests{resource=\"cpu\", namespace=~\"$namespace\"})",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "D",
+                      "expr": "max by (namespace, container) (kube_pod_container_resource_limits{resource=\"cpu\", namespace=~\"$namespace\"})",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    },
+                    {
+                      "refId": "E",
+                      "expr": "max by (namespace, container) (rate(container_cpu_cfs_throttled_periods_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"}[10m]) / rate(container_cpu_cfs_periods_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\"}[10m]))",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    }
+                  ],
+                  "transformations": [
+                    { "id": "merge", "options": {} },
+                    {
+                      "id": "organize",
+                      "options": {
+                        "excludeByName": { "Time": true },
+                        "indexByName": { "namespace": 0, "container": 1, "Value #A": 2, "Value #B": 3, "Value #C": 4, "Value #D": 5, "Value #E": 6 },
+                        "renameByName": {
+                          "namespace": "Namespace",
+                          "container": "Container",
+                          "Value #A": "Now",
+                          "Value #B": "7-day peak",
+                          "Value #C": "Request",
+                          "Value #D": "Limit",
+                          "Value #E": "Throttled"
+                        }
+                      }
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": { "unit": "none", "decimals": 3, "noValue": "-" },
+                    "overrides": [
+                      {
+                        "matcher": { "id": "byName", "options": "Throttled" },
+                        "properties": [
+                          { "id": "unit", "value": "percentunit" },
+                          { "id": "decimals", "value": 0 },
+                          { "id": "custom.cellOptions", "value": {"type": "color-background", "mode": "basic"} },
+                          {
+                            "id": "thresholds",
+                            "value": {
+                              "mode": "absolute",
+                              "steps": [ {"value": null, "color": "green"}, {"value": 0.25, "color": "yellow"}, {"value": 0.5, "color": "red"} ]
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [{"displayName": "7-day peak", "desc": true}] }
+                },
+                {
+                  "id": 3,
+                  "title": "Memory (RSS) per container",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 22, "w": 12, "h": 11 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "max by (pod, container) (container_memory_rss{job=\"kubelet-cadvisor\", namespace=~\"$namespace\", instance=~\"$node\"})",
+                      "legendFormat": "{{pod}} / {{container}}"
+                    }
+                  ],
+                  "fieldConfig": { "defaults": {"unit": "bytes", "custom": {"fillOpacity": 0}} },
+                  "options": {
+                    "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"], "sortBy": "Max", "sortDesc": true },
+                    "tooltip": { "mode": "multi", "sort": "desc" }
+                  }
+                },
+                {
+                  "id": 4,
+                  "title": "Memory (RSS) as share of limit",
+                  "description": "Only containers with a memory limit. ContainerMemoryNearLimit fires above 90 % (red line) for 15 minutes.",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 12, "y": 22, "w": 12, "h": 11 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "max by (pod, container) (container_memory_rss{job=\"kubelet-cadvisor\", namespace=~\"$namespace\", instance=~\"$node\"} / (container_spec_memory_limit_bytes{job=\"kubelet-cadvisor\", namespace=~\"$namespace\", instance=~\"$node\"} > 0))",
+                      "legendFormat": "{{pod}} / {{container}}"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "percentunit",
+                      "min": 0,
+                      "custom": { "fillOpacity": 0, "thresholdsStyle": {"mode": "line"} },
+                      "thresholds": { "mode": "absolute", "steps": [{"value": null, "color": "transparent"}, {"value": 0.9, "color": "red"}] }
+                    }
+                  },
+                  "options": {
+                    "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull", "max"], "sortBy": "Max", "sortDesc": true },
+                    "tooltip": { "mode": "multi", "sort": "desc" }
+                  }
+                },
+                {
+                  "id": 5,
+                  "title": "CPU usage per container (cores)",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 33, "w": 12, "h": 11 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "max by (pod, container) (rate(container_cpu_usage_seconds_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\", instance=~\"$node\"}[$__rate_interval]))",
+                      "legendFormat": "{{pod}} / {{container}}"
+                    }
+                  ],
+                  "fieldConfig": { "defaults": {"unit": "none", "decimals": 3, "min": 0, "custom": {"fillOpacity": 0}} },
+                  "options": {
+                    "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true },
+                    "tooltip": { "mode": "multi", "sort": "desc" }
+                  }
+                },
+                {
+                  "id": 6,
+                  "title": "CPU throttling",
+                  "description": "Share of CPU periods in which the container hit its CPU limit. Only containers with a CPU limit. ContainerCPUThrottled fires above 50 % (red line) for 30 minutes.",
+                  "type": "timeseries",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 12, "y": 33, "w": 12, "h": 11 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "max by (pod, container) (rate(container_cpu_cfs_throttled_periods_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\", instance=~\"$node\"}[5m]) / rate(container_cpu_cfs_periods_total{job=\"kubelet-cadvisor\", namespace=~\"$namespace\", instance=~\"$node\"}[5m]))",
+                      "legendFormat": "{{pod}} / {{container}}"
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": {
+                      "unit": "percentunit",
+                      "min": 0,
+                      "max": 1,
+                      "custom": { "fillOpacity": 0, "thresholdsStyle": {"mode": "line"} },
+                      "thresholds": { "mode": "absolute", "steps": [{"value": null, "color": "transparent"}, {"value": 0.5, "color": "red"}] }
+                    }
+                  },
+                  "options": {
+                    "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"], "sortBy": "Max", "sortDesc": true },
+                    "tooltip": { "mode": "multi", "sort": "desc" }
+                  }
+                },
+                {
+                  "id": 7,
+                  "title": "Restarts in the selected time range",
+                  "description": "Containers that restarted in the time range picked above, with the reason of their last termination (OOMKilled = ran out of memory).",
+                  "type": "table",
+                  "datasource": "Prometheus",
+                  "gridPos": { "x": 0, "y": 44, "w": 24, "h": 8 },
+                  "targets": [
+                    {
+                      "refId": "A",
+                      "expr": "round(sum by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total{namespace=~\"$namespace\"}[$__range])) > 0) * on (namespace, pod, container) group_left (reason) max by (namespace, pod, container, reason) (kube_pod_container_status_last_terminated_reason{namespace=~\"$namespace\"} == 1)",
+                      "format": "table",
+                      "instant": true,
+                      "range": false
+                    }
+                  ],
+                  "transformations": [
+                    {
+                      "id": "organize",
+                      "options": {
+                        "excludeByName": { "Time": true },
+                        "indexByName": { "namespace": 0, "pod": 1, "container": 2, "reason": 3, "Value": 4 },
+                        "renameByName": { "namespace": "Namespace", "pod": "Pod", "container": "Container", "reason": "Last termination", "Value": "Restarts" }
+                      }
+                    }
+                  ],
+                  "fieldConfig": {
+                    "defaults": { "unit": "none", "decimals": 0, "noValue": "No restarts" },
+                    "overrides": [
+                      {
+                        "matcher": { "id": "byName", "options": "Last termination" },
+                        "properties": [
+                          { "id": "mappings", "value": [{"type": "value", "options": {"OOMKilled": {"color": "red"}}}] },
+                          { "id": "custom.cellOptions", "value": {"type": "color-text"} },
+                          { "id": "thresholds", "value": {"mode": "absolute", "steps": [{"value": null, "color": "text"}]} }
+                        ]
+                      }
+                    ]
+                  },
+                  "options": { "showHeader": true, "cellHeight": "sm", "sortBy": [{"displayName": "Restarts", "desc": true}] }
                 }
               ]
             }
