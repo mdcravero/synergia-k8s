@@ -12,7 +12,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: grafana-labs
-      version: 1.14.4
+      version: 1.16.0
   interval: 5m
   timeout: 10m
   releaseName: alloy
