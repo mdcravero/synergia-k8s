@@ -117,7 +117,6 @@ See [security/authelia/README.md](bootstrap/kubernetes/apps/security/authelia/RE
 | PostgreSQL | Shared database (see below) |
 | Valkey | Redis-compatible cache (primary + replicas) |
 | Home Assistant | Home automation; the recorder stores history in PostgreSQL |
-| n8n | Workflow automation |
 | Mosquitto | MQTT broker |
 | Zigbee2MQTT | Zigbee bridge |
 | Homarr | Homelab dashboard |
@@ -259,7 +258,7 @@ Renovate PR to Telegram.
 | Rule | Packages | Schedule | Auto-merge |
 |---|---|---|---|
 | Default | Everything not listed below | Mondays before 9 AM (ART) | Patch and digest |
-| Frequent releases | n8n, Home Assistant, Traefik | Any time | Patch (n8n, HA) |
+| Frequent releases | Home Assistant, Traefik | Any time | Patch (HA) |
 | Media stack | Jellyfin, *arr apps, Seerr, Maintainerr, Transmission | Mondays, one grouped PR | No |
 | OpenClaw | `ghcr.io/openclaw/openclaw` | Any time | No |
 | Zigbee2MQTT | `ghcr.io/koenkk/zigbee2mqtt` | Any time | No |
@@ -291,7 +290,7 @@ bootstrap/kubernetes/apps/
 │   └── longhorn/       # Helm release + recurring backup job
 ├── security/authelia/
 ├── monitoring/         # prometheus, grafana, loki-stack, goldilocks
-├── tools/              # postgresql, valkey, homeassistant, n8n, mosquitto,
+├── tools/              # postgresql, valkey, homeassistant, mosquitto,
 │                       # zigbee2mqtt, homarr, homebox, couchdb, renovate, backup
 ├── agents/openclaw/
 ├── media/              # jellyfin, jellyseerr, *arr apps, sabnzbd, transmission_*
@@ -336,7 +335,7 @@ apps (media)      ← apps-authelia + apps-storage + apps-traefik-middlewares
 # Flux
 flux get kustomizations
 flux reconcile kustomization apps --with-source
-flux reconcile helmrelease n8n -n tools --force
+flux reconcile helmrelease homarr -n tools --force
 
 # Resource usage
 kubectl top nodes

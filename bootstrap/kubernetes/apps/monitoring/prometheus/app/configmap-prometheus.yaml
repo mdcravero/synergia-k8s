@@ -832,7 +832,7 @@ data:
                   instance: "tools/postgres-cluster"
                 annotations:
                   summary: "postgres-cluster Service does not point at the Postgres pod"
-                  description: "The endpoint address is '{{ $labels.address }}' (empty means no endpoint), and no postgres-cluster pod has that IP. Every app that uses Postgres (Authelia, n8n, Homebox, Home Assistant) times out, and Authelia down means SSO is down. Compare kubectl get endpoints -n tools postgres-cluster with kubectl get pod -n tools postgres-cluster-0 -o wide. Patching the endpoint does not stick, because Patroni rewrites it. Recreate the pod so it starts with a fresh POD_IP: kubectl delete pod -n tools postgres-cluster-0 (short DB outage)."
+                  description: "The endpoint address is '{{ $labels.address }}' (empty means no endpoint), and no postgres-cluster pod has that IP. Every app that uses Postgres (Authelia, Homebox, Home Assistant, the finance apps) times out, and Authelia down means SSO is down. Compare kubectl get endpoints -n tools postgres-cluster with kubectl get pod -n tools postgres-cluster-0 -o wide. Patching the endpoint does not stick, because Patroni rewrites it. Recreate the pod so it starts with a fresh POD_IP: kubectl delete pod -n tools postgres-cluster-0 (short DB outage)."
               # The HA recorder gives up after ~10 failed connection attempts at
               # startup and never retries, so HA keeps running with no history.
               # After the 2026-10-02 power cut HA started before Postgres was

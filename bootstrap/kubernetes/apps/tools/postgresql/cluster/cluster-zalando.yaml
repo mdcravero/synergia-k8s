@@ -27,8 +27,6 @@ spec:
       - login
     ha-user:
       - login
-    n8n:
-      - login
     bot_user:
       - login
 
@@ -36,7 +34,6 @@ spec:
     - authelia_user
     - homebox
     - ha-user
-    - n8n
     - bot_user
   #  usersWithSecretRotation:
   #  - foo_user
@@ -55,7 +52,6 @@ spec:
     authelia: authelia_user
     homebox: homebox
     homeassistant: ha-user
-    n8n: n8n
     bot_memory: bot_user
 
   # Finance MaFi: owner/reader/writer roles + login users (finance_mafi_owner_user runs migrations,
