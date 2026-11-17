@@ -115,7 +115,6 @@ See [security/authelia/README.md](bootstrap/kubernetes/apps/security/authelia/RE
 | App | Purpose |
 |---|---|
 | PostgreSQL | Shared database (see below) |
-| Valkey | Redis-compatible cache (primary + replicas) |
 | Home Assistant | Home automation; the recorder stores history in PostgreSQL |
 | Mosquitto | MQTT broker |
 | Zigbee2MQTT | Zigbee bridge |
@@ -290,10 +289,11 @@ bootstrap/kubernetes/apps/
 │   └── longhorn/       # Helm release + recurring backup job
 ├── security/authelia/
 ├── monitoring/         # prometheus, grafana, loki-stack, goldilocks
-├── tools/              # postgresql, valkey, homeassistant, mosquitto,
-│                       # zigbee2mqtt, homarr, homebox, couchdb, renovate, backup
+├── tools/              # postgresql, homeassistant, mosquitto, zigbee2mqtt,
+│                       # homarr, homebox, couchdb, renovate, backup,
+│                       # transmission_* (deployed to the media namespace)
 ├── agents/openclaw/
-├── media/              # jellyfin, jellyseerr, *arr apps, sabnzbd, transmission_*
+├── media/              # jellyfin, jellyseerr, *arr apps, sabnzbd
 └── declarations/       # Entry point of the `apps` Kustomization (media)
 ```
 
