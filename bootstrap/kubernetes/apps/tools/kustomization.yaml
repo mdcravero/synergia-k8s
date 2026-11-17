@@ -6,7 +6,6 @@ resources:
   - ./renovate/app
   - ./homarr/app
   - ./homeassistant/app
-  - ./n8n/app
   - ./transmission_movies/app
   - ./transmission_shows/app
   - ./transmission_music/app

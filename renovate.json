@@ -39,7 +39,7 @@
     },
     {
       "description": "Frequent releases: check as soon as detected, patches auto-merge",
-      "matchPackageNames": ["n8n", "homeassistant/home-assistant", "traefik"],
+      "matchPackageNames": ["homeassistant/home-assistant", "traefik"],
       "schedule": ["at any time"]
     },
     {
@@ -99,7 +99,7 @@
       "addLabels": ["restarts-postgres"],
       "commitMessageSuffix": "[restarts Postgres]",
       "prBodyNotes": [
-        "⚠️ **Merging this restarts Postgres.** The operator recreates `postgres-cluster-0`: about 3–6 minutes without a database, so Authelia (SSO), n8n, Homebox and the Home Assistant recorder are down too. Merge it **on its own**, not together with other PRs, at a time when that is acceptable. `PostgresqlNotResponding` will fire on Telegram and resolve by itself."
+        "⚠️ **Merging this restarts Postgres.** The operator recreates `postgres-cluster-0`: about 3–6 minutes without a database, so Authelia (SSO), Homebox, the finance apps and the Home Assistant recorder are down too. Merge it **on its own**, not together with other PRs, at a time when that is acceptable. `PostgresqlNotResponding` will fire on Telegram and resolve by itself."
       ]
     },
     {
