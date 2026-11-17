@@ -27,14 +27,11 @@ spec:
       - login
     ha-user:
       - login
-    bot_user:
-      - login
 
   usersIgnoringSecretRotation:
     - authelia_user
     - homebox
     - ha-user
-    - bot_user
   #  usersWithSecretRotation:
   #  - foo_user
   #  usersWithInPlaceSecretRotation:
@@ -52,7 +49,6 @@ spec:
     authelia: authelia_user
     homebox: homebox
     homeassistant: ha-user
-    bot_memory: bot_user
 
   # Finance MaFi: owner/reader/writer roles + login users (finance_mafi_owner_user runs migrations,
   # finance_mafi_writer_user runs the app). Their *.credentials secrets are created in the app's
