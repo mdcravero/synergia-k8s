@@ -19,7 +19,7 @@ _Last updated: 2026-10-10._
 | Auth | [Authelia](https://www.authelia.com/) (forward auth, 2FA, OIDC) |
 | Storage | NFS (default) + [Longhorn](https://longhorn.io/) 1.13 (local block storage on the worker) |
 | Database | PostgreSQL 17 via the [Zalando operator](https://github.com/zalando/postgres-operator) |
-| Observability | Prometheus + Alertmanager (Telegram), Grafana, Loki |
+| Observability | Prometheus + Alertmanager (Telegram), Grafana, Loki, Alloy |
 | Updates | Self-hosted [Renovate](https://docs.renovatebot.com/) |
 
 ## Hardware
@@ -108,6 +108,7 @@ See [security/authelia/README.md](bootstrap/kubernetes/apps/security/authelia/RE
 | Prometheus | Metrics, alert rules, Alertmanager → Telegram |
 | Grafana | Dashboards |
 | Loki + Promtail | Log aggregation (30-day retention) |
+| Alloy | Receives syslog from the Omada network gear (UDP 514 on LoadBalancer `10.42.20.45`) and sends it to Loki |
 | Goldilocks + VPA recommender | Resource request recommendations |
 
 ### Tools (`tools` namespace)
@@ -192,9 +193,10 @@ Alertmanager sends to Telegram:
 | flux | `FluxKustomizationFailed`, `FluxHelmReleaseFailed` |
 | renovate | `RenovateJobFailed`, `RenovateNoSuccessfulRun` |
 | certificates | `TalosConfigCertExpiringSoon` |
+| syslog | `AlloySyslogReceiverDown`, `OmadaSyslogParsingErrors` |
 
-Grafana dashboards: Node Exporter Full, Kubernetes cluster, PostgreSQL,
-Flux cluster stats, Node Temperatures and etcd. Its datasources are Prometheus and
+Grafana dashboards: Node Exporter Full, Pod Resources, PostgreSQL,
+Flux cluster stats, Node Temperatures, etcd and Omada Network. Its datasources are Prometheus and
 Loki.
 
 ## Backups
@@ -288,7 +290,7 @@ bootstrap/kubernetes/apps/
 │   ├── nfs-provisioner/
 │   └── longhorn/       # Helm release + recurring backup job
 ├── security/authelia/
-├── monitoring/         # prometheus, grafana, loki-stack, goldilocks
+├── monitoring/         # prometheus, grafana, loki-stack, alloy, goldilocks
 ├── tools/              # postgresql, homeassistant, mosquitto, zigbee2mqtt,
 │                       # homarr, homebox, couchdb, renovate, backup,
 │                       # transmission_* (deployed to the media namespace)
