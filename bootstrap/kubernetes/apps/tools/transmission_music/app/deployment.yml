@@ -34,10 +34,13 @@ spec:
                 - ALL
           resources:
             requests:
-              cpu: 15m
+              cpu: 50m
               memory: 112Mi
             limits:
-              cpu: 200m
+              # 2026-11-25: with 200m, downloading 9 torrents at once kept
+              # trans-shows at its limit for 9+ hours (60-90% of CFS periods
+              # throttled) and no episode finished. One core of the node.
+              cpu: 1000m
               memory: 128Mi
           ports:
             - containerPort: 9091
