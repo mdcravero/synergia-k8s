@@ -1041,6 +1041,10 @@ data:
               # its own SignalR keepalives on 2026-10-14, reconnect threads piled
               # up, and memory ran out 80 minutes later. This would have fired
               # about 50 minutes before that OOM kill.
+              # keep_firing_for: a long throttling spell hovers around the 50%
+              # line, and each dip below it sent a RESOLVED and, 30 minutes
+              # later, a new FIRING (trans-shows, 2026-11-25). Now one spell
+              # fires once and resolves 15 minutes after it really ends.
               - alert: ContainerCPUThrottled
                 expr: |
                   max by (namespace, container) (
@@ -1048,6 +1052,7 @@ data:
                       / rate(container_cpu_cfs_periods_total{job="kubelet-cadvisor"}[10m])
                   ) > 0.5
                 for: 30m
+                keep_firing_for: 15m
                 labels:
                   severity: warning
                   instance: "{{ $labels.namespace }}/{{ $labels.container }}"
