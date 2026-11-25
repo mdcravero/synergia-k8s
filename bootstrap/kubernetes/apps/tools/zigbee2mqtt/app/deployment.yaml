@@ -81,7 +81,7 @@ spec:
           # "online" bridge/state after a restart, leaving every HA
           # entity availability-linked to it stuck "unavailable" even
           # though the bridge is actually up and publishing. Force it.
-          image: eclipse-mosquitto:2.0.22
+          image: eclipse-mosquitto:2.0.23
           command:
             - sh
             - -c

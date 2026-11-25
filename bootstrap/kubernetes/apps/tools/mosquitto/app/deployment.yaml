@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: init-config
-          image: eclipse-mosquitto:2.0.22
+          image: eclipse-mosquitto:2.0.23
           securityContext:
             runAsUser: 1000
             runAsGroup: 1000
@@ -56,7 +56,7 @@ spec:
               mountPath: /mosquitto/config
       containers:
         - name: mosquitto
-          image: eclipse-mosquitto:2.0.22
+          image: eclipse-mosquitto:2.0.23
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
