@@ -1,0 +1,226 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-logs-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    # Pod log collector: one Alloy per node, tailing that node's container
+    # logs under /var/log/pods and pushing them to Loki. It replaces
+    # promtail (loki-stack), which reached end of life on 2026-03-02. The
+    # Omada syslog receiver is a separate release (../../alloy) on purpose:
+    # it has no Kubernetes API access and is pinned to the node MetalLB
+    # announces from, while this one needs the host's log files.
+    alloy:
+      configMap:
+        content: |
+          logging {
+            level  = "info"
+            format = "logfmt"
+          }
+
+          // Pods on this node only: every DaemonSet pod tails its own node's
+          // files, as promtail did.
+          discovery.kubernetes "pods" {
+            role = "pod"
+            selectors {
+              role  = "pod"
+              field = "spec.nodeName=" + sys.env("NODE_NAME")
+            }
+          }
+
+          // Same labels as promtail's kubernetes-pods job in loki-stack, so
+          // saved queries and dashboards keep working: app, instance,
+          // component, node_name, namespace, pod, container and job
+          // (namespace/app). The stream label comes from stage.cri below;
+          // filename is dropped there too.
+          discovery.relabel "pods" {
+            targets = discovery.kubernetes.pods.targets
+
+            rule {
+              source_labels = ["__meta_kubernetes_pod_controller_name"]
+              regex         = "([0-9a-z-.]+?)(-[0-9a-f]{8,10})?"
+              target_label  = "__tmp_controller_name"
+            }
+            rule {
+              source_labels = [
+                "__meta_kubernetes_pod_label_app_kubernetes_io_name",
+                "__meta_kubernetes_pod_label_app",
+                "__tmp_controller_name",
+                "__meta_kubernetes_pod_name",
+              ]
+              regex        = "^;*([^;]+)(;.*)?$"
+              target_label = "app"
+            }
+            rule {
+              source_labels = [
+                "__meta_kubernetes_pod_label_app_kubernetes_io_instance",
+                "__meta_kubernetes_pod_label_instance",
+              ]
+              regex        = "^;*([^;]+)(;.*)?$"
+              target_label = "instance"
+            }
+            rule {
+              source_labels = [
+                "__meta_kubernetes_pod_label_app_kubernetes_io_component",
+                "__meta_kubernetes_pod_label_component",
+              ]
+              regex        = "^;*([^;]+)(;.*)?$"
+              target_label = "component"
+            }
+            rule {
+              source_labels = ["__meta_kubernetes_pod_node_name"]
+              target_label  = "node_name"
+            }
+            rule {
+              source_labels = ["__meta_kubernetes_namespace"]
+              target_label  = "namespace"
+            }
+            rule {
+              source_labels = ["namespace", "app"]
+              separator     = "/"
+              target_label  = "job"
+            }
+            rule {
+              source_labels = ["__meta_kubernetes_pod_name"]
+              target_label  = "pod"
+            }
+            rule {
+              source_labels = ["__meta_kubernetes_pod_container_name"]
+              target_label  = "container"
+            }
+            rule {
+              source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+              separator     = "/"
+              replacement   = "/var/log/pods/*$1/*.log"
+              target_label  = "__path__"
+            }
+            // Static pods (Talos runs the control plane as static pods) log
+            // under their config hash instead of the mirror pod's UID.
+            rule {
+              source_labels = [
+                "__meta_kubernetes_pod_annotationpresent_kubernetes_io_config_hash",
+                "__meta_kubernetes_pod_annotation_kubernetes_io_config_hash",
+                "__meta_kubernetes_pod_container_name",
+              ]
+              separator    = "/"
+              regex        = "true/(.*)"
+              replacement  = "/var/log/pods/*$1/*.log"
+              target_label = "__path__"
+            }
+          }
+
+          local.file_match "pods" {
+            path_targets = discovery.relabel.pods.output
+          }
+
+          // Positions live on a hostPath (see storagePath below), so a
+          // restarted pod resumes where it stopped. A file it has never seen
+          // starts at the end: the first rollout does not re-send every
+          // existing log line.
+          loki.source.file "pods" {
+            targets       = local.file_match.pods.targets
+            tail_from_end = true
+            forward_to    = [loki.process.pods.receiver]
+          }
+
+          loki.process "pods" {
+            stage.cri {}
+
+            // Ported from promtail's pipeline in loki-stack: blank the
+            // credentials passed in URLs before they reach Loki. Homarr
+            // polled Sonarr and Radarr with ?apikey=<key>, and Traefik's
+            // access log stores the full RequestPath. [^&"\\\s] also stops
+            // at the backslash of &, Go's JSON escape for "&".
+            stage.replace {
+              expression = `(?i)(?:api[_-]?key|access[_-]?token|api[_-]?token|x-plex-token|token)=([^&"\\\s]+)`
+              replace    = "REDACTED"
+            }
+
+            // loki.source.file adds the file path as a label. It only
+            // repeats pod and container, so it is not stored.
+            stage.label_drop {
+              values = ["filename"]
+            }
+
+            forward_to = [loki.write.default.receiver]
+          }
+
+          loki.write "default" {
+            endpoint {
+              url = "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+            }
+          }
+
+      # No anonymous usage reports to Grafana Labs.
+      enableReporting: false
+
+      # On the host (volume below), so positions survive pod restarts.
+      storagePath: /var/lib/alloy
+
+      # discovery.kubernetes selects this node's pods by name.
+      extraEnv:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+
+      mounts:
+        extra:
+          - name: pod-logs
+            mountPath: /var/log/pods
+            readOnly: true
+          - name: storage
+            mountPath: /var/lib/alloy
+
+      # The kubelet writes pod logs as root with mode 0640, so Alloy reads
+      # them as root, like promtail did. Every capability is still dropped
+      # and the root filesystem stays read-only.
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+
+      # No CPU limit, as elsewhere in the repo: Go bursts get throttled.
+      resources:
+        requests:
+          cpu: 20m
+          memory: 96Mi
+        limits:
+          memory: 256Mi
+
+    controller:
+      type: daemonset
+      # Run on the control planes too: they run workloads here, and their
+      # static pods (etcd, apiserver) log there.
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      volumes:
+        extra:
+          - name: pod-logs
+            hostPath:
+              path: /var/log/pods
+          - name: storage
+            hostPath:
+              path: /var/lib/alloy-logs
+              type: DirectoryOrCreate
+
+    # The chart's default ClusterRole reads every Secret and ConfigMap in the
+    # cluster. rbac.yaml grants only what discovery.kubernetes needs.
+    rbac:
+      create: false
+    serviceAccount:
+      create: true
+
+    # Internal only: the web UI on this port has no authentication.
+    service:
+      type: ClusterIP
