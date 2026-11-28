@@ -1759,3 +1759,17 @@ data:
           name: loki-home
           type: loki
           url: http://loki-stack:3100
+        # Loki 3 (monitoring/loki), queryable side by side with loki-home
+        # while both run. At the cutover loki-home moves to this URL (its
+        # name, and so its uid and the dashboards that use it, stay) and
+        # this entry goes away.
+        - access: proxy
+          basicAuth: false
+          isDefault: false
+          jsonData:
+            maxLines: 1000
+            timeout: 60
+          name: loki-next
+          uid: loki-next
+          type: loki
+          url: http://loki.monitoring.svc.cluster.local:3100

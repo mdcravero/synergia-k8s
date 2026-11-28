@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - ./grafana/app
   - ./loki-stack/app
+  - ./loki/app
+  - ./alloy-logs/app
   - ./prometheus/app
   - ./goldilocks/app
   - ./alloy/app

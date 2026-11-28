@@ -1,0 +1,124 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-values
+  namespace: monitoring
+data:
+  values.yaml: |
+    # Loki 3 as a single binary, replacing loki-stack (Loki 2.9.3, chart
+    # deprecated). Pod logs come from alloy-logs and the Omada syslog from
+    # alloy. Until the cutover both Loki instances run side by side; the old
+    # one stays queryable as loki-legacy for its 30 days of history.
+    deploymentMode: SingleBinary
+
+    loki:
+      auth_enabled: false
+
+      # The chart pins an older 3.6 patch here; null falls back to the
+      # chart's appVersion, so a chart bump from Renovate also moves Loki.
+      image:
+        tag: null
+
+      commonConfig:
+        replication_factor: 1
+
+      storage:
+        type: filesystem
+
+      # TSDB index on the local filesystem. A fresh store, so the schema
+      # starts before the first write.
+      schemaConfig:
+        configs:
+          - from: "2026-11-01"
+            store: tsdb
+            object_store: filesystem
+            schema: v13
+            index:
+              prefix: index_
+              period: 24h
+
+      limits_config:
+        retention_period: 720h
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+        max_query_parallelism: 4
+        max_entries_limit_per_query: 5000
+        volume_enabled: true
+
+      # Retention is applied by the compactor; delete requests stay local.
+      compactor:
+        retention_enabled: true
+        delete_request_store: filesystem
+
+      # No memcached here (chunksCache and resultsCache are off below), so
+      # repeated dashboard queries use an in-process results cache.
+      query_range:
+        cache_results: true
+        results_cache:
+          cache:
+            embedded_cache:
+              enabled: true
+              max_size_mb: 100
+
+      # No anonymous usage reports to Grafana Labs.
+      analytics:
+        reporting_enabled: false
+
+    singleBinary:
+      replicas: 1
+      # Longhorn volumes can only attach on synergia-05 (the Longhorn data
+      # disk and engine live there), like OpenClaw's and Jellyfin's.
+      nodeSelector:
+        type: wk-amd
+      persistence:
+        enabled: true
+        storageClass: longhorn
+        size: 10Gi
+        # Keep the logs if the release or the StatefulSet goes away.
+        whenDeleted: Retain
+        whenScaled: Retain
+        enableStatefulSetAutoDeletePVC: false
+      # Roughly 250 MB of raw logs a day (2026-11-28); Loki 2.9 needed far
+      # more only because of boltdb-shipper on NFS.
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+
+    # Simple scalable and distributed components: not used in SingleBinary.
+    read:
+      replicas: 0
+    write:
+      replicas: 0
+    backend:
+      replicas: 0
+
+    # Alloy pushes straight to the Loki service; no nginx gateway, caches,
+    # canary, chart test pod or MinIO.
+    gateway:
+      enabled: false
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+    lokiCanary:
+      enabled: false
+    test:
+      enabled: false
+    minio:
+      enabled: false
+
+    # The rules sidecar loads alerting rules from labelled ConfigMaps, and
+    # its ClusterRole reads every ConfigMap and Secret in the cluster. Log
+    # alerts are not used here (alerts come from Prometheus). Without the
+    # sidecar, Loki needs no Kubernetes API access at all: namespaced RBAC
+    # with the sidecar off renders neither a Role nor a ClusterRole.
+    sidecar:
+      rules:
+        enabled: false
+    rbac:
+      namespaced: true
+    serviceAccount:
+      automountServiceAccountToken: false

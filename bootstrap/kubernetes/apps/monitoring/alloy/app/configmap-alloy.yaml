@@ -6,10 +6,9 @@ metadata:
 data:
   values.yaml: |
     # Receives syslog from the Omada network gear (gateway, switches, access
-    # point) and the Omada controller, and ships it to Loki. Pod logs
-    # still go through promtail (loki-stack), which reached end of life on
-    # 2026-03-02; Alloy is its replacement, so this is the first step of
-    # moving off it.
+    # point) and the Omada controller, and ships it to Loki. Pod logs are
+    # collected by the separate alloy-logs release (../../alloy-logs), which
+    # replaces promtail.
     alloy:
       configMap:
         content: |
@@ -104,9 +103,15 @@ data:
             }
           }
 
+          // Every line goes to both Lokis while they run side by side:
+          // loki-stack (2.9, being retired) and loki (3.x). The cutover drops
+          // the first endpoint.
           loki.write "default" {
             endpoint {
               url = "http://loki-stack.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+            }
+            endpoint {
+              url = "http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
             }
           }
 

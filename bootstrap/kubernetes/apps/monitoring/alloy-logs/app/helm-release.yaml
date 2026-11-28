@@ -1,0 +1,32 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alloy-logs
+  namespace: monitoring
+spec:
+  chart:
+    spec:
+      chart: alloy
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        # Defined in ../../alloy/app/helm-source.yaml.
+        name: grafana-labs
+      version: 1.16.0
+  interval: 5m
+  timeout: 10m
+  releaseName: alloy-logs
+  install:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+      strategy: rollback
+  valuesFrom:
+    - kind: ConfigMap
+      name: alloy-logs-values
+      valuesKey: values.yaml
