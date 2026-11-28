@@ -91,6 +91,12 @@ data:
           "canvas",         // experimental rendering for paired nodes
           "talk-voice",     // Telegram is used as text only
           "deep-research",  // new in 2026.11.10, on by default; unused here
+          // On by default since 2026.11.x. The agent writes its own "learned
+          // skills", which bypass the agents.defaults.skills allowlist below,
+          // and background reviews and a daily "skill diet" spend extra model
+          // calls on a tight free-tier quota. Needs the meta marker at the
+          // end of this file, or the deny entry is ignored.
+          "skill-workshop",
         ],
       },
 
@@ -169,5 +175,18 @@ data:
             ],
           },
         }
-      }
+      },
+
+      // Releases from 2026.10.1 ignored skill-workshop plugin policy, so
+      // 2026.11.x keeps ignoring a skill-workshop deny entry, and Doctor
+      // deletes it, until the config carries this marker. Doctor would write
+      // it into the runtime copy, but the copy-config init container replaces
+      // that copy from this ConfigMap on every start, so the marker lives
+      // here. See docs/gateway/doctor/config-migrations.md, "Skill Workshop
+      // plugin policy".
+      meta: {
+        migrations: {
+          skillWorkshopPlugin: true,
+        },
+      },
     }
