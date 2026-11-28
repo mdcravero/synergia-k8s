@@ -16,6 +16,17 @@ spec:
       version: 42.4.3
   interval: 1h
   releaseName: traefik
+  # Helm installs the chart's CRDs (traefik.io and hub.traefik.io) but never
+  # updates them, and helm-controller's default upgrade policy is Skip.
+  # Chart majors such as v43 ship CRD changes that the new Traefik relies on,
+  # so CreateReplace applies them before each upgrade, like the chart README
+  # asks for. It only touches the files in the chart's crds/ directory; the
+  # Gateway API CRDs that older charts installed are no longer there and stay
+  # as they are. Longhorn uses the same policy.
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   valuesFrom:
     - kind: ConfigMap
       name: traefik-values
