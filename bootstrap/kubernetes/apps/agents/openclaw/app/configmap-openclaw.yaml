@@ -14,6 +14,13 @@ data:
         },
         controlUi: {
           allowedOrigins: ["https://openclaw.synergia.net.ar"],
+          // 2026.11.x defaults native browser UI from user-installed plugins
+          // (Groq is one) to on; that UI runs with the signed-in viewer's
+          // Gateway authority. Nothing here uses it. Bundled views are
+          // unaffected.
+          experimental: {
+            customPlugins: false,
+          },
         },
         // Since 2026.9.x the gateway rejects requests that carry X-Forwarded-*
         // headers unless they arrive from a trusted proxy ("Proxy client
@@ -29,6 +36,17 @@ data:
         // forwarded request to loopback, so a forged header cannot claim local
         // trust, and token auth still applies.
         trustedProxies: ["127.0.0.1"],
+      },
+
+      // 2026.11.x defaults collaborative steering to on: another admitted
+      // participant's message can join the running turn under the original
+      // requester's identity and permissions. Only the owner is admitted on
+      // Telegram today (allowFrom / groupAllowFrom), so this is a guard for
+      // later. With false, another person's message queues as their own turn.
+      messages: {
+        queue: {
+          allowCollaborativeSteering: false,
+        },
       },
 
       commands: {
@@ -72,6 +90,7 @@ data:
           "browser",        // headless browsing; no skill here needs it
           "canvas",         // experimental rendering for paired nodes
           "talk-voice",     // Telegram is used as text only
+          "deep-research",  // new in 2026.11.10, on by default; unused here
         ],
       },
 

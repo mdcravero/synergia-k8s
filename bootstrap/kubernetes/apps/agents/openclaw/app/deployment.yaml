@@ -55,12 +55,14 @@ spec:
         # The runtime PVC keeps it across restarts, so this is a no-op once
         # installed; it only does work when the PVC starts empty. Non-blocking:
         # if npm is unreachable the gateway still starts and falls back to Google.
+        # Since 2026.11.x a bare package name installs from ClawHub; the npm:
+        # prefix keeps the npm registry as the source.
         - name: install-plugins
           image: ghcr.io/openclaw/openclaw:2026.11.10
           command:
             - sh
             - -c
-            - "ls -d /etc/openclaw/npm/projects/*groq* >/dev/null 2>&1 || node /app/openclaw.mjs plugins install @openclaw/groq-provider || true"
+            - "ls -d /etc/openclaw/npm/projects/*groq* >/dev/null 2>&1 || node /app/openclaw.mjs plugins install npm:@openclaw/groq-provider || true"
           volumeMounts:
             - name: openclaw-runtime
               mountPath: /etc/openclaw
