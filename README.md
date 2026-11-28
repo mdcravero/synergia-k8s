@@ -108,7 +108,6 @@ See [security/authelia/README.md](bootstrap/kubernetes/apps/security/authelia/RE
 | Prometheus | Metrics, alert rules, Alertmanager → Telegram |
 | Grafana | Dashboards |
 | Loki + Promtail | Log aggregation (30-day retention) |
-| Goldilocks + VPA recommender | Resource request recommendations |
 
 ### Tools (`tools` namespace)
 
@@ -288,7 +287,7 @@ bootstrap/kubernetes/apps/
 │   ├── nfs-provisioner/
 │   └── longhorn/       # Helm release + recurring backup job
 ├── security/authelia/
-├── monitoring/         # prometheus, grafana, loki-stack, goldilocks
+├── monitoring/         # prometheus, grafana, loki, alloy, alloy-logs, loki-stack
 ├── tools/              # postgresql, homeassistant, mosquitto, zigbee2mqtt,
 │                       # homarr, homebox, couchdb, renovate, backup,
 │                       # transmission_* (deployed to the media namespace)

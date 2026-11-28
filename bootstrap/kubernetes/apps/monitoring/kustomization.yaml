@@ -6,5 +6,4 @@ resources:
   - ./loki/app
   - ./alloy-logs/app
   - ./prometheus/app
-  - ./goldilocks/app
   - ./alloy/app
