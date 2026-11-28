@@ -143,9 +143,14 @@ spec:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9187"
     prometheus.io/path: "/metrics"
+  # MetalLB 0.16 deprecates the metallb.universe.tf/ prefix and warns on
+  # every reconcile. The operator only merge-patches Service annotations, so
+  # it never removes a key dropped from this list: when one is renamed or
+  # removed, delete the old key from the Service by hand
+  # (kubectl annotate svc postgres-cluster <key>-).
   serviceAnnotations:
-    metallb.universe.tf/address-pool: main-pool
-    metallb.universe.tf/loadBalancerIPs: 10.42.20.70
+    metallb.io/address-pool: main-pool
+    metallb.io/loadBalancerIPs: 10.42.20.70
   #  podPriorityClassName: "spilo-pod-priority"
   #  tolerations:
   #  - key: postgres
