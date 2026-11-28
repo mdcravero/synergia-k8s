@@ -109,10 +109,6 @@ data:
             policy: one_factor
             subject:
               - group:admins
-          - domain: goldilocks.synergia.net.ar
-            policy: one_factor
-            subject:
-              - group:admins
           - domain: zigbee2mqtt.synergia.net.ar
             policy: one_factor
             subject:

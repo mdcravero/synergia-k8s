@@ -5,7 +5,6 @@ resources:
   - middleware-homebox.yaml
   - middleware-authelia-monitoring.yaml
   - middleware-authelia-maintainerr.yaml
-  - middleware-authelia-goldilocks.yaml
   - middleware-authelia-zigbee2mqtt.yaml
   - middleware-authelia-openclaw.yaml
   - middleware-authelia-sabnzbd.yaml
