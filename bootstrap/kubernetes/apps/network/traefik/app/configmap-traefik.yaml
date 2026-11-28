@@ -30,6 +30,17 @@ data:
     additionalArguments:
       - "--api.insecure=false"
       - "--api.dashboard=true"
+      # Traefik 3.8 warns about both settings below until they are explicit.
+      # Drop request headers whose names alias another header (Remote_User,
+      # Remote.User for Remote-User). ForwardAuth only manages the canonical
+      # Remote-* headers it sets from Authelia, so a backend that normalizes
+      # header names could otherwise read a client-forged identity. Applies
+      # to every entry point (web, websecure, traefik).
+      - "--global.aliasHeadersStrategy=delete"
+      # Keep the legacy router/service names: they are the labels in the
+      # Traefik metrics and dashboards, and Ingress annotations reference
+      # middlewares as namespace-name@kubernetescrd. true would rename them.
+      - "--providers.kubernetescrd.safeNaming=false"
 
     providers:
       kubernetesCRD: 
