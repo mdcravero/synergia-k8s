@@ -48,7 +48,7 @@ Patroni `4.0.4`.
 - **The Service is updated in place.** `compareServices` detects the selector
   difference, and `updateService` (`pkg/cluster/resources.go`) does an
   `Update` rather than a delete. The LoadBalancer IP `10.42.20.70` is also
-  pinned by the `metallb.universe.tf/loadBalancerIPs` annotation.
+  pinned by the `metallb.io/loadBalancerIPs` annotation.
 - **The manual env var has to go.** The operator adds
   `KUBERNETES_USE_CONFIGMAPS=true`, but the cluster's own `spec.env` is
   appended after it and overrides it. So `PATRONI_KUBERNETES_USE_ENDPOINTS=true`
